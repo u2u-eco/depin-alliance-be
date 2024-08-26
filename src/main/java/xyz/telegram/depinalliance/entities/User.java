@@ -2,6 +2,7 @@ package xyz.telegram.depinalliance.entities;
 
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
+import xyz.telegram.depinalliance.common.constans.Enums;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ public class User extends BaseEntity {
   public String username;
   @Column(name = "point", scale = 18, precision = 29)
   public BigDecimal point = BigDecimal.ZERO;
+  @Column(name = "point_un_claimed", scale = 18, precision = 29)
+  public BigDecimal pointUnClaimed = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
   public BigDecimal xp = BigDecimal.ZERO;
   @Column(name = "mining_power", scale = 18, precision = 29)
@@ -41,6 +44,10 @@ public class User extends BaseEntity {
   public Long startCheckIn = 0L;
   @Column(name = "end_check_in")
   public Long endCheckIn = 0L;
+  @Column
+  public String avatar;
+  @Column
+  public Enums.UserStatus status;
 
   public static User createUser(User user) {
     user.create();
@@ -53,7 +60,7 @@ public class User extends BaseEntity {
     return find("code", code).firstResult();
   }
 
-  public static int updateAccount(String query, Map<String, Object> params) {
+  public static int updateUser(String query, Map<String, Object> params) {
     return update(query, params);
   }
 
@@ -61,7 +68,7 @@ public class User extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("point", point);
-    return updateAccount("point = point + :point where id = :id and point + :point >=0", params);
+    return updateUser("point = point + :point where id = :id and point + :point >=0", params);
   }
 
 }

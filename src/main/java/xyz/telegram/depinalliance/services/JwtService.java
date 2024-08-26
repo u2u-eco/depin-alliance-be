@@ -14,8 +14,8 @@ public class JwtService {
   @ConfigProperty(name = "login.time-out")
   long timeOut;
 
-  public String generateToken(String telegramId) {
+  public String generateToken(String telegramId, String username) {
     return Jwt.upn(telegramId).expiresAt(System.currentTimeMillis() / 1000L + timeOut).issuedAt(Instant.now())
-      .preferredUserName(telegramId).sign();
+      .preferredUserName(telegramId).claim("username", username).sign();
   }
 }

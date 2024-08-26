@@ -24,7 +24,7 @@ public class StartCommand extends BotCommand {
   @Override
   public void execute(TelegramClient telegramClient, User user, Chat chat, String[] strings) {
     StringBuilder messageBuilder = new StringBuilder();
-    String userName = user.getFirstName() + " " + user.getLastName();
+    String userName = user.getUserName();
     String refCode = "";
     if (strings != null && strings.length > 0) {
       refCode = strings[0];

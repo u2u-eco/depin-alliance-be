@@ -16,17 +16,16 @@ public class SystemConfig extends PanacheEntityBase {
   public Integer id;
   public String value;
 
-  public SystemConfig(Integer id, String value) {
-    this.id = id;
+  public SystemConfig(Enums.Config config, String value) {
+    this.id = config.getType();
     this.value = value;
   }
 
   public SystemConfig() {
   }
 
-  public static <T> T findByKey(Enums.Config config) {
+  public static String findByKey(Enums.Config config) {
     SystemConfig systemConfig = findById(config.getType());
-
-    return systemConfig != null ? (T) systemConfig.value : null;
+    return systemConfig != null ? systemConfig.value : null;
   }
 }

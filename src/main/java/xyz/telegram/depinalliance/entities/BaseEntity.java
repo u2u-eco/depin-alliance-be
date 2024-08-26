@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import xyz.telegram.depinalliance.common.utils.Utils;
 
 import java.io.Serializable;
 
@@ -21,14 +22,14 @@ public class BaseEntity extends PanacheEntityBase implements Serializable {
   public long updatedAt;
 
   public BaseEntity create() {
-    long time = System.currentTimeMillis();
+    long time = Utils.getCalendar().getTimeInMillis();
     createdAt = time;
     updatedAt = time;
     return this;
   }
 
   public BaseEntity update() {
-    updatedAt = System.currentTimeMillis();
+    updatedAt = Utils.getCalendar().getTimeInMillis();
     return this;
   }
 }
