@@ -75,6 +75,14 @@ public class Utils {
     return utcTime;
   }
 
+  public static Calendar getNewDay() {
+    Calendar calendar = getCalendar();
+    calendar.set(Calendar.HOUR_OF_DAY, 0);
+    calendar.set(Calendar.MINUTE, 0);
+    calendar.set(Calendar.SECOND, 0);
+    return calendar;
+  }
+
   public static BigDecimal stripDecimalZeros(BigDecimal value) {
     if (value == null)
       return null;

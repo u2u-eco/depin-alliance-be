@@ -37,13 +37,13 @@ public class User extends BaseEntity {
   @Column(unique = true)
   public String code;
   @Column(name = "time_start_mining")
-  public Long timeStartMining = 0L;
+  public long timeStartMining = 0L;
   @Column(name = "last_login_time")
-  public Long lastLoginTime = 0L;
+  public long lastLoginTime = 0L;
   @Column(name = "start_check_in")
-  public Long startCheckIn = 0L;
-  @Column(name = "end_check_in")
-  public Long endCheckIn = 0L;
+  public long startCheckIn = 0L;
+  @Column(name = "last_check_in")
+  public long lastCheckIn = 0L;
   @Column
   public String avatar;
   @Column

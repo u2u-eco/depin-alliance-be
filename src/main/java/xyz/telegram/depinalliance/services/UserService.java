@@ -139,6 +139,21 @@ public class UserService {
   }
 
   @Transactional
+  public BigDecimal changeMiningPower(User user, BigDecimal miningPower) throws Exception {
+    synchronized (user.id.toString().intern()) {
+      if (user.status != Enums.UserStatus.MINING) {
+        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+      }
+      mining(user);
+      Map<String, Object> paramsUser = new HashMap<>();
+      paramsUser.put("id", user.id);
+      paramsUser.put("miningPower", miningPower);
+      User.updateUser("miningPower = miningPower + :miningPower where id = :id", paramsUser);
+      return Utils.stripDecimalZeros(user.pointUnClaimed);
+    }
+  }
+
+  @Transactional
   public BigDecimal mining(User user, long time) throws Exception {
     if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);

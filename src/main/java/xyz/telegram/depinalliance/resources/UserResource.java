@@ -17,6 +17,7 @@ import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
 
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,13 +73,14 @@ public class UserResource extends BaseResource {
     userInfoResponse.level = user.level.id;
     userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPower);
     userInfoResponse.maximumPower = Utils.stripDecimalZeros(user.maximumPower);
-    userInfoResponse.point = Utils.stripDecimalZeros(user.point);
+    userInfoResponse.point = user.point.setScale(0, RoundingMode.DOWN);
     userInfoResponse.pointUnClaimed = Utils.stripDecimalZeros(user.pointUnClaimed);
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
     userInfoResponse.status = user.status;
     userInfoResponse.username = user.username;
     userInfoResponse.timeStartMining = user.timeStartMining;
     userInfoResponse.lastLoginTime = user.lastLoginTime;
+    userInfoResponse.lastCheckin = user.lastCheckIn;
     return ResponseData.ok(userInfoResponse);
   }
 

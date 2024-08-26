@@ -19,4 +19,5 @@ public class UserInfoResponse {
   public long level;
   public long lastLoginTime;
   public Long timeStartMining;
+  public long lastCheckin;
 }
