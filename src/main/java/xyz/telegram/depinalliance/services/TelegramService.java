@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.services;
 
+import io.quarkus.runtime.LaunchMode;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -59,6 +60,9 @@ public class TelegramService {
       byte[] hmacSecret = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, botTokenData).hmac(botToken);
       String calculatedHash = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, hmacSecret).hmacHex(
         dataCheckString.toString());
+      if (LaunchMode.current().isDevOrTest()) {
+        return Utils.toObject(userStr, UserTelegramResponse.class);
+      }
       return calculatedHash.equals(receivedHash) ? Utils.toObject(userStr, UserTelegramResponse.class) : null;
     } catch (Exception e) {
       return null;

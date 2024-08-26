@@ -3,6 +3,9 @@ package xyz.telegram.depinalliance.services;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
+import xyz.telegram.depinalliance.common.constans.Enums;
+import xyz.telegram.depinalliance.entities.Level;
+import xyz.telegram.depinalliance.entities.SystemConfig;
 import xyz.telegram.depinalliance.entities.User;
 
 import java.util.HashMap;
@@ -20,9 +23,13 @@ public class UserService {
       user = new User();
       user.id = id;
       user.username = username;
+      user.level = new Level(1L);
       User ref = null;
       if (StringUtils.isNotBlank(refCode)) {
         ref = User.findByCode(refCode);
+        if (ref != null) {
+          User.updatePointUser(ref.id, SystemConfig.findByKey(Enums.Config.POINT_REF));
+        }
       }
       user.ref = ref;
       User.createUser(user);

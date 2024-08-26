@@ -72,8 +72,6 @@ public class Utils {
 
   public static Calendar getCalendar() {
     Calendar utcTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    //    Calendar calendar = Calendar.getInstance();
-    //    calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
     return utcTime;
   }
 

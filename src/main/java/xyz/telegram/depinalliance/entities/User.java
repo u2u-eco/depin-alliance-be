@@ -20,9 +20,11 @@ public class User extends BaseEntity {
   @Column(name = "point", scale = 18, precision = 29)
   public BigDecimal point = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
-  public BigDecimal xp;
+  public BigDecimal xp = BigDecimal.ZERO;
   @Column(name = "mining_power", scale = 18, precision = 29)
-  public BigDecimal miningPower;
+  public BigDecimal miningPower = BigDecimal.ZERO;
+  @Column(name = "maximum_power", scale = 18, precision = 29)
+  public BigDecimal maximumPower = BigDecimal.ZERO;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ref_id")
   public User ref;
@@ -31,6 +33,14 @@ public class User extends BaseEntity {
   public Level level;
   @Column(unique = true)
   public String code;
+  @Column(name = "time_start_mining")
+  public Long timeStartMining = 0L;
+  @Column(name = "last_login_time")
+  public Long lastLoginTime = 0L;
+  @Column(name = "start_check_in")
+  public Long startCheckIn = 0L;
+  @Column(name = "end_check_in")
+  public Long endCheckIn = 0L;
 
   public static User createUser(User user) {
     user.create();
@@ -47,11 +57,11 @@ public class User extends BaseEntity {
     return update(query, params);
   }
 
-  public static int updateBalanceUser(BigDecimal amount, long id) {
+  public static int updatePointUser(long id, BigDecimal point) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
-    params.put("amount", amount);
-    return updateAccount("balance = balance + :amount where id = :id and balance + :amount >=0", params);
+    params.put("point", point);
+    return updateAccount("point = point + :point where id = :id and point + :point >=0", params);
   }
 
 }

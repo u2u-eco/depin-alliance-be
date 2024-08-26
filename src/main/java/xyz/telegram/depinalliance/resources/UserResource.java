@@ -6,11 +6,12 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
+import xyz.telegram.depinalliance.common.utils.Utils;
+import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 
@@ -20,8 +21,8 @@ import java.util.Map;
 /**
  * @author holden on 26-Jul-2024
  */
-@Path("/accounts")
-public class AccountResource extends BaseResource {
+@Path("/users")
+public class UserResource extends BaseResource {
 
   @Inject
   TelegramService telegramService;
@@ -37,18 +38,14 @@ public class AccountResource extends BaseResource {
     if (userTelegramResponse == null) {
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
     }
-//    PbkAccount pbkAccount = PbkAccount.findById(userTelegramResponse.id);
-//    if (pbkAccount == null) {
-//      pbkAccount = new PbkAccount();
-//      pbkAccount.id = userTelegramResponse.id;
-//      pbkAccount.username = userTelegramResponse.username;
-//      PbkAccount.createAccount(pbkAccount);
-//    } else if (!userTelegramResponse.username.equals(pbkAccount.username)) {
-//      Map<String, Object> params = new HashMap<>();
-//      params.put("id", pbkAccount.id);
-//      params.put("username", userTelegramResponse.username);
-//      PbkAccount.updateAccount("username = :username where id = :id", params);
-//    }
+    User user = User.findById(userTelegramResponse.id);
+    if (user == null) {
+      return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", user.id);
+    params.put("lastLoginTime", Utils.getCalendar().getTimeInMillis());
+    User.updateAccount("lastLoginTime = :lastLoginTime where id = :id", params);
     return ResponseData.ok(jwtService.generateToken(String.valueOf(userTelegramResponse.id)));
   }
 
