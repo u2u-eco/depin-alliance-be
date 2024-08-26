@@ -1,8 +1,5 @@
 package xyz.telegram.depinalliance.common.commands;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -21,6 +18,7 @@ public class StartCommand extends BotCommand {
     super("start", "With this command you can start the Bot");
     this.userService = userService;
   }
+
   UserService userService;
 
   @Override
@@ -31,7 +29,9 @@ public class StartCommand extends BotCommand {
     if (strings != null && strings.length > 0) {
       refCode = strings[0];
     }
-    userService.checkStartUser(chat.getId(), user.getUserName(), refCode);
+    synchronized (chat.getId().toString().intern()) {
+      userService.checkStartUser(chat.getId(), user.getUserName(), refCode);
+    }
     messageBuilder.append("Welcome ").append(userName).append("\n");
     messageBuilder.append("this bot will demonstrate you the command feature of the Java TelegramBots API!");
     SendMessage answer = new SendMessage(chat.getId().toString(), messageBuilder.toString());

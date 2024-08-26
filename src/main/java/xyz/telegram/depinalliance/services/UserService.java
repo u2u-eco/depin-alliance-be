@@ -5,6 +5,9 @@ import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.entities.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author holden on 24-Aug-2024
  */
@@ -23,10 +26,13 @@ public class UserService {
       }
       user.ref = ref;
       User.createUser(user);
+      return user;
     }
     if (!user.username.equals(username)) {
-      //update user....
-
+      Map<String, Object> params = new HashMap<>();
+      params.put("id", id);
+      params.put("username", username);
+      User.updateAccount("username = :username where id = :id", params);
     }
     return user;
   }

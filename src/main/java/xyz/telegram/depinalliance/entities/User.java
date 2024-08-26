@@ -1,7 +1,6 @@
 package xyz.telegram.depinalliance.entities;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.math.BigDecimal;
@@ -20,13 +19,19 @@ public class User extends BaseEntity {
   public String username;
   @Column(name = "point", scale = 18, precision = 29)
   public BigDecimal point = BigDecimal.ZERO;
+  @Column(name = "xp", scale = 18, precision = 29)
+  public BigDecimal xp;
+  @Column(name = "mining_power", scale = 18, precision = 29)
+  public BigDecimal miningPower;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ref_id")
   public User ref;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "level_id")
+  public Level level;
   @Column(unique = true)
   public String code;
 
-  @Transactional
   public static User createUser(User user) {
     user.create();
     user.persist();
