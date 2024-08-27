@@ -6,7 +6,8 @@ package xyz.telegram.depinalliance.common.constans;
 public class Enums {
 
   public enum Config {
-    POINT_REF(1), CPU_SLOT(2), GPU_SLOT(3), RAM_SLOT(4), STORAGE_SLOT(5);
+    POINT_REF(1), CPU_SLOT(2), GPU_SLOT(3), RAM_SLOT(4), STORAGE_SLOT(5), CPU_DEFAULT(6), GPU_DEFAULT(7), RAM_DEFAULT(
+      8), STORAGE_DEFAULT(9);
     private final int type;
 
     Config(int type) {
@@ -24,5 +25,13 @@ public class Enums {
 
   public enum ItemType {
     CPU, GPU, RAM, STORAGE
+  }
+
+  public enum MissionType {
+
+  }
+
+  public enum MissionStatus {
+    VERIFIED, CLAIMED
   }
 }

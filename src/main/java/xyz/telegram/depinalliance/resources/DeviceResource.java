@@ -7,6 +7,7 @@ import xyz.telegram.depinalliance.common.models.request.AddItemRequest;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.entities.Item;
+import xyz.telegram.depinalliance.entities.UserItem;
 import xyz.telegram.depinalliance.services.DeviceService;
 
 /**
@@ -20,9 +21,15 @@ public class DeviceResource extends BaseResource {
 
   @Path("item")
   @GET
-  public ResponseData getDeviceUser(@QueryParam("type") @DefaultValue(value = "CPU") String type,
+  public ResponseData getDeviceItem(@QueryParam("type") @DefaultValue(value = "CPU") String type,
     PagingParameters pagingParameters) {
     return ResponseData.ok(Item.findByTypeAndPaging(pagingParameters, Enums.ItemType.valueOf(type.toUpperCase())));
+  }
+
+  @Path("user-device-item")
+  @GET
+  public ResponseData getUserDeviceItem() {
+    return ResponseData.ok(UserItem.findByUserId(getTelegramId(), 1L));
   }
 
   @Path("add-item")

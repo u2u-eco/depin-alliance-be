@@ -1,6 +1,10 @@
 package xyz.telegram.depinalliance.entities;
 
+import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
+import xyz.telegram.depinalliance.common.models.response.DeviceItemResponse;
+
+import java.util.List;
 
 /**
  * @author holden on 26-Aug-2024
@@ -29,6 +33,10 @@ public class UserItem extends BaseEntity {
   }
 
   public UserItem() {
+  }
+
+  public static List<DeviceItemResponse> findByUserId(Long userId, Long deviceIndex) {
+    return find("user.id = ?1 and userDevice.index = ?2", Sort.ascending("id"), userId, deviceIndex).project(DeviceItemResponse.class).list();
   }
 
   public static UserItem create(UserItem userItem) {

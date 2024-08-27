@@ -6,10 +6,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import xyz.telegram.depinalliance.common.commands.HelloCommand;
 import xyz.telegram.depinalliance.common.commands.HelpCommand;
 import xyz.telegram.depinalliance.common.commands.StartCommand;
-import xyz.telegram.depinalliance.common.commands.StopCommand;
 import xyz.telegram.depinalliance.common.constans.Emoji;
 
 /**
@@ -17,11 +15,9 @@ import xyz.telegram.depinalliance.common.constans.Emoji;
  */
 
 public class BotService extends CommandLongPollingTelegramBot {
-  public BotService(String botToken, String botUsername, UserService userService) {
+  public BotService(String botToken, String botUsername, UserService userService, String url) {
     super(new OkHttpTelegramClient(botToken), true, () -> botUsername);
-//    register(new HelloCommand());
-    register(new StartCommand(userService));
-//    register(new StopCommand());
+    register(new StartCommand(userService, botUsername, url));
     HelpCommand helpCommand = new HelpCommand(this);
     register(helpCommand);
     registerDefaultAction((telegramClient, message) -> {

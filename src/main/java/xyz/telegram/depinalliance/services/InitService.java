@@ -46,6 +46,26 @@ public class InitService {
         SystemConfig systemConfig = new SystemConfig(Enums.Config.STORAGE_SLOT, "1");
         systemConfig.persist();
       }
+      String configCpuDefault = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
+      if (configCpuDefault == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.CPU_DEFAULT, "CPU_1");
+        systemConfig.persist();
+      }
+      String configGpuDefault = SystemConfig.findByKey(Enums.Config.GPU_DEFAULT);
+      if (configGpuDefault == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.GPU_DEFAULT, "GPU_1");
+        systemConfig.persist();
+      }
+      String configRamDefault = SystemConfig.findByKey(Enums.Config.RAM_DEFAULT);
+      if (configRamDefault == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.RAM_DEFAULT, "RAM_1");
+        systemConfig.persist();
+      }
+      String configStorageDefault = SystemConfig.findByKey(Enums.Config.STORAGE_DEFAULT);
+      if (configStorageDefault == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.STORAGE_DEFAULT, "STORAGE_1");
+        systemConfig.persist();
+      }
 
       if (Level.count() == 0) {
         for (long i = 1; i < 100; i++) {

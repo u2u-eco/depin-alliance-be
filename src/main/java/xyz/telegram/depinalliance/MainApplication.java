@@ -20,12 +20,16 @@ public class MainApplication {
   String botToken;
   @ConfigProperty(name = "telegram.run")
   boolean botRun;
+  @ConfigProperty(name = "telegram.url")
+  String botUrl;
+  @ConfigProperty(name = "telegram.bot-username")
+  String botUsername;
 
   void onStart(@Observes StartupEvent event) {
     if (botRun) {
       new Thread(() -> {
         try (TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication()) {
-          botsApplication.registerBot(botToken, new BotService(botToken, "DepinallianceBot", userService));
+          botsApplication.registerBot(botToken, new BotService(botToken, botUsername, userService, botUrl));
           System.out.println("Bot successfully started!");
           Thread.currentThread().join();
         } catch (Exception e) {

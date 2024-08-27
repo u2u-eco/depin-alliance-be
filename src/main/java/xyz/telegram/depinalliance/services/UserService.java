@@ -23,6 +23,8 @@ import java.util.*;
 public class UserService {
   @Inject
   Logger logger;
+  @Inject
+  SystemConfigService systemConfigService;
 
   @Transactional
   public User checkStartUser(Long id, String username, String refCode) {
@@ -66,19 +68,19 @@ public class UserService {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
-    String codeCpu = "CPU_" + Utils.getRandomNumber(1, 31);
+    String codeCpu = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
     Item itemCpu = Item.find("code", codeCpu).firstResult();
     UserItem.create(new UserItem(user, itemCpu, userDevice));
 
-    String codeGpu = "GPU_" + Utils.getRandomNumber(1, 31);
+    String codeGpu = SystemConfig.findByKey(Enums.Config.GPU_DEFAULT);
     Item itemGpu = Item.find("code", codeGpu).firstResult();
     UserItem.create(new UserItem(user, itemGpu, userDevice));
 
-    String codeRam = "RAM_" + Utils.getRandomNumber(1, 31);
+    String codeRam = SystemConfig.findByKey(Enums.Config.RAM_DEFAULT);
     Item itemRam = Item.find("code", codeRam).firstResult();
     UserItem.create(new UserItem(user, itemRam, userDevice));
 
-    String codeStorage = "STORAGE_" + Utils.getRandomNumber(1, 31);
+    String codeStorage = SystemConfig.findByKey(Enums.Config.STORAGE_DEFAULT);
     Item itemStorage = Item.find("code", codeStorage).firstResult();
     UserItem.create(new UserItem(user, itemStorage, userDevice));
     Map<String, Object> params = new HashMap<>();
