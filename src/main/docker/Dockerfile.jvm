@@ -79,6 +79,14 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.18
 
 ENV LANGUAGE='en_US:en'
 
+ARG GIT_TAG
+ARG GIT_COMMIT
+ARG COMPILED_AT
+
+ENV LANGUAGE='en_US:en'
+ENV GIT_TAG=${GIT_TAG}
+ENV GIT_COMMIT=${GIT_COMMIT}
+ENV COMPILED_AT=${COMPILED_AT}
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
 COPY --chown=185 build/quarkus-app/lib/ /deployments/lib/
