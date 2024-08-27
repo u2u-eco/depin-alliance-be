@@ -9,6 +9,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
+import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
 import xyz.telegram.depinalliance.common.models.response.RankingResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
@@ -129,5 +130,21 @@ public class UserResource extends BaseResource {
     res.put("currentRank", User.findRankByUserId(getTelegramId()));
     res.put("ranking", User.findAll(Sort.descending("miningPower").and("createdAt", Sort.Direction.Ascending)).page(0, 30).project(RankingResponse.class).list());
     return ResponseData.ok(res);
+  }
+  @POST
+  @Path("upgrade-level")
+  @Transactional
+  public ResponseData upgradeLevel() throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(userService.upgradeLevel(getUser()));
+    }
+  }
+  @POST
+  @Path("upgrade-skill")
+  @Transactional
+  public ResponseData upgradeSkill(SkillUpgradeRequest request) throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(userService.upgradeSkill(getUser(), request.skillId));
+    }
   }
 }

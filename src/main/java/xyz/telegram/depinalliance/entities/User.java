@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.entities;
 
+import io.quarkus.panache.common.Parameters;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -75,5 +76,9 @@ public class User extends BaseEntity {
     return find(
       "select position from ( select id as id, row_number() over(order by miningPower desc, createdAt asc) as position from User) result where id =?1",
       userId).project(Long.class).firstResult();
+  }
+  public static int updateLevel(long id, long maxLevel) {
+    return update("level = level+1 where id = :id and point >= 0 and exp >= 0 and level <= :maxLevel",
+            Parameters.with("maxLevel", maxLevel));
   }
 }
