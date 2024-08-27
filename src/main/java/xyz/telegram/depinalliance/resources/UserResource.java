@@ -1,13 +1,16 @@
 package xyz.telegram.depinalliance.resources;
 
+import io.quarkus.panache.common.Sort;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
+import xyz.telegram.depinalliance.common.models.response.RankingResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserInfoResponse;
 import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
@@ -38,7 +41,7 @@ public class UserResource extends BaseResource {
   @Path("auth")
   @PermitAll
   @Transactional
-  public ResponseData auth(TelegramInitDataRequest request) {
+  public ResponseData auth(TelegramInitDataRequest request) throws Exception {
     UserTelegramResponse userTelegramResponse = telegramService.validateInitData(request.initData);
     if (userTelegramResponse == null) {
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
@@ -57,6 +60,9 @@ public class UserResource extends BaseResource {
     }
 
     User.updateUser(sql + "lastLoginTime = :lastLoginTime where id = :id", params);
+    if (user.status == Enums.UserStatus.MINING) {
+      userService.mining(user);
+    }
     Map<String, Object> res = new HashMap<>();
     res.put("currentStatus", user.status);
     res.put("accessToken",
@@ -74,7 +80,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPower);
     userInfoResponse.maximumPower = Utils.stripDecimalZeros(user.maximumPower);
     userInfoResponse.point = user.point.setScale(0, RoundingMode.DOWN);
-    userInfoResponse.pointUnClaimed = Utils.stripDecimalZeros(user.pointUnClaimed);
+    userInfoResponse.pointUnClaimed = user.pointUnClaimed.setScale(0, RoundingMode.DOWN);
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
     userInfoResponse.status = user.status;
     userInfoResponse.username = user.username;
@@ -114,5 +120,14 @@ public class UserResource extends BaseResource {
   @Path("claim")
   public ResponseData claim() throws Exception {
     return ResponseData.ok(userService.claim(getUser()));
+  }
+
+  @GET
+  @Path("ranking-engineer")
+  public ResponseData ranking() throws Exception {
+    Map<String, Object> res = new HashMap<>();
+    res.put("currentRank", User.findRankByUserId(getTelegramId()));
+    res.put("ranking", User.findAll(Sort.descending("miningPower").and("createdAt", Sort.Direction.Ascending)).page(0, 30).project(RankingResponse.class).list());
+    return ResponseData.ok(res);
   }
 }

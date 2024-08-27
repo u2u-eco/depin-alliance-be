@@ -1,7 +1,13 @@
 package xyz.telegram.depinalliance.entities;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import xyz.telegram.depinalliance.common.constans.Enums;
+import xyz.telegram.depinalliance.common.models.request.PagingParameters;
+import xyz.telegram.depinalliance.common.models.response.ItemResponse;
+import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 
 import java.math.BigDecimal;
 
@@ -26,4 +32,14 @@ public class Item extends BaseEntity {
   public String image;
   @Column(name = "point", scale = 18, precision = 29)
   public BigDecimal point = BigDecimal.ZERO;
+
+  public static Item findByCode(String code) {
+    return find("code", code.toUpperCase()).firstResult();
+  }
+
+  public static ResponsePage<ItemResponse> findByTypeAndPaging(PagingParameters pageable, Enums.ItemType type) {
+    PanacheQuery<PanacheEntityBase> panacheQuery = find("type = ?1", Sort.ascending("id"), type);
+    return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(ItemResponse.class).list(), pageable,
+      panacheQuery.count());
+  }
 }

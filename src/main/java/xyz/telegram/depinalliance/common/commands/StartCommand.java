@@ -8,11 +8,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import xyz.telegram.depinalliance.services.UserService;
 
-/**
- * This commands starts the conversation with the bot
- *
- * @author Timo Schulz (Mit0x2)
- */
 public class StartCommand extends BotCommand {
   public StartCommand(UserService userService) {
     super("start", "With this command you can start the Bot");

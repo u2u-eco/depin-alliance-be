@@ -1,6 +1,5 @@
 package xyz.telegram.depinalliance.services;
 
-import io.quarkus.runtime.LaunchMode;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -20,7 +19,9 @@ import java.util.TreeMap;
 public class TelegramService {
 
   @ConfigProperty(name = "telegram.token")
-  public String botToken;
+  String botToken;
+  @ConfigProperty(name = "telegram.validate")
+  boolean isValidate;
 
   public UserTelegramResponse validateInitData(String initData) {
     Map<String, String> params = new TreeMap<>();
@@ -35,7 +36,7 @@ public class TelegramService {
         receivedHash = value;
       } else {
         try {
-          String decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
+          String decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
           params.put(key, decodedValue);
           if ("user".equals(key)) {
             userStr = decodedValue;
@@ -44,6 +45,9 @@ public class TelegramService {
           e.printStackTrace();
         }
       }
+    }
+    if (!isValidate) {
+      return Utils.toObject(userStr, UserTelegramResponse.class);
     }
     if (receivedHash == null) {
       return null;
@@ -60,9 +64,7 @@ public class TelegramService {
       byte[] hmacSecret = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, botTokenData).hmac(botToken);
       String calculatedHash = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, hmacSecret).hmacHex(
         dataCheckString.toString());
-      if (LaunchMode.current().isDevOrTest()) {
-        return Utils.toObject(userStr, UserTelegramResponse.class);
-      }
+
       return calculatedHash.equals(receivedHash) ? Utils.toObject(userStr, UserTelegramResponse.class) : null;
     } catch (Exception e) {
       return null;

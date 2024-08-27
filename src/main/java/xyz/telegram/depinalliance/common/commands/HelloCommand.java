@@ -2,20 +2,12 @@ package xyz.telegram.depinalliance.common.commands;
 
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-/**
- * This command simply replies with a hello to the users command and
- * sends them the 'kind' words back, which they send via command parameters
- *
- * @author Timo Schulz (Mit0x2)
- */
-public class HelloCommand extends BotCommand {
 
-  private static final String LOGTAG = "HELLOCOMMAND";
+public class HelloCommand extends BotCommand {
 
   public HelloCommand() {
     super("hello", "Say hallo to this bot");

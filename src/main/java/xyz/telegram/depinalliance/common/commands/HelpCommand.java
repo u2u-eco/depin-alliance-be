@@ -9,14 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-/**
- * This command helps the user to find the command they need
- *
- * @author Timo Schulz (Mit0x2)
- */
 public class HelpCommand extends BotCommand {
-
-  private static final String LOGTAG = "HELPCOMMAND";
 
   private final ICommandRegistry commandRegistry;
 

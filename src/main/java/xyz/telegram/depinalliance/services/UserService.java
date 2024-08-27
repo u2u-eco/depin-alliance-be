@@ -1,8 +1,10 @@
 package xyz.telegram.depinalliance.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.logging.Logger;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
@@ -19,6 +21,9 @@ import java.util.*;
  */
 @ApplicationScoped
 public class UserService {
+  @Inject
+  Logger logger;
+
   @Transactional
   public User checkStartUser(Long id, String username, String refCode) {
     User user = User.findById(id);
@@ -43,6 +48,7 @@ public class UserService {
       userDevice.name = "Device " + 1;
       userDevice.index = 1;
       UserDevice.create(userDevice);
+      logger.info("User " + user.username + " created");
       return user;
     }
     if (!user.username.equals(username)) {

@@ -37,3 +37,4 @@ nb-configuration.xml
 application-dev.properties
 privateKey.pem
 publicKey.pem
+build.sh

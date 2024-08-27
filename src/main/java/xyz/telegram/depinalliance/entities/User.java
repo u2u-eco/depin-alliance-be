@@ -71,4 +71,9 @@ public class User extends BaseEntity {
     return updateUser("point = point + :point where id = :id and point + :point >=0", params);
   }
 
+  public static long findRankByUserId(long userId) {
+    return find(
+      "select position from ( select id as id, row_number() over(order by miningPower desc, createdAt asc) as position from User) result where id =?1",
+      userId).project(Long.class).firstResult();
+  }
 }

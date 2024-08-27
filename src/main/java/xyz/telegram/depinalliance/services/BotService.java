@@ -19,9 +19,9 @@ import xyz.telegram.depinalliance.common.constans.Emoji;
 public class BotService extends CommandLongPollingTelegramBot {
   public BotService(String botToken, String botUsername, UserService userService) {
     super(new OkHttpTelegramClient(botToken), true, () -> botUsername);
-    register(new HelloCommand());
+//    register(new HelloCommand());
     register(new StartCommand(userService));
-    register(new StopCommand());
+//    register(new StopCommand());
     HelpCommand helpCommand = new HelpCommand(this);
     register(helpCommand);
     registerDefaultAction((telegramClient, message) -> {

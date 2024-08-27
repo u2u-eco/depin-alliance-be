@@ -1,6 +1,5 @@
 package xyz.telegram.depinalliance.common.filters;
 
-import xyz.telegram.depinalliance.common.exceptions.AccessDeniedException;
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
@@ -11,6 +10,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.ext.Provider;
+import xyz.telegram.depinalliance.common.exceptions.AccessDeniedException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

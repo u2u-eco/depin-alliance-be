@@ -1,6 +1,5 @@
 package xyz.telegram.depinalliance.common.models.request;
 
-import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import io.quarkus.panache.common.Page;
 import jakarta.ws.rs.QueryParam;
 
@@ -13,9 +12,9 @@ public class PagingParameters {
   @QueryParam("size")
   public int size = 16;
 
-  public Page getPage() throws BusinessException {
+  public Page getPage() {
     if (size < 0 || size > 100) {
-      throw new BusinessException("Size invalid");
+      this.size = 100;
     }
     int index = page >= 1 ? page - 1 : page;
     return new Page(index, size);

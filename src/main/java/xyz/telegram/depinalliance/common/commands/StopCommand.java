@@ -7,19 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-/**
- * This commands stops the conversation with the bot.
- * Bot won't respond to user until he sends a start command
- *
- * @author Timo Schulz (Mit0x2)
- */
 public class StopCommand extends BotCommand {
 
-  public static final String LOGTAG = "STOPCOMMAND";
-
-  /**
-   * Construct
-   */
   public StopCommand() {
     super("stop", "With this command you can stop the Bot");
   }
