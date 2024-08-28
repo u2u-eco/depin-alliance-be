@@ -28,7 +28,7 @@ public class Enums {
   }
 
   public enum MissionType {
-
+    TELEGRAM, TWITTER, QUIZ
   }
 
   public enum MissionStatus {

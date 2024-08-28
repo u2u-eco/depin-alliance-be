@@ -3,10 +3,11 @@ package xyz.telegram.depinalliance.resources;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import xyz.telegram.depinalliance.common.constans.Enums;
-import xyz.telegram.depinalliance.common.models.request.AddItemRequest;
+import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.entities.Item;
+import xyz.telegram.depinalliance.entities.UserDevice;
 import xyz.telegram.depinalliance.entities.UserItem;
 import xyz.telegram.depinalliance.services.DeviceService;
 
@@ -26,17 +27,47 @@ public class DeviceResource extends BaseResource {
     return ResponseData.ok(Item.findByTypeAndPaging(pagingParameters, Enums.ItemType.valueOf(type.toUpperCase())));
   }
 
-  @Path("user-device-item")
+  @Path("user-device")
   @GET
-  public ResponseData getUserDeviceItem() {
-    return ResponseData.ok(UserItem.findByUserId(getTelegramId(), 1L));
+  public ResponseData getUserDevice() {
+    return ResponseData.ok(UserDevice.findByUser(getTelegramId()));
   }
 
-  @Path("add-item")
+  @Path("user-device-item")
+  @GET
+  public ResponseData getUserDeviceItem(@QueryParam("index") Long index) {
+    return ResponseData.ok(UserItem.findByUserId(getTelegramId(), index));
+  }
+
+  @Path("buy-item")
   @POST
-  public ResponseData addItem(AddItemRequest request) throws Exception {
+  public ResponseData buyItem(BuyItemRequest request) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(deviceService.addItem(getUser(), request));
+      return ResponseData.ok(deviceService.buyItem(getUser(), request));
+    }
+  }
+
+  @Path("add-item/{index}/{itemId}")
+  @GET
+  public ResponseData addItem(@PathParam("index") int index, @PathParam("itemId") long itemId) throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.addItem(getUser(), index, itemId));
+    }
+  }
+
+  @Path("remove-item/{itemId}")
+  @GET
+  public ResponseData removeItem(@PathParam("itemId") long itemId) throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.removeItem(getUser(), itemId));
+    }
+  }
+
+  @Path("sell-item/{itemId}")
+  @GET
+  public ResponseData sellItem(@PathParam("itemId") long itemId) throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.sellItem(getUser(), itemId));
     }
   }
 }

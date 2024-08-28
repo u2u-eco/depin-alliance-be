@@ -1,7 +1,10 @@
 package xyz.telegram.depinalliance.entities;
 
+import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
+import xyz.telegram.depinalliance.common.models.response.UserDeviceResponse;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,8 +30,6 @@ public class UserDevice extends BaseEntity {
   public int slotGpuUsed = 0;
   @Column(name = "slot_storage_used")
   public int slotStorageUsed = 0;
-  @Column(name = "total_slot")
-  public int totalSlot;
 
   public static UserDevice create(UserDevice userDevice) {
     userDevice.create();
@@ -42,5 +43,9 @@ public class UserDevice extends BaseEntity {
 
   public static UserDevice findByUserAndIndex(long userId, int index) {
     return find("user.id = ?1 and index = ?2", userId, index).firstResult();
+  }
+
+  public static List<UserDeviceResponse> findByUser(long userId) {
+    return find("user.id", Sort.ascending("index"), userId).project(UserDeviceResponse.class).list();
   }
 }
