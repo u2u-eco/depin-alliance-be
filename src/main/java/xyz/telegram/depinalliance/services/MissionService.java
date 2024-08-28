@@ -3,12 +3,16 @@ package xyz.telegram.depinalliance.services;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.DailyCheckinResponse;
+import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.DailyCheckin;
+import xyz.telegram.depinalliance.entities.Mission;
 import xyz.telegram.depinalliance.entities.User;
+import xyz.telegram.depinalliance.entities.UserMission;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -91,5 +95,40 @@ public class MissionService {
       return Utils.stripDecimalZeros(dailyCheckin.point);
     }
     throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+  }
+
+  @Transactional
+  public boolean verify(User user, long missionId) throws BusinessException {
+    UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
+    if (check == null) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    } else if (check.status != null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    UserMission userMission = new UserMission();
+    userMission.mission = new Mission(check.id);
+    userMission.user = user;
+    userMission.status = Enums.MissionStatus.VERIFIED;
+    UserMission.create(userMission);
+    return true;
+  }
+
+  @Transactional
+  public boolean claim(User user, long missionId) throws BusinessException {
+    UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
+    if (check == null) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    } else if (check.status != Enums.MissionStatus.VERIFIED) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("missionId", missionId);
+    params.put("userId", user.id);
+    params.put("status", Enums.MissionStatus.CLAIMED);
+    if (UserMission.updateObject("status = :status where user.id = :userId and mission.id = :missionId", params) > 0) {
+      User.updatePointAndXpUser(user.id, check.point, check.xp);
+      return true;
+    }
+    return false;
   }
 }

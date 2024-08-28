@@ -6,10 +6,7 @@ import jakarta.enterprise.event.Observes;
 import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.utils.Utils;
-import xyz.telegram.depinalliance.entities.DailyCheckin;
-import xyz.telegram.depinalliance.entities.Item;
-import xyz.telegram.depinalliance.entities.Level;
-import xyz.telegram.depinalliance.entities.SystemConfig;
+import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
 
@@ -146,6 +143,59 @@ public class InitService {
             item.persist();
           }
         }
+      }
+      if (Mission.count() == 0) {
+        Mission mission = new Mission();
+        mission.groupMission = "Social mission";
+        mission.name = "Follow Our X Account";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Our X Account";
+        mission.orders = 1;
+        mission.url = "https://www.google.com/search?q=";
+        mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
+        mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = "Social mission";
+        mission.name = "Follow Our Telegram channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Follow Our Telegram channel";
+        mission.orders = 2;
+        mission.url = "https://www.google.com/search?q=";
+        mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
+        mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = "OKX Partner";
+        mission.name = "Follow Our X Account";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Our X Account";
+        mission.orders = 3;
+        mission.url = "https://www.google.com/search?q=";
+        mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
+        mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = "OKX partner";
+        mission.name = "Follow Our X Account";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Our X Account";
+        mission.orders = 4;
+        mission.url = "https://www.google.com/search?q=";
+        mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
+        mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.create();
+        mission.persist();
       }
     }
   }

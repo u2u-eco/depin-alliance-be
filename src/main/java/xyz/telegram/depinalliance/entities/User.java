@@ -59,12 +59,24 @@ public class User extends BaseEntity {
   public static User createUser(User user) {
     user.create();
     user.persist();
-    user.code = RandomStringUtils.randomAlphanumeric(10);
+    user.code = getCodeUser();
     return user;
+  }
+
+  public static String getCodeUser() {
+    while (true) {
+      String code = RandomStringUtils.randomAlphanumeric(10);
+      if (countByCode(code) <= 0)
+        return code;
+    }
   }
 
   public static User findByCode(String code) {
     return find("code", code).firstResult();
+  }
+
+  public static long countByCode(String code) {
+    return count("code", code);
   }
 
   public static int updateUser(String query, Map<String, Object> params) {
@@ -76,6 +88,15 @@ public class User extends BaseEntity {
     params.put("id", id);
     params.put("point", point);
     return updateUser("point = point + :point where id = :id and point + :point >=0", params);
+  }
+
+  public static int updatePointAndXpUser(long id, BigDecimal point, BigDecimal xp) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", id);
+    params.put("point", point);
+    params.put("xp", xp);
+    return updateUser("point = point + :point, xp = xp + :xp where id = :id and point + :point >=0 and xp + :xp >= 0",
+      params);
   }
 
   public static long findRankByUserId(long userId) {

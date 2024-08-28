@@ -17,7 +17,6 @@ import xyz.telegram.depinalliance.common.models.response.UserInfoResponse;
 import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.User;
-import xyz.telegram.depinalliance.entities.UserSkill;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
@@ -89,6 +88,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.timeStartMining = user.timeStartMining;
     userInfoResponse.lastLoginTime = user.lastLoginTime;
     userInfoResponse.lastCheckin = user.lastCheckIn;
+    userInfoResponse.code = user.code;
     return ResponseData.ok(userInfoResponse);
   }
 
@@ -129,9 +129,12 @@ public class UserResource extends BaseResource {
   public ResponseData ranking() throws Exception {
     Map<String, Object> res = new HashMap<>();
     res.put("currentRank", User.findRankByUserId(getTelegramId()));
-    res.put("ranking", User.findAll(Sort.descending("miningPower").and("createdAt", Sort.Direction.Ascending)).page(0, 30).project(RankingResponse.class).list());
+    res.put("ranking",
+      User.findAll(Sort.descending("miningPower").and("createdAt", Sort.Direction.Ascending)).page(0, 30)
+        .project(RankingResponse.class).list());
     return ResponseData.ok(res);
   }
+
   @GET
   @Path("skills")
   public ResponseData getUserSkill() throws Exception {
@@ -146,6 +149,7 @@ public class UserResource extends BaseResource {
       return ResponseData.ok(userService.upgradeLevel(getUser()));
     }
   }
+
   @POST
   @Path("upgrade-skill")
   @Transactional

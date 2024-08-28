@@ -9,6 +9,7 @@ import java.math.BigDecimal;
  */
 public class UserInfoResponse {
   public String username;
+  public String code;
   public Enums.UserStatus status;
   public BigDecimal miningPower;
   public BigDecimal maximumPower;
