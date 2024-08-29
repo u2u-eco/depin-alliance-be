@@ -31,6 +31,6 @@ public class Level extends PanacheEntityBase {
   public Level() {
   }
   public static Long maxLevel() {
-    return find(" select max(id) ").project(Long.class).firstResult();
+    return find(" select max(id) from Level ").project(Long.class).firstResult();
   }
 }

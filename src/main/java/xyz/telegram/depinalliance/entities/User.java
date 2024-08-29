@@ -29,6 +29,12 @@ public class User extends BaseEntity {
   public BigDecimal miningPower = BigDecimal.ZERO;
   @Column(name = "maximum_power", scale = 18, precision = 29)
   public BigDecimal maximumPower = BigDecimal.ZERO;
+  @Column(name = "rate_mining", scale = 18, precision = 29)
+  public BigDecimal rateMining = BigDecimal.ONE;
+  @Column(name = "rate_purchase", scale = 18, precision = 29)
+  public BigDecimal ratePurchase = BigDecimal.ONE;
+  @Column(name = "rate_reward", scale = 18, precision = 29)
+  public BigDecimal rateReward = BigDecimal.ONE;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ref_id")
   public User ref;
@@ -77,8 +83,19 @@ public class User extends BaseEntity {
       "select position from ( select id as id, row_number() over(order by miningPower desc, createdAt asc) as position from User) result where id =?1",
       userId).project(Long.class).firstResult();
   }
-  public static int updateLevel(long id, long maxLevel) {
-    return update("level = level+1 where id = :id and point >= 0 and exp >= 0 and level <= :maxLevel",
-            Parameters.with("maxLevel", maxLevel));
+  public static int updateLevel(long id, long nextLevel, long maxLevel, BigDecimal pointUse, BigDecimal expUse) {
+    try {
+      Map<String, Object> params = new HashMap<>();
+      params.put("id", id);
+      params.put("nextLevel", nextLevel);
+      params.put("maxLevel", maxLevel);
+      params.put("pointUse", pointUse);
+      params.put("expUse", expUse);
+      return update("level.id = :nextLevel " +
+              "where id = :id and level.id < :nextLevel " +
+              "and point + :pointUse >= 0 and xp + :expUse >= 0 and :nextLevel <= :maxLevel", params);
+    }catch (Exception e) {
+      throw e;
+    }
   }
 }

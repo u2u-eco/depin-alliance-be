@@ -1,10 +1,11 @@
 package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "skills")
 public class Skill extends PanacheEntityBase {
@@ -13,4 +14,6 @@ public class Skill extends PanacheEntityBase {
     public String name;
     @Column(name = "order_display")
     public Integer orderDisplay;
+    @Column(name = "max_level")
+    public Long maxLevel;
 }

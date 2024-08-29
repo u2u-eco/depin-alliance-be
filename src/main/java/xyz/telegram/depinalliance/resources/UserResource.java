@@ -17,6 +17,7 @@ import xyz.telegram.depinalliance.common.models.response.UserInfoResponse;
 import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.User;
+import xyz.telegram.depinalliance.entities.UserSkill;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
@@ -131,6 +132,12 @@ public class UserResource extends BaseResource {
     res.put("ranking", User.findAll(Sort.descending("miningPower").and("createdAt", Sort.Direction.Ascending)).page(0, 30).project(RankingResponse.class).list());
     return ResponseData.ok(res);
   }
+  @GET
+  @Path("skills")
+  public ResponseData getUserSkill() throws Exception {
+    return ResponseData.ok(UserSkill.findByUserId(getUser().id));
+  }
+
   @POST
   @Path("upgrade-level")
   @Transactional

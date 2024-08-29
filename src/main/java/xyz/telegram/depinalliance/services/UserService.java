@@ -9,6 +9,7 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.DetectDeviceResponse;
+import xyz.telegram.depinalliance.common.models.response.UserSkillResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
@@ -188,7 +189,9 @@ public class UserService {
       paramsUser);
     return Utils.stripDecimalZeros(pointUnClaimed);
   }
-
+  public List<UserSkillResponse> getUserSkill(Long userId) {
+    return UserSkill.findByUserId(userId);
+  }
   public boolean upgradeLevel(User user) throws Exception {
     synchronized (user.id.toString().intern()) {
       if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
@@ -196,20 +199,17 @@ public class UserService {
       }
       long maxLevel = Level.maxLevel();
       if(user.level.id >= maxLevel)
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+        throw new BusinessException(ResponseMessageConstants.USER_MAX_LEVEL);
       Level nextLevel = Level.findById(user.level.id+1);
-      //TODO: Subtract point, exp of user by nextLevel
-
-      //Update level
-      User.updateLevel(user.id, maxLevel);
-      UserLevelHistory history = new UserLevelHistory();
+      User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)), nextLevel.exp.multiply(new BigDecimal(-1)));
+      HistoryUpgradeLevel history = new HistoryUpgradeLevel();
       history.create();
       history.userId = user.id;
       history.levelCurrent = user.level.id;
       history.levelUpgrade = nextLevel.id;
       history.pointUsed = nextLevel.point;
       history.expUsed = nextLevel.exp;
-      UserLevelHistory.createHistory(history);
+      HistoryUpgradeLevel.createHistory(history);
       return true;
     }
   }
@@ -219,24 +219,27 @@ public class UserService {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
       UserSkill userSkill = UserSkill.findByUserIdAndSkillId(user.id, skillId)
-              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.HAS_ERROR));
-      Integer maxLevel = SkillLevel.getMaxLevel(skillId);
+              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_NOT_FOUND));
+      Long maxLevel = SkillLevel.getMaxLevel(skillId);
       if(userSkill.skill.id >= maxLevel)
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-      SkillLevel skillLevelNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level+1)
-              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.HAS_ERROR));
-      //TODO: Subtract point to upgrade skill
-
-      //Update level
-      UserSkill.updateLevel(user.id, skillId, maxLevel);
-//      UserLevelHistory history = new UserLevelHistory();
-//      history.create();
-//      history.userId = user.id;
-//      history.levelCurrent = user.level.id;
-//      history.levelUpgrade = nextLevel.id;
-//      history.pointUsed = nextLevel.point;
-//      history.expUsed = nextLevel.exp;
-//      UserLevelHistory.createHistory(history);
+        throw new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL);
+      SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level+1)
+              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
+      User.updatePointUser(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)));
+//      UserSkill.updateStatus();
+      HistoryUpgradeSkill history = new HistoryUpgradeSkill();
+      history.create();
+      history.userId = user.id;
+      history.skillId = userSkill.skill.id;
+      history.levelCurrent = userSkill.level;
+      history.levelUpgrade = userSkillNext.level;
+      history.rateMining = userSkillNext.rateMining;
+      history.ratePurchase = userSkillNext.ratePurchase;
+      history.rateReward = userSkillNext.rateReward;
+      history.feeUpgrade = userSkillNext.feeUpgrade;
+      history.timeWaitUpgrade = userSkillNext.timeWaitUpgrade;
+      history.timeUpgrade = Utils.getCalendar().getTimeInMillis() + userSkillNext.timeWaitUpgrade*3600000;
+      HistoryUpgradeSkill.createHistory(history);
       return true;
     }
   }

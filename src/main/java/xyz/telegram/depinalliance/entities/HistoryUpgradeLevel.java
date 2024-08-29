@@ -5,11 +5,11 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "user_level_history")
-public class UserLevelHistory extends BaseEntity{
+@Table(name = "history_upgrade_user")
+public class HistoryUpgradeLevel extends BaseEntity{
     @Id
-    @SequenceGenerator(name = "userLevelHistorySequence", sequenceName = "user_level_history_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userLevelHistorySequence")
+    @SequenceGenerator(name = "historyUpgradeLevelSequence", sequenceName = "history_upgrade_level_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "historyUpgradeLevelSequence")
     public Long id;
     @Column(name = "user_id")
     public Long userId;
@@ -21,7 +21,7 @@ public class UserLevelHistory extends BaseEntity{
     public BigDecimal pointUsed;
     @Column(name = "exp_used", scale = 18, precision = 29)
     public BigDecimal expUsed;
-    public static void createHistory(UserLevelHistory userLevelHistory) {
-        userLevelHistory.persist();
+    public static void createHistory(HistoryUpgradeLevel historyUpgradeLevel) {
+        historyUpgradeLevel.persist();
     }
 }
