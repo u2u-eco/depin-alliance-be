@@ -55,6 +55,9 @@ public class User extends BaseEntity {
   public String avatar;
   @Column
   public Enums.UserStatus status;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "league_id")
+  public League league;
 
   public static User createUser(User user) {
     user.create();

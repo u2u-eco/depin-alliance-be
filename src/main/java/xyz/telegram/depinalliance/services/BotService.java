@@ -37,7 +37,7 @@ public class BotService extends CommandLongPollingTelegramBot {
       Message message = update.getMessage();
       if (message.hasText()) {
         SendMessage echoMessage = new SendMessage(String.valueOf(message.getChatId()),
-          "Hey heres your message:\n" + message.getText());
+          "Hey here's your message:\n" + message.getText());
         try {
           telegramClient.execute(echoMessage);
         } catch (TelegramApiException e) {

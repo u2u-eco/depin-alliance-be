@@ -7,7 +7,8 @@ public class Enums {
 
   public enum Config {
     POINT_REF(1), CPU_SLOT(2), GPU_SLOT(3), RAM_SLOT(4), STORAGE_SLOT(5), CPU_DEFAULT(6), GPU_DEFAULT(7), RAM_DEFAULT(
-      8), STORAGE_DEFAULT(9);
+      8), STORAGE_DEFAULT(9), AVATAR_DEFAULT(10), AVATAR_LIST(11), MAX_MINING_POWER_DEFAULT(12), REF_POINT_CLAIM(
+      13), ROOT_POINT_CLAIM(14);
     private final int type;
 
     Config(int type) {

@@ -63,6 +63,33 @@ public class InitService {
         SystemConfig systemConfig = new SystemConfig(Enums.Config.STORAGE_DEFAULT, "STORAGE_1");
         systemConfig.persist();
       }
+      String configAvatarDefault = SystemConfig.findByKey(Enums.Config.AVATAR_DEFAULT);
+      if (configAvatarDefault == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.AVATAR_DEFAULT,
+          "/assets/images/avatar/avatar-01@2x.png");
+        systemConfig.persist();
+      }
+      String configAvatarList = SystemConfig.findByKey(Enums.Config.AVATAR_LIST);
+      if (configAvatarList == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.AVATAR_LIST,
+          "/assets/images/avatar/avatar-01@2x.png;/assets/images/avatar/avatar-02@2x.png;/assets/images/avatar/avatar-03@2x.png;/assets/images/avatar/avatar-04@2x.png;/assets/images/avatar/avatar-05@2x.png;/assets/images/avatar/avatar-06@2x.png");
+        systemConfig.persist();
+      }
+      String configMaxMiningPowerDefault = SystemConfig.findByKey(Enums.Config.MAX_MINING_POWER_DEFAULT);
+      if (configMaxMiningPowerDefault == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.MAX_MINING_POWER_DEFAULT, "1000");
+        systemConfig.persist();
+      }
+      String configRefPointClaim = SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM);
+      if (configRefPointClaim == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.REF_POINT_CLAIM, "0.05");
+        systemConfig.persist();
+      }
+      String configRootPointClaim = SystemConfig.findByKey(Enums.Config.ROOT_POINT_CLAIM);
+      if (configRootPointClaim == null) {
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.ROOT_POINT_CLAIM, "0.05");
+        systemConfig.persist();
+      }
 
       if (Level.count() == 0) {
         for (long i = 1; i < 100; i++) {
@@ -75,7 +102,7 @@ public class InitService {
         }
       }
       if (DailyCheckin.count() == 0) {
-        for (long i = 1; i < 31; i++) {
+        for (long i = 1; i < 7; i++) {
           DailyCheckin dailyCheckin = new DailyCheckin();
           dailyCheckin.id = i;
           dailyCheckin.name = "Day " + i;

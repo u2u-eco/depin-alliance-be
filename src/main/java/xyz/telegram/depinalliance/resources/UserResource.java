@@ -7,8 +7,11 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
+import xyz.telegram.depinalliance.common.exceptions.BusinessException;
+import xyz.telegram.depinalliance.common.models.request.AvatarRequest;
 import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
 import xyz.telegram.depinalliance.common.models.response.RankingResponse;
@@ -16,13 +19,16 @@ import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserInfoResponse;
 import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
+import xyz.telegram.depinalliance.entities.SystemConfig;
 import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
 
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,7 +87,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPower);
     userInfoResponse.maximumPower = Utils.stripDecimalZeros(user.maximumPower);
     userInfoResponse.point = user.point.setScale(0, RoundingMode.DOWN);
-    userInfoResponse.pointUnClaimed = user.pointUnClaimed.setScale(0, RoundingMode.DOWN);
+    userInfoResponse.pointUnClaimed = user.pointUnClaimed;
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
     userInfoResponse.status = user.status;
     userInfoResponse.username = user.username;
@@ -107,6 +113,16 @@ public class UserResource extends BaseResource {
   public ResponseData claimRewardNewUser() throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.claimRewardNewUser(getUser());
+      Thread.sleep(1000);
+      return ResponseData.ok(res);
+    }
+  }
+
+  @GET
+  @Path("start-contributing")
+  public ResponseData startContributing() throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      Object res = userService.startContributing(getUser());
       Thread.sleep(1000);
       return ResponseData.ok(res);
     }
@@ -157,5 +173,31 @@ public class UserResource extends BaseResource {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(userService.upgradeSkill(getUser(), request.skillId));
     }
+  }
+
+  @GET
+  @Path("avatar")
+  public ResponseData listAvatar() {
+    String avatarLst = SystemConfig.findByKey(Enums.Config.AVATAR_LIST);
+    return ResponseData.ok(avatarLst.split(";"));
+  }
+
+  @POST
+  @Path("avatar")
+  @Transactional
+  public ResponseData updateAvatar(AvatarRequest request) throws BusinessException {
+    if (request == null || StringUtils.isBlank(request.avatar)) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    String avatarLst = SystemConfig.findByKey(Enums.Config.AVATAR_LIST);
+    List<String> lstAvatar = Arrays.asList(avatarLst.split(";"));
+    if (!lstAvatar.contains(request.avatar)) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", getTelegramId());
+    params.put("avatar", request.avatar);
+    User.updateUser("avatar = :avatar where id = :id", params);
+    return ResponseData.ok(request.avatar);
   }
 }

@@ -24,8 +24,6 @@ import java.util.*;
 public class UserService {
   @Inject
   Logger logger;
-  @Inject
-  SystemConfigService systemConfigService;
 
   @Transactional
   public User checkStartUser(Long id, String username, String refCode) {
@@ -36,6 +34,7 @@ public class UserService {
       user.username = username;
       user.level = new Level(1L);
       user.status = Enums.UserStatus.STARTED;
+      user.avatar = SystemConfig.findByKey(Enums.Config.AVATAR_DEFAULT);
       User ref = null;
       if (StringUtils.isNotBlank(refCode)) {
         ref = User.findByCode(refCode);
@@ -117,10 +116,24 @@ public class UserService {
     paramsUser.put("id", user.id);
     paramsUser.put("status", Enums.UserStatus.CLAIMED);
     paramsUser.put("point", user.pointUnClaimed);
-    paramsUser.put("maximumPower", new BigDecimal(Utils.getRandomNumber(40000, 50000)));
+    paramsUser.put("maximumPower",
+      new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.MAX_MINING_POWER_DEFAULT))));
     User.updateUser("status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower where id = :id",
       paramsUser);
     return Utils.stripDecimalZeros(user.pointUnClaimed);
+  }
+
+  @Transactional
+  public BigDecimal startContributing(User user) throws Exception {
+    if (user.status != Enums.UserStatus.CLAIMED) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    Map<String, Object> paramsUser = new HashMap<>();
+    paramsUser.put("id", user.id);
+    paramsUser.put("status", Enums.UserStatus.MINING);
+    paramsUser.put("timeStartMining", Utils.getCalendar().getTimeInMillis() / 1000);
+    User.updateUser("status = :status, timeStartMining = :timeStartMining where id = :id", paramsUser);
+    return BigDecimal.ZERO;
   }
 
   public BigDecimal mining(User user) throws Exception {
@@ -139,10 +152,22 @@ public class UserService {
       }
       mining(user);
       user = User.findById(user.id);
+      BigDecimal refPointClaim = new BigDecimal(
+        Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
-      paramsUser.put("point", user.pointUnClaimed);
+      paramsUser.put("point", user.pointUnClaimed.multiply(new BigDecimal("100").subtract(refPointClaim)));
       User.updateUser("point = point + :point, pointUnClaimed = pointUnClaimed - :point where id = :id", paramsUser);
+      Long userRefId = 0L;
+      if (user.ref != null) {
+        userRefId = user.ref.id;
+      } else {
+        userRefId = Long.valueOf(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.ROOT_POINT_CLAIM)));
+      }
+      Map<String, Object> paramsUserRef = new HashMap<>();
+      paramsUserRef.put("id", userRefId);
+      paramsUserRef.put("point", user.pointUnClaimed.multiply(refPointClaim));
+      User.updateUser("point = point + :point where id = :id", paramsUserRef);
       return Utils.stripDecimalZeros(user.pointUnClaimed);
     }
   }
@@ -150,29 +175,18 @@ public class UserService {
   @Transactional
   public BigDecimal changeMiningPower(User user, BigDecimal miningPower) throws Exception {
     synchronized (user.id.toString().intern()) {
-      if (user.status != Enums.UserStatus.MINING) {
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-      }
       mining(user);
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
       paramsUser.put("miningPower", miningPower);
       User.updateUser("miningPower = miningPower + :miningPower where id = :id", paramsUser);
-      return Utils.stripDecimalZeros(user.pointUnClaimed);
+      return Utils.stripDecimalZeros(user.miningPower.add(user.miningPower));
     }
   }
 
   @Transactional
   public BigDecimal mining(User user, long time) throws Exception {
-    if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
-      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-    }
-    if (user.status == Enums.UserStatus.CLAIMED) {
-      Map<String, Object> paramsUser = new HashMap<>();
-      paramsUser.put("id", user.id);
-      paramsUser.put("status", Enums.UserStatus.MINING);
-      paramsUser.put("timeStartMining", time);
-      User.updateUser("status = :status, timeStartMining = :timeStartMining where id = :id", paramsUser);
+    if (user.status != Enums.UserStatus.MINING) {
       return BigDecimal.ZERO;
     }
     BigDecimal pointUnClaimed = user.miningPower.divide(new BigDecimal(3600), 18, RoundingMode.FLOOR)
@@ -189,21 +203,24 @@ public class UserService {
       paramsUser);
     return Utils.stripDecimalZeros(pointUnClaimed);
   }
+
   public List<UserSkillResponse> getUserSkill(Long userId) {
     return UserSkill.findByUserId(userId);
   }
+
   public boolean upgradeLevel(User user) throws Exception {
     synchronized (user.id.toString().intern()) {
       if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
       long maxLevel = Level.maxLevel();
-      if(user.level.id >= maxLevel)
+      if (user.level.id >= maxLevel)
         throw new BusinessException(ResponseMessageConstants.USER_MAX_LEVEL);
-      Level nextLevel = Level.findById(user.level.id+1);
-      if(user.point.compareTo(nextLevel.point) < 0 || user.xp.compareTo(nextLevel.exp) < 0)
+      Level nextLevel = Level.findById(user.level.id + 1);
+      if (user.point.compareTo(nextLevel.point) < 0 || user.xp.compareTo(nextLevel.exp) < 0)
         throw new BusinessException(ResponseMessageConstants.USER_BALANCE_NOT_ENOUGH);
-      if(!User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)), nextLevel.exp.multiply(new BigDecimal(-1))))
+      if (!User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)),
+        nextLevel.exp.multiply(new BigDecimal(-1))))
         throw new BusinessException(ResponseMessageConstants.USER_UPGRADE_LEVEL_FAILED);
       HistoryUpgradeLevel history = new HistoryUpgradeLevel();
       history.create();
@@ -216,22 +233,24 @@ public class UserService {
       return true;
     }
   }
+
   public boolean upgradeSkill(User user, Long skillId) throws Exception {
     synchronized (user.id.toString().intern()) {
       if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
       UserSkill userSkill = UserSkill.findByUserIdAndSkillId(user.id, skillId)
-              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_NOT_FOUND));
-      Skill skill = (Skill) Skill.findByIdOptional(skillId).orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
-      if(userSkill.skill.id >= skill.maxLevel)
+        .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_NOT_FOUND));
+      Skill skill = (Skill) Skill.findByIdOptional(skillId)
+        .orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
+      if (userSkill.skill.id >= skill.maxLevel)
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL);
-      SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level+1)
-              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
+      SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level + 1)
+        .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
       User.updatePointUser(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)));
       long currentTime = Utils.getCalendar().getTimeInMillis();
-      long timeUpgrade = currentTime + 1000*userSkillNext.timeWaitUpgrade;
-      if(!UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime))
+      long timeUpgrade = currentTime + 1000 * userSkillNext.timeWaitUpgrade;
+      if (!UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime))
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       HistoryUpgradeSkill history = new HistoryUpgradeSkill();
       history.create();

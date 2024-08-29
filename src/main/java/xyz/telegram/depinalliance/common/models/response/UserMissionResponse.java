@@ -14,6 +14,7 @@ public class UserMissionResponse {
   @JsonIgnore
   public String groupMission;
   public String name;
+  public String image;
   public String description;
   public Enums.MissionType type;
   public String url;
@@ -21,7 +22,7 @@ public class UserMissionResponse {
   public BigDecimal xp;
   public Enums.MissionStatus status;
 
-  public UserMissionResponse(Long id, String groupMission, String name, String description, Enums.MissionType type,
+  public UserMissionResponse(Long id, String groupMission, String name, String image, String description, Enums.MissionType type,
     String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status) {
     this.groupMission = groupMission;
     this.name = name;
@@ -32,5 +33,6 @@ public class UserMissionResponse {
     this.xp = Utils.stripDecimalZeros(xp);
     this.status = status;
     this.id = id;
+    this.image = image;
   }
 }

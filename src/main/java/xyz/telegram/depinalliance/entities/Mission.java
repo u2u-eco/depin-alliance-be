@@ -20,6 +20,7 @@ public class Mission extends BaseEntity {
   public Long id;
   @Column(name = "group_mission")
   public String groupMission;
+  public String image;
   public String name;
   public String description;
   public Enums.MissionType type;
@@ -41,13 +42,13 @@ public class Mission extends BaseEntity {
 
   public static List<UserMissionResponse> findByUserId(long userId) {
     return find(
-      "select m.id, m.groupMission, m.name, m.description, m.type, m.url, m.point, m.xp, um.status from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1",
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1",
       Sort.ascending("m.orders"), userId).project(UserMissionResponse.class).list();
   }
 
   public static UserMissionResponse findByUserIdAndMissionId(long userId, long missionId) {
     return find(
-      "select m.id, m.groupMission, m.name, m.description, m.type, m.url, m.point, m.xp, um.status from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2",
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2",
       Sort.ascending("m.orders"), userId, missionId).project(UserMissionResponse.class).firstResult();
   }
 }
