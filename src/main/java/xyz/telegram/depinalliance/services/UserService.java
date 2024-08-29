@@ -220,13 +220,16 @@ public class UserService {
       }
       UserSkill userSkill = UserSkill.findByUserIdAndSkillId(user.id, skillId)
               .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_NOT_FOUND));
-      Long maxLevel = SkillLevel.getMaxLevel(skillId);
-      if(userSkill.skill.id >= maxLevel)
+      Skill skill = (Skill) Skill.findByIdOptional(skillId).orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
+      if(userSkill.skill.id >= skill.maxLevel)
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL);
       SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level+1)
               .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
       User.updatePointUser(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)));
-//      UserSkill.updateStatus();
+      long currentTime = Utils.getCalendar().getTimeInMillis();
+      long timeUpgrade = currentTime + 1000*userSkillNext.timeWaitUpgrade;
+      if(UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime)!=1)
+        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       HistoryUpgradeSkill history = new HistoryUpgradeSkill();
       history.create();
       history.userId = user.id;
@@ -238,7 +241,7 @@ public class UserService {
       history.rateReward = userSkillNext.rateReward;
       history.feeUpgrade = userSkillNext.feeUpgrade;
       history.timeWaitUpgrade = userSkillNext.timeWaitUpgrade;
-      history.timeUpgrade = Utils.getCalendar().getTimeInMillis() + userSkillNext.timeWaitUpgrade*3600000;
+      history.timeUpgrade = currentTime;
       HistoryUpgradeSkill.createHistory(history);
       return true;
     }

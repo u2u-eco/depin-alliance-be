@@ -23,7 +23,7 @@ public class SkillLevel extends PanacheEntityBase {
     @Column(name = "fee_upgrade", scale = 18, precision = 29)
     public BigDecimal feeUpgrade;  //point
     @Column(name = "time_wait_upgrade")
-    public Long timeWaitUpgrade; //hours
+    public Long timeWaitUpgrade; //seconds
 
     @Column(name = "rate_mining", scale = 18, precision = 29)
     public BigDecimal rateMining; //percent

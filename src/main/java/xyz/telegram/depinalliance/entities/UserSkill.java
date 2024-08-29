@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import xyz.telegram.depinalliance.common.models.response.UserSkillResponse;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Entity
@@ -25,14 +27,16 @@ public class UserSkill extends BaseEntity{
     public Skill skill;
 
     @Column(name = "level")
-    public Long level;
+    public Long level = 1L;
     @Column(name = "rate_mining", scale = 18, precision = 29)
     public BigDecimal rateMining;
 
     @Column(name = "power_mining", scale = 18, precision = 29)
     public BigDecimal powerMining;
+    @Column(name = "level_upgrade")
+    public Long levelUpgrade = 1L;
     @Column(name = "time_upgrade")
-    public Long timeUpgrade = 0L;
+    public Long timeUpgrade = 0L;   //Milliseconds
 
     public void initUserSkill(User user, Skill skill, Long level, BigDecimal rateMining, BigDecimal powerMining) {
         this.user = user;
@@ -62,6 +66,20 @@ public class UserSkill extends BaseEntity{
             return find("select s.id, s.name, us.level, s.maxLevel, us.timeUpgrade from "+UserSkill.class.getSimpleName()+" us inner join "+Skill.class.getSimpleName()+" s on us.skill.id = s.id " +
                     "where us.user.id = :userId ", Parameters.with("userId", userId))
                     .project(UserSkillResponse.class).list();
+        }catch (Exception e) {
+            throw e;
+        }
+    }
+    public static int upgradeSkillPending(long userId, long skillId, long timeUpgrade, long currentTime) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("userId", userId);
+            params.put("skillId", skillId);
+            params.put("timeUpgrade", timeUpgrade);
+            params.put("currentTime", currentTime);
+            return update("levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " +
+                            "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime ",
+                    params);
         }catch (Exception e) {
             throw e;
         }
