@@ -306,18 +306,25 @@ public class UserService {
       history.rateReward = userSkillNext.rateReward;
       history.feeUpgrade = userSkillNext.feeUpgrade;
       history.timeWaitUpgrade = userSkillNext.timeWaitUpgrade;
-      history.timeUpgrade = currentTime;
+      history.timeUpgrade = timeUpgrade;
       HistoryUpgradeSkill.createHistory(history);
       return true;
     }
   }
   @Transactional
   public void updateSkillLevelForUser(HistoryUpgradeSkill his) {
-    if(UserSkill.updateLevel(his.userId, his.skillId, his.levelUpgrade)) {
-      HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
+    boolean status = UserSkill.updateLevel(his.userId, his.skillId, his.levelUpgrade);
+    if(status) {
       User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward);
-    }else{
-
+    }
+    HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
+  }
+  public void updateLevelByExp(long userId) {
+    User user = User.findById(userId);
+    Long maxLevel = Level.maxLevel();
+    Level level = Level.getLevelBeExp(user.xp);
+    if(null!=level && level.id - user.level.id > 0 && level.id < maxLevel) {
+      User.updateLevelAndPointSkill(userId, level.id, new BigDecimal(level.id - user.level.id));
     }
   }
 }

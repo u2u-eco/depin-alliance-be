@@ -22,6 +22,7 @@ import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashMap;

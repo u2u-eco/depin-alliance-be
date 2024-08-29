@@ -1,6 +1,5 @@
 package xyz.telegram.depinalliance.entities;
 
-import io.quarkus.panache.common.Parameters;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -135,15 +134,37 @@ public class User extends BaseEntity {
   }
 
   public static void updateRate(long id, BigDecimal rateMining, BigDecimal ratePurchase, BigDecimal rateReward) {
-    Map<String, Object> params = new HashMap<>();
-    params.put("id", id);
-    params.put("rateMining", rateMining);
-    params.put("ratePurchase", ratePurchase);
-    params.put("rateReward", rateReward);
-    update("rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, " +
-            "rateReward = rateReward + :rateReward where id= :id and rateMining + :rateMining >= 0 ");
+    try {
+      Map<String, Object> params = new HashMap<>();
+      params.put("id", id);
+      params.put("rateMining", rateMining);
+      params.put("ratePurchase", ratePurchase);
+      params.put("rateReward", rateReward);
+      update("rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, " +
+              "rateReward = rateReward + :rateReward where id= :id and :rateMining > 0 and :rateReward > 0", params);
+    }catch (Exception e) {
+      throw e;
+    }
   }
-  public static void updateLevelByXp(long userId, BigDecimal xpAdded) {
-
+//  public static void updateLevelByXp(long userId, BigDecimal xpAdded) {
+//    try {
+//      Map<String, Object> params = new HashMap<>();
+//      params.put("userId", userId);
+//      params.put("xpAdded", xpAdded);
+//      update("level.id = sub.lvNew, pointSkill = pointSkill + sub.lvNew - level.id " +
+//              "FROM (select u.xp, lv.id as lvNew from Level lv, User u " +
+//              "where lv.expFrom <= u.xp + :xpAdded and u.xp + :xpAdded < lv.expTo) as sub " +
+//              "where id = :userId and level.id < sub.lvNew and sub.lvNew - level.id > 0", params);
+//    }catch (Exception e) {
+//      throw e;
+//    }
+//  }
+  public static void updateLevelAndPointSkill(Long userId, Long levelNew, BigDecimal pointSkill) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
+    params.put("levelNew", levelNew);
+    params.put("pointSkill", pointSkill);
+    update("level.id = :levelNew, pointSkill = pointSkill + :pointSkill" +
+            "where id = :userId and level.id < :levelNew and :pointSkill > 0 ");
   }
 }

@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.schedule;
 
+import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
@@ -16,14 +17,15 @@ public class ScheduleUpgradeSkill {
     @Inject
     Logger logger;
 
-//    @Scheduled(every = "5s", identity = "task-job")
+    @Scheduled(every = "5s", identity = "task-job")
     void schedule() {
-        System.out.println("Job run after 5s");
         List<HistoryUpgradeSkill> skillsUpgrade = HistoryUpgradeSkill.getPending(Utils.getCalendar().getTimeInMillis());
         if(skillsUpgrade.size() > 0) {
             skillsUpgrade.forEach(up -> {
                 try {
                     userService.updateSkillLevelForUser(up);
+                    logger.infov("Upgrade skill {} for user {} from lv {} to {} success",
+                            up.skillId, up.userId, up.levelCurrent, up.levelUpgrade);
                 }catch (Exception e) {
                     logger.errorv("ID [{}]: Update level {} skill {} for user {} error ",
                             up.id, up.levelUpgrade, up.skillId, up.userId);

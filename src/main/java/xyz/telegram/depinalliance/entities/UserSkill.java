@@ -53,7 +53,8 @@ public class UserSkill extends BaseEntity{
             params.put("userId", userId);
             params.put("skillId", skillId);
             params.put("levelUpdate", levelUpdate);
-            return update("level= :levelUpdate WHERE user.id = :userId AND skill.id= :skillId AND level < :levelUpdate",
+            return update("level= :levelUpdate " +
+                            "WHERE user.id = :userId AND skill.id= :skillId AND level < :levelUpdate",
                     params) == 1 ? true : false;
         }catch (Exception e) {
             throw e;

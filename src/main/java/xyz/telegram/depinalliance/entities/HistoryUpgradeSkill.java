@@ -44,8 +44,8 @@ public class HistoryUpgradeSkill extends BaseEntity{
     }
     public static List<HistoryUpgradeSkill> getPending(long timeScan) {
         try {
-            return find("status = 0 AND timeUpgrade <= :timeScan ",
-                    Parameters.with("timeScan", timeScan).map(), Sort.by("timeUpgrade").ascending()).list();
+            return find("status = 0 AND timeUpgrade <= :timeScan ", Sort.by("timeUpgrade").ascending(),
+                    Parameters.with("timeScan", timeScan)).list();
         }catch (Exception e) {
             throw e;
         }
