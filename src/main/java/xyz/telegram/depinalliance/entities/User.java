@@ -40,6 +40,8 @@ public class User extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ref_id")
   public User ref;
+  @Column(name = "point_ref", scale = 18, precision = 29)
+  public BigDecimal pointRef;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "level_id")
   public Level level;

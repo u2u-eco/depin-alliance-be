@@ -68,6 +68,6 @@ public class LeagueResource extends BaseResource {
   public ResponseData getUserLeague() {
     User user = getUser();
     League userLeague = user.league;
-    return ResponseData.ok(userLeague == null ? "" : new LeagueResponse(userLeague, user, new BigDecimal(0)));
+    return ResponseData.ok(userLeague == null ? "" : new LeagueResponse(userLeague, user));
   }
 }

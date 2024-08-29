@@ -81,7 +81,7 @@ public class UserResource extends BaseResource {
     UserInfoResponse userInfoResponse = new UserInfoResponse();
     userInfoResponse.avatar = user.avatar;
     userInfoResponse.level = user.level.id;
-    userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPower);
+    userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPower.multiply(user.rateMining));
     userInfoResponse.maximumPower = Utils.stripDecimalZeros(user.maximumPower);
     userInfoResponse.point = user.point.setScale(0, RoundingMode.DOWN);
     userInfoResponse.pointUnClaimed = user.pointUnClaimed;
@@ -159,14 +159,14 @@ public class UserResource extends BaseResource {
     return ResponseData.ok(data);
   }
 
-  @POST
+  /*@POST
   @Path("upgrade-level")
   @Transactional
   public ResponseData upgradeLevel() throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(userService.upgradeLevel(getUser()));
     }
-  }
+  }*/
 
   @POST
   @Path("upgrade-skill")

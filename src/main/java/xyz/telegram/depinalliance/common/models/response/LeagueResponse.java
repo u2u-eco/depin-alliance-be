@@ -20,13 +20,6 @@ public class LeagueResponse {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public Boolean isOwner;
 
-  public LeagueResponse(String code, String name, String avatar, Long totalContributors) {
-    this.code = code;
-    this.name = name;
-    this.avatar = avatar;
-    this.totalContributors = totalContributors;
-  }
-
   public LeagueResponse(String code, String name, String avatar, long totalContributors, BigDecimal totalMining) {
     this.code = code;
     this.name = name;
@@ -35,20 +28,20 @@ public class LeagueResponse {
     this.avatar = avatar;
   }
 
-  public LeagueResponse(League league, String userCode, BigDecimal totalMining) {
+  public LeagueResponse(League league, String userCode) {
     this.code = league.code;
     this.name = league.name;
     this.totalContributors = league.totalContributors;
-    this.totalMining = totalMining;
+    this.totalMining = league.totalMining;
     this.avatar = league.avatar;
     this.inviteLink = userCode + "_" + league.code;
   }
 
-  public LeagueResponse(League league, User user, BigDecimal totalMining) {
+  public LeagueResponse(League league, User user) {
     this.code = league.code;
     this.name = league.name;
     this.totalContributors = league.totalContributors;
-    this.totalMining = totalMining;
+    this.totalMining = league.totalMining;
     this.avatar = league.avatar;
     this.inviteLink = user.code + "_" + league.code;
     this.isOwner = league.user.id == user.id;

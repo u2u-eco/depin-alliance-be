@@ -38,7 +38,7 @@ public class LeagueService {
     params.put("league", league.id);
     params.put("id", user.id);
     User.updateUser("league.id = :league where id = :id", params);
-    return new LeagueResponse(league, user.code, new BigDecimal(0));
+    return new LeagueResponse(league, user.code);
   }
 
   @Transactional
@@ -57,7 +57,7 @@ public class LeagueService {
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", league.id);
     League.updateObject("totalContributors = totalContributors + 1 where id = :id", leagueParams);
-    return new LeagueResponse(league, user.code, new BigDecimal(0));
+    return new LeagueResponse(league, user.code);
   }
 
   @Transactional

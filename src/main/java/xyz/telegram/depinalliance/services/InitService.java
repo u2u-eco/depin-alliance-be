@@ -87,19 +87,12 @@ public class InitService {
       }
       String configRootPointClaim = SystemConfig.findByKey(Enums.Config.ROOT_POINT_CLAIM);
       if (configRootPointClaim == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.ROOT_POINT_CLAIM, "0.05");
+        SystemConfig systemConfig = new SystemConfig(Enums.Config.ROOT_POINT_CLAIM, "338079956");
         systemConfig.persist();
       }
 
       if (Level.count() == 0) {
-        for (long i = 1; i < 100; i++) {
-          Level level = new Level();
-          level.id = i;
-          level.name = "Level " + i;
-          level.exp = new BigDecimal(10 * i);
-          level.point = new BigDecimal(100 * i);
-          level.persist();
-        }
+        initLevel();
       }
       if (DailyCheckin.count() == 0) {
         for (long i = 1; i < 7; i++) {
@@ -225,5 +218,218 @@ public class InitService {
         mission.persist();
       }
     }
+  }
+
+  public void initLevel() {
+    long id = 1;
+    Level level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = BigDecimal.ZERO;
+    level.expTo = new BigDecimal(100);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(100);
+    level.expTo = new BigDecimal(221);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(221);
+    level.expTo = new BigDecimal(354);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(354);
+    level.expTo = new BigDecimal(501);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(501);
+    level.expTo = new BigDecimal(662);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(662);
+    level.expTo = new BigDecimal(839);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(839);
+    level.expTo = new BigDecimal(1034);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(1034);
+    level.expTo = new BigDecimal(1248);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(1248);
+    level.expTo = new BigDecimal(1484);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(1484);
+    level.expTo = new BigDecimal(1743);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(1743);
+    level.expTo = new BigDecimal(2028);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(2028);
+    level.expTo = new BigDecimal(2342);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(2342);
+    level.expTo = new BigDecimal(2687);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(2687);
+    level.expTo = new BigDecimal(3067);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(3067);
+    level.expTo = new BigDecimal(3485);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(3485);
+    level.expTo = new BigDecimal(3944);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(3944);
+    level.expTo = new BigDecimal(4450);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(4450);
+    level.expTo = new BigDecimal(5006);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(5006);
+    level.expTo = new BigDecimal(5617);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(5617);
+    level.expTo = new BigDecimal(6290);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(6290);
+    level.expTo = new BigDecimal(7030);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(7030);
+    level.expTo = new BigDecimal(7844);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(7844);
+    level.expTo = new BigDecimal(8740);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(8740);
+    level.expTo = new BigDecimal(9725);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(9725);
+    level.expTo = new BigDecimal(10808);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(10808);
+    level.expTo = new BigDecimal(12000);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(12000);
+    level.expTo = new BigDecimal(13311);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(13311);
+    level.expTo = new BigDecimal(14753);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(14753);
+    level.expTo = new BigDecimal(16339);
+    level.persist();
+
+    level = new Level();
+    level.id = id++;
+    level.name = "Level " + level.id;
+    level.expFrom = new BigDecimal(16339);
+    level.expTo = new BigDecimal(18084);
+    level.persist();
   }
 }

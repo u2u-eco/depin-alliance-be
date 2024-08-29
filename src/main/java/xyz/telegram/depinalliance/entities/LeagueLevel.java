@@ -12,24 +12,13 @@ import java.math.BigDecimal;
  * @author holden on 26-Aug-2024
  */
 @Entity
-@Table(name = "levels")
-public class Level extends PanacheEntityBase {
+@Table(name = "league_levels")
+public class LeagueLevel extends PanacheEntityBase {
   @Id
   public Long id;
   public String name;
-  @Column(name = "exp_from", scale = 18, precision = 29)
-  public BigDecimal expFrom;
-  @Column(name = "exp_to", scale = 18, precision = 29)
-  public BigDecimal expTo;
-  @Column(name = "max_mining_power")
-  public BigDecimal maxMiningPower = BigDecimal.ZERO;
-
-  public Level(Long id) {
-    this.id = id;
-  }
-
-  public Level() {
-  }
+  @Column(scale = 18, precision = 29)
+  public BigDecimal expNextLevel;
 
   public static Long maxLevel() {
     return find(" select max(id) from Level ").project(Long.class).firstResult();

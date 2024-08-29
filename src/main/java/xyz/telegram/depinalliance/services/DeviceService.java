@@ -89,7 +89,7 @@ public class DeviceService {
     } else {
       UserItem.create(new UserItem(user, item, null));
     }
-    User.updatePointUser(user.id, amount.multiply(new BigDecimal("-1")));
+    User.updatePointUser(user.id, amount.multiply(user.ratePurchase).multiply(new BigDecimal("-1")));
     return true;
   }
 

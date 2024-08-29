@@ -9,6 +9,7 @@ import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -32,6 +33,10 @@ public class League extends BaseEntity {
   public String nameNormalize;
   @Column(name = "total_contributors")
   public long totalContributors = 0;
+  @Column(name = "total_mining")
+  public BigDecimal totalMining = BigDecimal.ZERO;
+  @Column(name = "xp", scale = 18, precision = 29)
+  public BigDecimal xp = BigDecimal.ZERO;
 
   public static League createLeague(League league) {
     league.create();
@@ -66,13 +71,14 @@ public class League extends BaseEntity {
   }
 
   public static ResponsePage<LeagueResponse> findByPaging(PagingParameters pageable) {
-    PanacheQuery<PanacheEntityBase> panacheQuery = find("select code, name, avatar, totalContributors from League", Sort.ascending("id"));
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(
+      "select code, name, avatar, totalContributors, totalMining from League", Sort.ascending("id"));
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(LeagueResponse.class).list(), pageable,
       panacheQuery.count());
   }
 
   public static LeagueResponse findDetailById(long id) {
-    return find("select code, name, avatar, totalContributors, 0 from League where id = ?1", id).project(
+    return find("select code, name, avatar, totalContributors, totalMining from League where id = ?1", id).project(
       LeagueResponse.class).firstResult();
   }
 }

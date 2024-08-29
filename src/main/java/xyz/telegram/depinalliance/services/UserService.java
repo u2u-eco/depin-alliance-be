@@ -42,6 +42,7 @@ public class UserService {
         if (ref != null) {
           User.updatePointUser(ref.id,
             new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF))));
+          user.pointRef = new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF)));
         }
       }
       user.ref = ref;
@@ -153,24 +154,53 @@ public class UserService {
       }
       mining(user);
       user = User.findById(user.id);
-      BigDecimal refPointClaim = new BigDecimal(
-        Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
+
+      BigDecimal pointUnClaimed = user.pointUnClaimed.multiply(bonusClaim());
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
-      paramsUser.put("point", user.pointUnClaimed.multiply(new BigDecimal("100").subtract(refPointClaim)));
-      User.updateUser("point = point + :point, pointUnClaimed = pointUnClaimed - :point where id = :id", paramsUser);
-      Long userRefId = 0L;
+      paramsUser.put("point", pointUnClaimed);
+      paramsUser.put("pointUnClaimed", user.pointUnClaimed);
+      User.updateUser("point = point + :point, pointUnClaimed = pointUnClaimed - :pointUnClaimed where id = :id",
+        paramsUser);
+      Long userRefId;
       if (user.ref != null) {
         userRefId = user.ref.id;
       } else {
         userRefId = Long.valueOf(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.ROOT_POINT_CLAIM)));
       }
+      BigDecimal refPointClaim = new BigDecimal(
+        Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
       Map<String, Object> paramsUserRef = new HashMap<>();
       paramsUserRef.put("id", userRefId);
-      paramsUserRef.put("point", user.pointUnClaimed.multiply(refPointClaim));
+      paramsUserRef.put("point", pointUnClaimed.multiply(refPointClaim));
       User.updateUser("point = point + :point where id = :id", paramsUserRef);
-      return Utils.stripDecimalZeros(user.pointUnClaimed);
+      return Utils.stripDecimalZeros(pointUnClaimed);
     }
+  }
+
+  public BigDecimal bonusClaim() {
+    int a = new Random().nextInt(100);
+    if (a < 5) {
+      // 5% chance
+      a = new Random().nextInt(100);
+      if (a < 65) {
+        // 65% chance
+        return new BigDecimal("1.05");
+      } else if (a < 85) {
+        // 20% chance
+        return new BigDecimal("1.1");
+      } else if (a < 95) {
+        // 10% chance
+        return new BigDecimal("1.15");
+      } else if (a < 99) {
+        // 4%
+        return new BigDecimal("1.35");
+      } else {
+        //1 %
+        return new BigDecimal("1.4");
+      }
+    }
+    return BigDecimal.ONE;
   }
 
   @Transactional
@@ -181,6 +211,12 @@ public class UserService {
       paramsUser.put("id", user.id);
       paramsUser.put("miningPower", miningPower);
       User.updateUser("miningPower = miningPower + :miningPower where id = :id", paramsUser);
+      if (user.league != null) {
+        Map<String, Object> paramsLeague = new HashMap<>();
+        paramsLeague.put("id", user.league.id);
+        paramsLeague.put("miningPower", miningPower);
+        League.updateObject("totalMining = totalMining + :miningPower where id = :id", paramsLeague);
+      }
       return Utils.stripDecimalZeros(user.miningPower.add(user.miningPower));
     }
   }
@@ -191,7 +227,7 @@ public class UserService {
       return BigDecimal.ZERO;
     }
     BigDecimal pointUnClaimed = user.miningPower.divide(new BigDecimal(3600), 18, RoundingMode.FLOOR)
-      .multiply(new BigDecimal(time - user.timeStartMining));
+      .multiply(new BigDecimal(time - user.timeStartMining)).multiply(user.rateMining);
     if (user.pointUnClaimed.add(pointUnClaimed).compareTo(user.maximumPower) > 0) {
       pointUnClaimed = user.maximumPower.subtract(user.pointUnClaimed);
     }
@@ -209,31 +245,31 @@ public class UserService {
     return UserSkill.findByUserId(userId);
   }
 
-  public boolean upgradeLevel(User user) throws Exception {
-    synchronized (user.id.toString().intern()) {
-      if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-      }
-      long maxLevel = Level.maxLevel();
-      if (user.level.id >= maxLevel)
-        throw new BusinessException(ResponseMessageConstants.USER_MAX_LEVEL);
-      Level nextLevel = Level.findById(user.level.id + 1);
-      if (user.point.compareTo(nextLevel.point) < 0 || user.xp.compareTo(nextLevel.exp) < 0)
-        throw new BusinessException(ResponseMessageConstants.USER_BALANCE_NOT_ENOUGH);
-      if (!User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)),
-        nextLevel.exp.multiply(new BigDecimal(-1))))
-        throw new BusinessException(ResponseMessageConstants.USER_UPGRADE_LEVEL_FAILED);
-      HistoryUpgradeLevel history = new HistoryUpgradeLevel();
-      history.create();
-      history.userId = user.id;
-      history.levelCurrent = user.level.id;
-      history.levelUpgrade = nextLevel.id;
-      history.pointUsed = nextLevel.point;
-      history.expUsed = nextLevel.exp;
-      HistoryUpgradeLevel.createHistory(history);
-      return true;
-    }
-  }
+  //  public boolean upgradeLevel(User user) throws Exception {
+  //    synchronized (user.id.toString().intern()) {
+  //      if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
+  //        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+  //      }
+  //      long maxLevel = Level.maxLevel();
+  //      if (user.level.id >= maxLevel)
+  //        throw new BusinessException(ResponseMessageConstants.USER_MAX_LEVEL);
+  //      Level nextLevel = Level.findById(user.level.id + 1);
+  //      if (user.point.compareTo(nextLevel.point) < 0 || user.xp.compareTo(nextLevel.exp) < 0)
+  //        throw new BusinessException(ResponseMessageConstants.USER_BALANCE_NOT_ENOUGH);
+  //      if (!User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)),
+  //        nextLevel.exp.multiply(new BigDecimal(-1))))
+  //        throw new BusinessException(ResponseMessageConstants.USER_UPGRADE_LEVEL_FAILED);
+  //      HistoryUpgradeLevel history = new HistoryUpgradeLevel();
+  //      history.create();
+  //      history.userId = user.id;
+  //      history.levelCurrent = user.level.id;
+  //      history.levelUpgrade = nextLevel.id;
+  //      history.pointUsed = nextLevel.point;
+  //      history.expUsed = nextLevel.exp;
+  //      HistoryUpgradeLevel.createHistory(history);
+  //      return true;
+  //    }
+  //  }
 
   public boolean upgradeSkill(User user, Long skillId) throws Exception {
     synchronized (user.id.toString().intern()) {
