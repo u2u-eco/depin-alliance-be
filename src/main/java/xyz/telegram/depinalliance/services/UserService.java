@@ -52,6 +52,7 @@ public class UserService {
       userDevice.name = "Device " + 1;
       userDevice.index = 1;
       UserDevice.create(userDevice);
+      UserSkill.initUserSkill(user, Skill.findAll().list());
       logger.info("User " + user.username + " created");
       return user;
     }
@@ -276,19 +277,16 @@ public class UserService {
       if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
+      Skill skill = (Skill) Skill.findByIdOptional(skillId)
+              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
       UserSkill userSkill = UserSkill.findByUserIdAndSkillId(user.id, skillId)
         .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_NOT_FOUND));
-      Skill skill = (Skill) Skill.findByIdOptional(skillId)
-        .orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
       if (userSkill.skill.id >= skill.maxLevel)
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL);
-      SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level + 1)
-        .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
-      User.updatePointUser(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)));
       if(userSkill.timeUpgrade > Utils.getCalendar().getTimeInMillis())
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_WAITING_UPGRADE);
-      if(userSkill.skill.id >= skill.maxLevel)
-        throw new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL);;
+      SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level + 1)
+        .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
       if(user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0)
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
       if(!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))

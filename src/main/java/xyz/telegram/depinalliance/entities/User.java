@@ -143,4 +143,7 @@ public class User extends BaseEntity {
     update("rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, " +
             "rateReward = rateReward + :rateReward where id= :id and rateMining + :rateMining >= 0 ");
   }
+  public static void updateLevelByXp(long userId, BigDecimal xpAdded) {
+
+  }
 }

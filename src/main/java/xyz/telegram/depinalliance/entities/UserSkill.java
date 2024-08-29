@@ -38,11 +38,14 @@ public class UserSkill extends BaseEntity{
     @Column(name = "time_upgrade")
     public Long timeUpgrade = 0L;   //Milliseconds
 
-    public void initUserSkill(User user, Skill skill, Long level, BigDecimal rateMining, BigDecimal powerMining) {
-        this.user = user;
-        this.skill = skill;
-        this.level = level;
-        persist();
+    public static void initUserSkill(User user, List<Skill> skills) {
+        skills.forEach(sk -> {
+            UserSkill userSkill = new UserSkill();
+            userSkill.create();
+            userSkill.user = user;
+            userSkill.skill = sk;
+            userSkill.persist();
+        });
     }
     public static boolean updateLevel(Long userId, Long skillId, Long levelUpdate) {
         try {
@@ -72,6 +75,15 @@ public class UserSkill extends BaseEntity{
             throw e;
         }
     }
+//    public static List<UserSkillResponse> findByUserId (long userId) {
+//        try {
+//            return find("select s.id, s.name, us.level, s.maxLevel, us.timeUpgrade from "+Skill.class.getSimpleName()+" us left join "+UserSkill.class.getSimpleName()+" s on us.skill.id = s.id " +
+//                    "where us.user.id = :userId ", Parameters.with("userId", userId))
+//                    .project(UserSkillResponse.class).list();
+//        }catch (Exception e) {
+//            throw e;
+//        }
+//    }
     public static boolean upgradeSkillPending(long userId, long skillId, long timeUpgrade, long currentTime) {
         try {
             Map<String, Object> params = new HashMap<>();
