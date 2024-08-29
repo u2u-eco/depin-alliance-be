@@ -27,14 +27,14 @@ public class UserSkill extends BaseEntity{
     public Skill skill;
 
     @Column(name = "level")
-    public Long level = 1L;
-    @Column(name = "rate_mining", scale = 18, precision = 29)
-    public BigDecimal rateMining;
-
-    @Column(name = "power_mining", scale = 18, precision = 29)
-    public BigDecimal powerMining;
+    public Long level = 0L;
+//    @Column(name = "rate_mining", scale = 18, precision = 29)
+//    public BigDecimal rateMining;
+//
+//    @Column(name = "power_mining", scale = 18, precision = 29)
+//    public BigDecimal powerMining;
     @Column(name = "level_upgrade")
-    public Long levelUpgrade = 1L;
+    public Long levelUpgrade = 0L;
     @Column(name = "time_upgrade")
     public Long timeUpgrade = 0L;   //Milliseconds
 
@@ -42,14 +42,16 @@ public class UserSkill extends BaseEntity{
         this.user = user;
         this.skill = skill;
         this.level = level;
-        this.rateMining = rateMining;
-        this.powerMining = powerMining;
         persist();
     }
-    public static void updateLevel(Long userId, Long skillId, Long maxLevel) {
+    public static boolean updateLevel(Long userId, Long skillId, Long levelUpdate) {
         try {
-            UserSkill.update("level=level+1 WHERE user.id = ?1 AND skill.id= ?2 AND level <= ?3",
-                    userId, skillId, maxLevel);
+            Map<String, Object> params = new HashMap<>();
+            params.put("userId", userId);
+            params.put("skillId", skillId);
+            params.put("levelUpdate", levelUpdate);
+            return update("level= :levelUpdate WHERE user.id = :userId AND skill.id= :skillId AND level < :levelUpdate",
+                    params) == 1 ? true : false;
         }catch (Exception e) {
             throw e;
         }

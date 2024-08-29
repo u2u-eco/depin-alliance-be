@@ -24,6 +24,10 @@ public class Enums {
     STARTED, DETECTED_DEVICE_INFO, CLAIMED, MINING
   }
 
+  public enum SkillUpgradeStatus {
+    NEW, DONE
+  }
+
   public enum ItemType {
     CPU, GPU, RAM, STORAGE
   }

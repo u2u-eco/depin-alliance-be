@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.services;
 
+import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -248,6 +249,14 @@ public class UserService {
       SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level + 1)
         .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
       User.updatePointUser(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)));
+      if(userSkill.timeUpgrade > Utils.getCalendar().getTimeInMillis())
+        throw new BusinessException(ResponseMessageConstants.USER_SKILL_WAITING_UPGRADE);
+      if(userSkill.skill.id >= skill.maxLevel)
+        throw new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL);;
+      if(user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0)
+        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+      if(!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
+        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
       long currentTime = Utils.getCalendar().getTimeInMillis();
       long timeUpgrade = currentTime + 1000 * userSkillNext.timeWaitUpgrade;
       if (!UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime))
@@ -266,6 +275,15 @@ public class UserService {
       history.timeUpgrade = currentTime;
       HistoryUpgradeSkill.createHistory(history);
       return true;
+    }
+  }
+  @Transactional
+  public void updateSkillLevelForUser(HistoryUpgradeSkill his) {
+    if(UserSkill.updateLevel(his.userId, his.skillId, his.levelUpgrade)) {
+      HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
+      User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward);
+    }else{
+
     }
   }
 }

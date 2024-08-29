@@ -21,6 +21,8 @@ public class User extends BaseEntity {
   public String username;
   @Column(name = "point", scale = 18, precision = 29)
   public BigDecimal point = BigDecimal.ZERO;
+  @Column(name = "point_skill", scale = 18, precision = 29)
+  public BigDecimal pointSkill = BigDecimal.ZERO;
   @Column(name = "point_un_claimed", scale = 18, precision = 29)
   public BigDecimal pointUnClaimed = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
@@ -92,6 +94,12 @@ public class User extends BaseEntity {
     params.put("point", point);
     return updateUser("point = point + :point where id = :id and point + :point >=0", params);
   }
+  public static boolean updatePointSkill(long id, BigDecimal pointSkill) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", id);
+    params.put("pointSkill", pointSkill);
+    return updateUser("pointSkill = pointSkill + :pointSkill where id = :id and pointSkill + :pointSkill >=0", params) == 1 ? true : false;
+  }
 
   public static int updatePointAndXpUser(long id, BigDecimal point, BigDecimal xp) {
     Map<String, Object> params = new HashMap<>();
@@ -124,8 +132,13 @@ public class User extends BaseEntity {
     }
   }
 
-  public static int updateLevel(long id, long maxLevel) {
-    return update("level = level + 1 where id = :id and point >= 0 and exp >= 0 and level <= :maxLevel",
-      Parameters.with("maxLevel", maxLevel));
+  public static void updateRate(long id, BigDecimal rateMining, BigDecimal ratePurchase, BigDecimal rateReward) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", id);
+    params.put("rateMining", rateMining);
+    params.put("ratePurchase", ratePurchase);
+    params.put("rateReward", rateReward);
+    update("rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, " +
+            "rateReward = rateReward + :rateReward where id= :id and rateMining + :rateMining >= 0 ");
   }
 }

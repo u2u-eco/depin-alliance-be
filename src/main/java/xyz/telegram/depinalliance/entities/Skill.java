@@ -3,9 +3,6 @@ package xyz.telegram.depinalliance.entities;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Table(name = "skills")
 public class Skill extends PanacheEntityBase {

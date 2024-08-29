@@ -1,9 +1,13 @@
 package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Entity
@@ -33,7 +37,17 @@ public class HistoryUpgradeSkill extends BaseEntity{
     public BigDecimal rateReward; //percent
     @Column(name = "time_upgrade")
     public long timeUpgrade;
+    @Column(name = "status")
+    public int status;
     public static void createHistory(HistoryUpgradeSkill history) {
         history.persist();
+    }
+    public static List<HistoryUpgradeSkill> getPending(long timeScan) {
+        try {
+            return find("status = 0 AND timeUpgrade <= :timeScan ",
+                    Parameters.with("timeScan", timeScan).map(), Sort.by("timeUpgrade").ascending()).list();
+        }catch (Exception e) {
+            throw e;
+        }
     }
 }

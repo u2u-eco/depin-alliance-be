@@ -14,10 +14,7 @@ import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.AvatarRequest;
 import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
-import xyz.telegram.depinalliance.common.models.response.RankingResponse;
-import xyz.telegram.depinalliance.common.models.response.ResponseData;
-import xyz.telegram.depinalliance.common.models.response.UserInfoResponse;
-import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
+import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.SystemConfig;
 import xyz.telegram.depinalliance.entities.User;
@@ -154,7 +151,12 @@ public class UserResource extends BaseResource {
   @GET
   @Path("skills")
   public ResponseData getUserSkill() throws Exception {
-    return ResponseData.ok(userService.getUserSkill(getUser().id));
+    User user = getUser();
+    List<UserSkillResponse> userSkills = userService.getUserSkill(user.id);
+    Map<String, Object> data = new HashMap<>();
+    data.put("skill", userSkills);
+    data.put("point", user.pointSkill);
+    return ResponseData.ok(data);
   }
 
   @POST
