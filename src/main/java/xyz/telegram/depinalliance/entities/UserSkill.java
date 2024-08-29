@@ -70,7 +70,7 @@ public class UserSkill extends BaseEntity{
             throw e;
         }
     }
-    public static int upgradeSkillPending(long userId, long skillId, long timeUpgrade, long currentTime) {
+    public static boolean upgradeSkillPending(long userId, long skillId, long timeUpgrade, long currentTime) {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("userId", userId);
@@ -79,7 +79,7 @@ public class UserSkill extends BaseEntity{
             params.put("currentTime", currentTime);
             return update("levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " +
                             "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime ",
-                    params);
+                    params) == 1 ? true : false;
         }catch (Exception e) {
             throw e;
         }

@@ -201,7 +201,10 @@ public class UserService {
       if(user.level.id >= maxLevel)
         throw new BusinessException(ResponseMessageConstants.USER_MAX_LEVEL);
       Level nextLevel = Level.findById(user.level.id+1);
-      User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)), nextLevel.exp.multiply(new BigDecimal(-1)));
+      if(user.point.compareTo(nextLevel.point) < 0 || user.xp.compareTo(nextLevel.exp) < 0)
+        throw new BusinessException(ResponseMessageConstants.USER_BALANCE_NOT_ENOUGH);
+      if(!User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)), nextLevel.exp.multiply(new BigDecimal(-1))))
+        throw new BusinessException(ResponseMessageConstants.USER_UPGRADE_LEVEL_FAILED);
       HistoryUpgradeLevel history = new HistoryUpgradeLevel();
       history.create();
       history.userId = user.id;
@@ -228,7 +231,7 @@ public class UserService {
       User.updatePointUser(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)));
       long currentTime = Utils.getCalendar().getTimeInMillis();
       long timeUpgrade = currentTime + 1000*userSkillNext.timeWaitUpgrade;
-      if(UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime)!=1)
+      if(!UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime))
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       HistoryUpgradeSkill history = new HistoryUpgradeSkill();
       history.create();

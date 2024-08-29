@@ -83,7 +83,7 @@ public class User extends BaseEntity {
       "select position from ( select id as id, row_number() over(order by miningPower desc, createdAt asc) as position from User) result where id =?1",
       userId).project(Long.class).firstResult();
   }
-  public static int updateLevel(long id, long nextLevel, long maxLevel, BigDecimal pointUse, BigDecimal expUse) {
+  public static boolean updateLevel(long id, long nextLevel, long maxLevel, BigDecimal pointUse, BigDecimal expUse) {
     try {
       Map<String, Object> params = new HashMap<>();
       params.put("id", id);
@@ -91,9 +91,9 @@ public class User extends BaseEntity {
       params.put("maxLevel", maxLevel);
       params.put("pointUse", pointUse);
       params.put("expUse", expUse);
-      return update("level.id = :nextLevel " +
+      return update("level.id = :nextLevel, point = point + :pointUse, xp = xp + :expUse " +
               "where id = :id and level.id < :nextLevel " +
-              "and point + :pointUse >= 0 and xp + :expUse >= 0 and :nextLevel <= :maxLevel", params);
+              "and point + :pointUse >= 0 and xp + :expUse >= 0 and :nextLevel <= :maxLevel", params) == 1 ? true : false;
     }catch (Exception e) {
       throw e;
     }

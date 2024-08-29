@@ -135,7 +135,7 @@ public class UserResource extends BaseResource {
   @GET
   @Path("skills")
   public ResponseData getUserSkill() throws Exception {
-    return ResponseData.ok(UserSkill.findByUserId(getUser().id));
+    return ResponseData.ok(userService.getUserSkill(getUser().id));
   }
 
   @POST
