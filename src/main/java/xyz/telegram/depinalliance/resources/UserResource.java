@@ -8,6 +8,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.resteasy.reactive.RestQuery;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
@@ -17,17 +18,16 @@ import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
 import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
+import xyz.telegram.depinalliance.entities.SkillLevel;
 import xyz.telegram.depinalliance.entities.SystemConfig;
 import xyz.telegram.depinalliance.entities.User;
+import xyz.telegram.depinalliance.entities.UserSkill;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
 
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author holden on 26-Jul-2024
@@ -174,6 +174,24 @@ public class UserResource extends BaseResource {
       return ResponseData.ok(userService.upgradeLevel(getUser()));
     }
   }*/
+  @GET
+  @Path("skills/{skillId}/next-level")
+  public ResponseData getSkillNextLevel(Long skillId) throws Exception {
+    User user = getUser();
+    Optional<SkillLevel> optional = SkillLevel.findBySkillAndLevel(skillId, user.level.id+1);
+    SkillLevelNextResponse levelNextResponse = new SkillLevelNextResponse();
+    if(optional.isPresent()) {
+      SkillLevel skillLevel = optional.get();
+      levelNextResponse.skillId = skillLevel.skill.id;
+      levelNextResponse.name = skillLevel.skill.name;
+      levelNextResponse.levelCurrent = user.level.id;
+      levelNextResponse.levelUpgrade = user.level.id + 1;
+      levelNextResponse.feeUpgrade = skillLevel.feeUpgrade.setScale(2, RoundingMode.UP);
+      levelNextResponse.rateEffect = skillLevel.rateMining.add(skillLevel.rateReward).add(skillLevel.ratePurchase).setScale(2, RoundingMode.UP);
+      return ResponseData.ok(levelNextResponse);
+    }
+    return ResponseData.ok(null);
+  }
 
   @POST
   @Path("upgrade-skill")

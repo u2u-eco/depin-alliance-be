@@ -74,7 +74,6 @@ public class UserSkill extends BaseEntity {
       throw e;
     }
   }
-
   //    public static List<UserSkillResponse> findByUserId (long userId) {
   //        try {
   //            return find("select s.id, s.name, us.level, s.maxLevel, us.timeUpgrade from "+Skill.class.getSimpleName()+" us left join "+UserSkill.class.getSimpleName()+" s on us.skill.id = s.id " +
@@ -95,7 +94,7 @@ public class UserSkill extends BaseEntity {
         "levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " + "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime ",
         params) == 1 ? true : false;
     } catch (Exception e) {
-      throw e;
+        throw e;
     }
   }
 }
