@@ -79,12 +79,7 @@ public class DeviceService {
       params.put("id", userDevice.id);
       params.put("item", request.number);
       UserDevice.updateObject(query + " where id = :id", params);
-      //      userService.mining(user);
       BigDecimal miningPower = item.miningPower.multiply(new BigDecimal(request.number));
-      //      Map<String, Object> paramsUser = new HashMap<>();
-      //      paramsUser.put("id", user.id);
-      //      paramsUser.put("miningPower", miningPower);
-      //      User.updateUser("miningPower = miningPower + :miningPower where id = :id", paramsUser);
       userService.changeMiningPower(user, miningPower);
     } else {
       UserItem.create(new UserItem(user, item, null));
@@ -143,11 +138,6 @@ public class DeviceService {
     paramsUserItem.put("id", itemId);
     paramsUserItem.put("userDeviceId", userDevice.id);
     UserItem.updateObject(" userDevice.id = :userDeviceId where id = :id", paramsUserItem);
-    //    userService.mining(user);
-    //    Map<String, Object> paramsUser = new HashMap<>();
-    //    paramsUser.put("id", user.id);
-    //    paramsUser.put("miningPower", userItem.item.miningPower);
-    //    User.updateUser("miningPower = miningPower + :miningPower where id = :id", paramsUser);
     userService.changeMiningPower(user, userItem.item.miningPower);
     return true;
   }
@@ -185,11 +175,6 @@ public class DeviceService {
     paramsUserItem.put("id", itemId);
     paramsUserItem.put("userDeviceId", null);
     UserItem.updateObject(" userDevice.id = :userDeviceId where id = :id", paramsUserItem);
-    //    userService.mining(user);
-    //    Map<String, Object> paramsUser = new HashMap<>();
-    //    paramsUser.put("id", user.id);
-    //    paramsUser.put("miningPower", userItem.item.miningPower);
-    //    User.updateUser("miningPower = miningPower - :miningPower where id = :id", paramsUser);
     userService.changeMiningPower(user, userItem.item.miningPower.multiply(new BigDecimal("-1")));
     return true;
   }

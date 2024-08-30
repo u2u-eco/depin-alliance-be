@@ -208,7 +208,7 @@ public class UserService {
   }
 
   @Transactional
-  public BigDecimal changeMiningPower(User user, BigDecimal miningPower) throws Exception {
+  public void changeMiningPower(User user, BigDecimal miningPower) throws Exception {
     synchronized (user.id.toString().intern()) {
       mining(user);
       Map<String, Object> paramsUser = new HashMap<>();
@@ -221,7 +221,6 @@ public class UserService {
         paramsLeague.put("miningPower", miningPower.multiply(user.rateMining));
         League.updateObject("totalMining = totalMining + :miningPower where id = :id", paramsLeague);
       }
-      return Utils.stripDecimalZeros(user.miningPower.add(user.miningPower));
     }
   }
 
@@ -230,8 +229,8 @@ public class UserService {
     if (user.status != Enums.UserStatus.MINING) {
       return BigDecimal.ZERO;
     }
-    BigDecimal pointUnClaimed = user.miningPower.divide(new BigDecimal(3600), 18, RoundingMode.FLOOR)
-      .multiply(new BigDecimal(time - user.timeStartMining)).multiply(user.rateMining);
+    BigDecimal pointUnClaimed = user.miningPower.multiply(user.rateMining)
+      .divide(new BigDecimal(3600), 18, RoundingMode.FLOOR).multiply(new BigDecimal(time - user.timeStartMining));
     if (user.pointUnClaimed.add(pointUnClaimed).compareTo(user.maximumPower) > 0) {
       pointUnClaimed = user.maximumPower.subtract(user.pointUnClaimed);
     }
@@ -319,6 +318,16 @@ public class UserService {
   public void updateSkillLevelForUser(HistoryUpgradeSkill his) {
     boolean status = UserSkill.updateLevel(his.userId, his.skillId, his.levelUpgrade);
     if (status) {
+      if (his.rateMining != null && his.rateMining.compareTo(BigDecimal.ZERO) > 0) {
+        User user = User.findById(his.userId);
+        if (user.league != null) {
+          Map<String, Object> paramsLeague = new HashMap<>();
+          paramsLeague.put("id", user.league.id);
+          paramsLeague.put("miningPowerOld", user.miningPower.multiply(user.rateMining));
+          paramsLeague.put("miningPowerNew", user.miningPower.multiply(user.rateMining.add(his.rateMining)));
+          League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id", paramsLeague);
+        }
+      }
       User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward);
     }
     HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));

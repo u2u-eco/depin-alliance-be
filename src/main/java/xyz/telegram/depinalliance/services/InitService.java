@@ -19,81 +19,81 @@ public class InitService {
   @Transactional
   void onStart(@Observes StartupEvent event) {
     if (LaunchMode.current().isDevOrTest()) {
-      String configPointRef = SystemConfig.findByKey(Enums.Config.POINT_REF);
-      if (configPointRef == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.POINT_REF, "200");
-        systemConfig.persist();
-      }
-      String configUserDeviceCpuSlot = SystemConfig.findByKey(Enums.Config.CPU_SLOT);
-      if (configUserDeviceCpuSlot == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.CPU_SLOT, "1");
-        systemConfig.persist();
-      }
-      String configUserDeviceGpuSlot = SystemConfig.findByKey(Enums.Config.GPU_SLOT);
-      if (configUserDeviceGpuSlot == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.GPU_SLOT, "2");
-        systemConfig.persist();
-      }
-      String configUserDeviceRamSlot = SystemConfig.findByKey(Enums.Config.RAM_SLOT);
-      if (configUserDeviceRamSlot == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.RAM_SLOT, "3");
-        systemConfig.persist();
-      }
-      String configUserDeviceStorageSlot = SystemConfig.findByKey(Enums.Config.STORAGE_SLOT);
-      if (configUserDeviceStorageSlot == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.STORAGE_SLOT, "1");
-        systemConfig.persist();
-      }
-      String configCpuDefault = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
-      if (configCpuDefault == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.CPU_DEFAULT, "CPU_1");
-        systemConfig.persist();
-      }
-      String configGpuDefault = SystemConfig.findByKey(Enums.Config.GPU_DEFAULT);
-      if (configGpuDefault == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.GPU_DEFAULT, "GPU_1");
-        systemConfig.persist();
-      }
-      String configRamDefault = SystemConfig.findByKey(Enums.Config.RAM_DEFAULT);
-      if (configRamDefault == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.RAM_DEFAULT, "RAM_1");
-        systemConfig.persist();
-      }
-      String configStorageDefault = SystemConfig.findByKey(Enums.Config.STORAGE_DEFAULT);
-      if (configStorageDefault == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.STORAGE_DEFAULT, "STORAGE_1");
-        systemConfig.persist();
-      }
-      String configAvatarDefault = SystemConfig.findByKey(Enums.Config.AVATAR_DEFAULT);
-      if (configAvatarDefault == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.AVATAR_DEFAULT,
-          "/assets/images/avatar/avatar-01@2x.png");
-        systemConfig.persist();
-      }
-      String configAvatarList = SystemConfig.findByKey(Enums.Config.AVATAR_LIST);
-      if (configAvatarList == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.AVATAR_LIST,
-          "/assets/images/avatar/avatar-01@2x.png;/assets/images/avatar/avatar-02@2x.png;/assets/images/avatar/avatar-03@2x.png;/assets/images/avatar/avatar-04@2x.png;/assets/images/avatar/avatar-05@2x.png;/assets/images/avatar/avatar-06@2x.png");
-        systemConfig.persist();
-      }
-      String configMaxMiningPowerDefault = SystemConfig.findByKey(Enums.Config.MAX_MINING_POWER_DEFAULT);
-      if (configMaxMiningPowerDefault == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.MAX_MINING_POWER_DEFAULT, "1000");
-        systemConfig.persist();
-      }
-      String configRefPointClaim = SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM);
-      if (configRefPointClaim == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.REF_POINT_CLAIM, "0.05");
-        systemConfig.persist();
-      }
-      String configRootPointClaim = SystemConfig.findByKey(Enums.Config.ROOT_POINT_CLAIM);
-      if (configRootPointClaim == null) {
-        SystemConfig systemConfig = new SystemConfig(Enums.Config.ROOT_POINT_CLAIM, "338079956");
-        systemConfig.persist();
-      }
+//      String configPointRef = SystemConfig.findByKey(Enums.Config.POINT_REF);
+//      if (configPointRef == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.POINT_REF, "200");
+//        systemConfig.persist();
+//      }
+//      String configUserDeviceCpuSlot = SystemConfig.findByKey(Enums.Config.CPU_SLOT);
+//      if (configUserDeviceCpuSlot == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.CPU_SLOT, "1");
+//        systemConfig.persist();
+//      }
+//      String configUserDeviceGpuSlot = SystemConfig.findByKey(Enums.Config.GPU_SLOT);
+//      if (configUserDeviceGpuSlot == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.GPU_SLOT, "2");
+//        systemConfig.persist();
+//      }
+//      String configUserDeviceRamSlot = SystemConfig.findByKey(Enums.Config.RAM_SLOT);
+//      if (configUserDeviceRamSlot == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.RAM_SLOT, "3");
+//        systemConfig.persist();
+//      }
+//      String configUserDeviceStorageSlot = SystemConfig.findByKey(Enums.Config.STORAGE_SLOT);
+//      if (configUserDeviceStorageSlot == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.STORAGE_SLOT, "1");
+//        systemConfig.persist();
+//      }
+//      String configCpuDefault = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
+//      if (configCpuDefault == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.CPU_DEFAULT, "CPU_1");
+//        systemConfig.persist();
+//      }
+//      String configGpuDefault = SystemConfig.findByKey(Enums.Config.GPU_DEFAULT);
+//      if (configGpuDefault == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.GPU_DEFAULT, "GPU_1");
+//        systemConfig.persist();
+//      }
+//      String configRamDefault = SystemConfig.findByKey(Enums.Config.RAM_DEFAULT);
+//      if (configRamDefault == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.RAM_DEFAULT, "RAM_1");
+//        systemConfig.persist();
+//      }
+//      String configStorageDefault = SystemConfig.findByKey(Enums.Config.STORAGE_DEFAULT);
+//      if (configStorageDefault == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.STORAGE_DEFAULT, "STORAGE_1");
+//        systemConfig.persist();
+//      }
+//      String configAvatarDefault = SystemConfig.findByKey(Enums.Config.AVATAR_DEFAULT);
+//      if (configAvatarDefault == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.AVATAR_DEFAULT,
+//          "/assets/images/avatar/avatar-01@2x.png");
+//        systemConfig.persist();
+//      }
+//      String configAvatarList = SystemConfig.findByKey(Enums.Config.AVATAR_LIST);
+//      if (configAvatarList == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.AVATAR_LIST,
+//          "/assets/images/avatar/avatar-01@2x.png;/assets/images/avatar/avatar-02@2x.png;/assets/images/avatar/avatar-03@2x.png;/assets/images/avatar/avatar-04@2x.png;/assets/images/avatar/avatar-05@2x.png;/assets/images/avatar/avatar-06@2x.png");
+//        systemConfig.persist();
+//      }
+//      String configMaxMiningPowerDefault = SystemConfig.findByKey(Enums.Config.MAX_MINING_POWER_DEFAULT);
+//      if (configMaxMiningPowerDefault == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.MAX_MINING_POWER_DEFAULT, "1000");
+//        systemConfig.persist();
+//      }
+//      String configRefPointClaim = SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM);
+//      if (configRefPointClaim == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.REF_POINT_CLAIM, "0.05");
+//        systemConfig.persist();
+//      }
+//      String configRootPointClaim = SystemConfig.findByKey(Enums.Config.ROOT_POINT_CLAIM);
+//      if (configRootPointClaim == null) {
+//        SystemConfig systemConfig = new SystemConfig(Enums.Config.ROOT_POINT_CLAIM, "338079956");
+//        systemConfig.persist();
+//      }
 
       if (Level.count() == 0) {
-        initLevel();
+//        initLevel();
       }
       /*if (DailyCheckin.count() == 0) {
         for (long i = 1; i < 7; i++) {

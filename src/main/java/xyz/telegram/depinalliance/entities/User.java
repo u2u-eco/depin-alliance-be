@@ -107,7 +107,7 @@ public class User extends BaseEntity {
     params.put("id", id);
     params.put("pointSkill", pointSkill);
     return updateUser("pointSkill = pointSkill + :pointSkill where id = :id and pointSkill + :pointSkill >=0",
-      params) == 1 ? true : false;
+      params) == 1;
   }
 
   public static int updatePointAndXpUser(long id, BigDecimal point, BigDecimal xp) {
@@ -154,6 +154,15 @@ public class User extends BaseEntity {
     } catch (Exception e) {
       throw e;
     }
+  }
+
+  public static void updateLevelAndPointSkill(Long userId, Long levelNew, BigDecimal pointSkill) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
+    params.put("levelNew", levelNew);
+    params.put("pointSkill", pointSkill);
+    update("level.id = :levelNew, pointSkill = pointSkill + :pointSkill" +
+      " where id = :userId and level.id < :levelNew and :pointSkill > 0 ");
   }
 
   public static ResponsePage<FriendResponse> findFriendByUserAndPaging(PagingParameters pageable, long userId) {

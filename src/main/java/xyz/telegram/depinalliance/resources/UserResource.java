@@ -212,7 +212,7 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("friend")
-  public ResponseData friend(PagingParameters pagingParameters) throws Exception {
+  public ResponseData friend(PagingParameters pagingParameters) {
     return ResponseData.ok(User.findFriendByUserAndPaging(pagingParameters, getTelegramId()));
   }
 }

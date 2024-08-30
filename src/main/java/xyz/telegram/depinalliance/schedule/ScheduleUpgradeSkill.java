@@ -20,7 +20,7 @@ public class ScheduleUpgradeSkill {
   @Scheduled(every = "5s", identity = "task-job")
   void schedule() {
     List<HistoryUpgradeSkill> skillsUpgrade = HistoryUpgradeSkill.getPending(Utils.getCalendar().getTimeInMillis());
-    if (skillsUpgrade.size() > 0) {
+    if (!skillsUpgrade.isEmpty()) {
       skillsUpgrade.forEach(up -> {
         try {
           userService.updateSkillLevelForUser(up);
