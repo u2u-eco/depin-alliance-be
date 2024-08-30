@@ -42,7 +42,7 @@ public class MissionService {
       return dailyCheckins.stream().map(dailyCheckin -> {
         long time = calendar.getTimeInMillis() / 1000;
         DailyCheckinResponse dailyCheckinResponse = new DailyCheckinResponse(dailyCheckin.name, time,
-          dailyCheckin.point, time <= today);
+          dailyCheckin.point, dailyCheckin.xp, time <= today);
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         return dailyCheckinResponse;
       }).collect(Collectors.toList());
@@ -53,7 +53,7 @@ public class MissionService {
       return dailyCheckins.stream().map(dailyCheckin -> {
         long time = calendar.getTimeInMillis() / 1000;
         DailyCheckinResponse dailyCheckinResponse = new DailyCheckinResponse(dailyCheckin.name, time,
-          dailyCheckin.point, time < today);
+          dailyCheckin.point, dailyCheckin.xp, time < today);
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         return dailyCheckinResponse;
       }).collect(Collectors.toList());
@@ -62,7 +62,7 @@ public class MissionService {
     if (user.startCheckIn == 0 || today - user.lastCheckIn > 86400) {
       return dailyCheckins.stream().map(dailyCheckin -> {
         DailyCheckinResponse dailyCheckinResponse = new DailyCheckinResponse(dailyCheckin.name,
-          calendar.getTimeInMillis() / 1000, dailyCheckin.point, false);
+          calendar.getTimeInMillis() / 1000, dailyCheckin.point, dailyCheckin.xp, false);
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         return dailyCheckinResponse;
       }).collect(Collectors.toList());
@@ -85,8 +85,14 @@ public class MissionService {
       paramsUser.put("startCheckIn", today);
       paramsUser.put("lastCheckIn", today);
       paramsUser.put("point", dailyCheckin.point);
-      User.updateUser("startCheckIn = :startCheckIn, lastCheckIn = :lastCheckIn, point = point + :point where id = :id",
+      paramsUser.put("xp", dailyCheckin.xp);
+      User.updateUser(
+        "startCheckIn = :startCheckIn, lastCheckIn = :lastCheckIn, point = point + :point, xp = xp + :xp where id = :id",
         paramsUser);
+      if (dailyCheckin.xp != null || dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
+        userService.updateLevelByExp(user.id);
+        leagueService.updateXp(user, dailyCheckin.xp);
+      }
       return Utils.stripDecimalZeros(dailyCheckin.point);
     }
     //checkin lien tiep
@@ -97,7 +103,12 @@ public class MissionService {
       paramsUser.put("id", user.id);
       paramsUser.put("lastCheckIn", today);
       paramsUser.put("point", dailyCheckin.point);
-      User.updateUser("lastCheckIn = :lastCheckIn, point = point + :point where id = :id", paramsUser);
+      paramsUser.put("xp", dailyCheckin.xp);
+      User.updateUser("lastCheckIn = :lastCheckIn, point = point + :point, xp = xp + :xp where id = :id", paramsUser);
+      if (dailyCheckin.xp != null || dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
+        userService.updateLevelByExp(user.id);
+        leagueService.updateXp(user, dailyCheckin.xp);
+      }
       return Utils.stripDecimalZeros(dailyCheckin.point);
     }
     throw new BusinessException(ResponseMessageConstants.HAS_ERROR);

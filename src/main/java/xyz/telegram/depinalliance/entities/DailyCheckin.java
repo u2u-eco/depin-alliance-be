@@ -17,4 +17,5 @@ public class DailyCheckin extends PanacheEntityBase {
   public Long id;
   public String name;
   public BigDecimal point;
+  public BigDecimal xp;
 }
