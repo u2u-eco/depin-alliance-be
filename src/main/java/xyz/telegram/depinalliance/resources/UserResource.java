@@ -163,7 +163,8 @@ public class UserResource extends BaseResource {
     List<UserSkillResponse> userSkills = userService.getUserSkill(user.id);
     Map<String, Object> data = new HashMap<>();
     data.put("skill", userSkills);
-    data.put("point", user.pointSkill);
+    data.put("pointSkill", user.pointSkill);
+    data.put("point", user.point);
     return ResponseData.ok(data);
   }
 
@@ -181,6 +182,7 @@ public class UserResource extends BaseResource {
       levelNextResponse.levelCurrent = userSkill.level;
       levelNextResponse.levelUpgrade = userSkill.level + 1;
       levelNextResponse.feeUpgrade = skillLevel.feeUpgrade.setScale(2, RoundingMode.UP);
+      levelNextResponse.feePointUpgrade = skillLevel.feePoint.setScale(2, RoundingMode.UP);
       levelNextResponse.rateEffect = skillLevel.rateMining.add(skillLevel.rateReward).add(skillLevel.ratePurchase)
         .setScale(2, RoundingMode.UP);
       return ResponseData.ok(levelNextResponse);

@@ -8,5 +8,6 @@ public class SkillLevelNextResponse {
     public Long levelCurrent;
     public Long levelUpgrade;
     public BigDecimal feeUpgrade;
+    public BigDecimal feePointUpgrade;
     public BigDecimal rateEffect;
 }
