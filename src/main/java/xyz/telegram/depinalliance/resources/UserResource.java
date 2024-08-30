@@ -18,14 +18,12 @@ import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
 import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
-import xyz.telegram.depinalliance.entities.SkillLevel;
-import xyz.telegram.depinalliance.entities.SystemConfig;
-import xyz.telegram.depinalliance.entities.User;
-import xyz.telegram.depinalliance.entities.UserSkill;
+import xyz.telegram.depinalliance.entities.*;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
@@ -163,9 +161,19 @@ public class UserResource extends BaseResource {
     List<UserSkillResponse> userSkills = userService.getUserSkill(user.id);
     Map<String, Object> data = new HashMap<>();
     data.put("skill", userSkills);
-    data.put("pointSkill", user.pointSkill);
-    data.put("point", user.point);
+    data.put("pointSkill", user.pointSkill.setScale(2, RoundingMode.UP));
+    data.put("point", user.point.setScale(2, RoundingMode.UP));
     return ResponseData.ok(data);
+  }
+  private BigDecimal getUserRate(int skillId, User user, SkillLevel skillLevel) {
+    switch (skillId) {
+      case 1: return null!=user ? user.rateMining : skillLevel.rateMining;
+      case 2: return null!=user ? user.ratePurchase : skillLevel.ratePurchase;
+      case 3: return null!=user ? user.rateCountDown : skillLevel.rateCountDown;
+      case 4: return null!=user ? user.rateReward : skillLevel.rateReward;
+      case 5: return null!=user ? user.rateCapacity : skillLevel.rateCapacity;
+    }
+    return BigDecimal.ZERO;
   }
 
   @GET
@@ -179,12 +187,13 @@ public class UserResource extends BaseResource {
       SkillLevel skillLevel = optional.get();
       levelNextResponse.skillId = skillLevel.skill.id;
       levelNextResponse.name = skillLevel.skill.name;
+      levelNextResponse.description = skillLevel.skill.description;
       levelNextResponse.levelCurrent = userSkill.level;
       levelNextResponse.levelUpgrade = userSkill.level + 1;
       levelNextResponse.feeUpgrade = skillLevel.feeUpgrade.setScale(2, RoundingMode.UP);
-      levelNextResponse.feePointUpgrade = skillLevel.feePoint.setScale(2, RoundingMode.UP);
-      levelNextResponse.rateEffect = skillLevel.rateMining.add(skillLevel.rateReward).add(skillLevel.ratePurchase)
-        .setScale(2, RoundingMode.UP);
+      levelNextResponse.feePointUpgrade = SkillPoint.getPointRequire(user.id).point.setScale(2, RoundingMode.UP);
+      levelNextResponse.effectCurrent = getUserRate(skillId.intValue(), user, null).setScale(2, RoundingMode.UP);
+      levelNextResponse.rateEffect = getUserRate(skillId.intValue(), null, skillLevel).setScale(2, RoundingMode.UP);
       return ResponseData.ok(levelNextResponse);
     }
     return ResponseData.ok(null);
@@ -195,7 +204,6 @@ public class UserResource extends BaseResource {
   @Transactional
   public ResponseData upgradeSkill(SkillUpgradeRequest request) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
-      userService.updateLevelByExp(getUser().id);
       return ResponseData.ok(userService.upgradeSkill(getUser(), request.skillId));
     }
   }

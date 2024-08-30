@@ -16,4 +16,6 @@ public class Skill extends PanacheEntityBase {
   public Integer orderDisplay;
   @Column(name = "max_level")
   public Long maxLevel;
+  @Column
+  public String description;
 }

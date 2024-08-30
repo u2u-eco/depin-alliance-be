@@ -288,15 +288,19 @@ public class UserService {
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_WAITING_UPGRADE);
       SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level + 1)
         .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
-      if (user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0 || user.point.compareTo(userSkillNext.feePoint) < 0)
-        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+      if (user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0)
+        throw new BusinessException(ResponseMessageConstants.USER_POINT_SKILL_NOT_ENOUGH);
+      SkillPoint skillPoint = SkillPoint.getPointRequire(user.id);
+      if(skillPoint!=null && user.point.compareTo(skillPoint.point) < 0)
+          throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
 //      if (!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
 //        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
       if (!User.updatePointSkillAndPoint(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)),
-              userSkillNext.feePoint.multiply(new BigDecimal(-1))))
-        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+              skillPoint.point.multiply(new BigDecimal(-1))))
+        throw new BusinessException(ResponseMessageConstants.USER_POINT_OR_POINT_SKILL_NOT_ENOUGH);
       long currentTime = Utils.getCalendar().getTimeInMillis();
-      long timeUpgrade = currentTime + 1000 * userSkillNext.timeWaitUpgrade;
+      long currentDiscount = user.rateCountDown.multiply(new BigDecimal(100)).longValue();
+      long timeUpgrade = currentTime + ((1000 * userSkillNext.timeWaitUpgrade * currentDiscount) / 100);
       if (!UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime))
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       HistoryUpgradeSkill history = new HistoryUpgradeSkill();
@@ -308,7 +312,10 @@ public class UserService {
       history.rateMining = userSkillNext.rateMining;
       history.ratePurchase = userSkillNext.ratePurchase;
       history.rateReward = userSkillNext.rateReward;
+      history.rateCountDown = userSkillNext.rateCountDown;
+      history.rateCapacity = userSkillNext.rateCapacity;
       history.feeUpgrade = userSkillNext.feeUpgrade;
+      history.feePointUpgrade = skillPoint.point;
       history.timeWaitUpgrade = userSkillNext.timeWaitUpgrade;
       history.timeUpgrade = timeUpgrade;
       HistoryUpgradeSkill.createHistory(history);
@@ -331,7 +338,7 @@ public class UserService {
             paramsLeague);
         }
       }
-      User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward);
+      User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward, his.rateCountDown, his.rateCapacity);
     }
     HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
   }

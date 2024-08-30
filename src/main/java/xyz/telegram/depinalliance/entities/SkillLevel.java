@@ -21,18 +21,19 @@ public class SkillLevel extends PanacheEntityBase {
   @Column(name = "level")
   public Long level;
   @Column(name = "fee_upgrade", scale = 18, precision = 29)
-  public BigDecimal feeUpgrade;  //point skill
-  @Column(name = "fee_point", scale = 18, precision = 29)
-  public BigDecimal feePoint;  //point
+  public BigDecimal feeUpgrade = BigDecimal.ZERO;  //point skill
   @Column(name = "time_wait_upgrade")
-  public Long timeWaitUpgrade; //seconds
-
+  public Long timeWaitUpgrade = 0L; //seconds
   @Column(name = "rate_mining", scale = 18, precision = 29)
-  public BigDecimal rateMining; //percent
+  public BigDecimal rateMining = BigDecimal.ZERO; //percent
   @Column(name = "rate_purchase", scale = 18, precision = 29)
-  public BigDecimal ratePurchase; //percent
+  public BigDecimal ratePurchase = BigDecimal.ZERO; //percent
   @Column(name = "rate_reward", scale = 18, precision = 29)
-  public BigDecimal rateReward; //percent
+  public BigDecimal rateReward= BigDecimal.ZERO; //percent
+  @Column(name = "rate_count_down", scale = 18, precision = 29)
+  public BigDecimal rateCountDown = BigDecimal.ZERO; //percent
+  @Column(name = "rate_capacity", scale = 18, precision = 29)
+  public BigDecimal rateCapacity = BigDecimal.ZERO; //percent
 
   public static Long getMaxLevel(Long skillId) {
     try {

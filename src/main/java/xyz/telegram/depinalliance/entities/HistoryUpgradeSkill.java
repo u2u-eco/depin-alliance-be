@@ -23,15 +23,21 @@ public class HistoryUpgradeSkill extends BaseEntity {
   @Column(name = "level_upgrade")
   public long levelUpgrade;
   @Column(name = "fee_upgrade", scale = 18, precision = 29)
-  public BigDecimal feeUpgrade; //percent
+  public BigDecimal feeUpgrade;
+  @Column(name = "fee_point_upgrade", scale = 18, precision = 29)
+  public BigDecimal feePointUpgrade;
   @Column(name = "time_wait_upgrade")
-  public Long timeWaitUpgrade; //hours
+  public Long timeWaitUpgrade;
   @Column(name = "rate_mining", scale = 18, precision = 29)
   public BigDecimal rateMining; //percent
   @Column(name = "rate_purchase", scale = 18, precision = 29)
   public BigDecimal ratePurchase; //percent
   @Column(name = "rate_reward", scale = 18, precision = 29)
   public BigDecimal rateReward; //percent
+  @Column(name = "rate_count_down", scale = 18, precision = 29)
+  public BigDecimal rateCountDown = BigDecimal.ZERO; //percent
+  @Column(name = "rate_capacity", scale = 18, precision = 29)
+  public BigDecimal rateCapacity = BigDecimal.ZERO; //percent
   @Column(name = "time_upgrade")
   public long timeUpgrade;
   @Column(name = "status")

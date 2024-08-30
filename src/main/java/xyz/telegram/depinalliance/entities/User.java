@@ -42,6 +42,10 @@ public class User extends BaseEntity {
   public BigDecimal ratePurchase = BigDecimal.ONE;
   @Column(name = "rate_reward", scale = 18, precision = 29)
   public BigDecimal rateReward = BigDecimal.ONE;
+  @Column(name = "rate_count_down", scale = 18, precision = 29)
+  public BigDecimal rateCountDown = BigDecimal.ONE;
+  @Column(name = "rate_capacity", scale = 18, precision = 29)
+  public BigDecimal rateCapacity = BigDecimal.ONE;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ref_id")
   public User ref;
@@ -154,15 +158,20 @@ public class User extends BaseEntity {
     }
   }
 
-  public static void updateRate(long id, BigDecimal rateMining, BigDecimal ratePurchase, BigDecimal rateReward) {
+  public static void updateRate(long id, BigDecimal rateMining, BigDecimal ratePurchase, BigDecimal rateReward,
+                                BigDecimal rateCountDown, BigDecimal rateCapacity) {
     try {
       Map<String, Object> params = new HashMap<>();
       params.put("id", id);
       params.put("rateMining", rateMining);
       params.put("ratePurchase", ratePurchase);
       params.put("rateReward", rateReward);
+      params.put("rateCountDown", rateCountDown);
+      params.put("rateCapacity", rateCapacity);
       update(
-        "rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, " + "rateReward = rateReward + :rateReward where id= :id and :rateMining > 0 and :rateReward > 0",
+        "rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, "
+                + " rateReward = rateReward + :rateReward,  rateCountDown = rateCountDown + :rateCountDown, rateCapacity = rateCapacity + :rateCapacity "
+                + " where id= :id and :rateMining > 0 and :rateReward > 0 and :rateCapacity > 0 ",
         params);
     } catch (Exception e) {
       throw e;
