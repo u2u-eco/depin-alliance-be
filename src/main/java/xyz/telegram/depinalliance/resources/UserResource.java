@@ -176,8 +176,8 @@ public class UserResource extends BaseResource {
       SkillLevel skillLevel = optional.get();
       levelNextResponse.skillId = skillLevel.skill.id;
       levelNextResponse.name = skillLevel.skill.name;
-      levelNextResponse.levelCurrent = user.level.id;
-      levelNextResponse.levelUpgrade = user.level.id + 1;
+      levelNextResponse.levelCurrent = skillLevel.level;
+      levelNextResponse.levelUpgrade = skillLevel.level + 1;
       levelNextResponse.feeUpgrade = skillLevel.feeUpgrade.setScale(2, RoundingMode.UP);
       levelNextResponse.rateEffect = skillLevel.rateMining.add(skillLevel.rateReward).add(skillLevel.ratePurchase)
         .setScale(2, RoundingMode.UP);
