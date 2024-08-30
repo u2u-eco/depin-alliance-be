@@ -82,7 +82,7 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("info")
-  public ResponseData info() {
+  public ResponseData info() throws BusinessException {
     User user = getUser();
     UserInfoResponse userInfoResponse = new UserInfoResponse();
     userInfoResponse.avatar = user.avatar;

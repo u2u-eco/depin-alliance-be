@@ -2,6 +2,8 @@ package xyz.telegram.depinalliance.resources;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.SecurityContext;
+import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
+import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.entities.User;
 
 import java.security.Principal;
@@ -18,9 +20,13 @@ public class BaseResource {
     return principal != null ? Long.valueOf(ctx.getUserPrincipal().getName()) : null;
   }
 
-  public User getUser() {
+  public User getUser() throws BusinessException {
     if (ctx.getUserPrincipal() != null) {
-      return User.findById(getTelegramId());
+      User user = User.findById(getTelegramId());
+      if (user == null) {
+        throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+      }
+      return user;
     } else {
       return null;
     }

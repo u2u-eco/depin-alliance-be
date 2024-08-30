@@ -71,7 +71,7 @@ public class LeagueResource extends BaseResource {
 
   @GET
   @Path("user-league")
-  public ResponseData getUserLeague() {
+  public ResponseData getUserLeague() throws BusinessException {
     User user = getUser();
     League userLeague = user.league;
     return ResponseData.ok(userLeague == null ? "" : new LeagueResponse(userLeague, user));

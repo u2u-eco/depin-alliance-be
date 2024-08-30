@@ -26,7 +26,7 @@ public class MissionResource extends BaseResource {
 
   @GET
   @Path("daily-checkin")
-  public ResponseData getDailyCheckin() {
+  public ResponseData getDailyCheckin() throws BusinessException {
     return ResponseData.ok(missionService.getListOfDailyCheckin(getUser()));
   }
 
