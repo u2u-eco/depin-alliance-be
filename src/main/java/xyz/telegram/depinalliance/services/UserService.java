@@ -288,9 +288,12 @@ public class UserService {
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_WAITING_UPGRADE);
       SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level + 1)
         .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
-      if (user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0)
+      if (user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0 || user.point.compareTo(userSkillNext.feePoint) < 0)
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
-      if (!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
+//      if (!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
+//        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+      if (!User.updatePointSkillAndPoint(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)),
+              userSkillNext.feePoint.multiply(new BigDecimal(-1))))
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
       long currentTime = Utils.getCalendar().getTimeInMillis();
       long timeUpgrade = currentTime + 1000 * userSkillNext.timeWaitUpgrade;

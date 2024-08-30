@@ -22,6 +22,8 @@ public class SkillLevel extends PanacheEntityBase {
   public Long level;
   @Column(name = "fee_upgrade", scale = 18, precision = 29)
   public BigDecimal feeUpgrade;  //point skill
+  @Column(name = "fee_point", scale = 18, precision = 29)
+  public BigDecimal feePoint;  //point
   @Column(name = "time_wait_upgrade")
   public Long timeWaitUpgrade; //seconds
 

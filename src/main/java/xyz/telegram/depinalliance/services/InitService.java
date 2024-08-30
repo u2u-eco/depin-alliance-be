@@ -97,8 +97,22 @@ public class InitService {
 
     skill = new Skill();
     skill.id = 3L;
-    skill.name = "Networking";
+    skill.name = "Innovation";
     skill.orderDisplay = 3;
+    skill.maxLevel = 10L;
+    skill.persist();
+
+    skill = new Skill();
+    skill.id = 4L;
+    skill.name = "Data Analysis";
+    skill.orderDisplay = 4;
+    skill.maxLevel = 10L;
+    skill.persist();
+
+    skill = new Skill();
+    skill.id = 5L;
+    skill.name = "Strategic Planning";
+    skill.orderDisplay = 5;
     skill.maxLevel = 10L;
     skill.persist();
   }
@@ -107,6 +121,8 @@ public class InitService {
     Skill skill1 = Skill.findById(1L);
     Skill skill2 = Skill.findById(2L);
     Skill skill3 = Skill.findById(3L);
+    Skill skill4 = Skill.findById(4L);
+    Skill skill5 = Skill.findById(5L);
 
     for (long i = 1; i <= 10; i++) {
       SkillLevel skillLevel = new SkillLevel();

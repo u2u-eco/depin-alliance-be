@@ -21,6 +21,7 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.SkillLevel;
 import xyz.telegram.depinalliance.entities.SystemConfig;
 import xyz.telegram.depinalliance.entities.User;
+import xyz.telegram.depinalliance.entities.UserSkill;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
@@ -170,14 +171,15 @@ public class UserResource extends BaseResource {
   @Path("skills/{skillId}/next-level")
   public ResponseData getSkillNextLevel(@PathParam("skillId") Long skillId) throws Exception {
     User user = getUser();
-    Optional<SkillLevel> optional = SkillLevel.findBySkillAndLevel(skillId, user.level.id + 1);
+    UserSkill userSkill = UserSkill.findByUserIdAndSkillId(user.id, skillId).get();
+    Optional<SkillLevel> optional = SkillLevel.findBySkillAndLevel(skillId, userSkill.level + 1);
     SkillLevelNextResponse levelNextResponse = new SkillLevelNextResponse();
     if (optional.isPresent()) {
       SkillLevel skillLevel = optional.get();
       levelNextResponse.skillId = skillLevel.skill.id;
       levelNextResponse.name = skillLevel.skill.name;
-      levelNextResponse.levelCurrent = skillLevel.level;
-      levelNextResponse.levelUpgrade = skillLevel.level + 1;
+      levelNextResponse.levelCurrent = userSkill.level;
+      levelNextResponse.levelUpgrade = userSkill.level + 1;
       levelNextResponse.feeUpgrade = skillLevel.feeUpgrade.setScale(2, RoundingMode.UP);
       levelNextResponse.rateEffect = skillLevel.rateMining.add(skillLevel.rateReward).add(skillLevel.ratePurchase)
         .setScale(2, RoundingMode.UP);
@@ -191,6 +193,7 @@ public class UserResource extends BaseResource {
   @Transactional
   public ResponseData upgradeSkill(SkillUpgradeRequest request) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
+      userService.updateLevelByExp(getUser().id);
       return ResponseData.ok(userService.upgradeSkill(getUser(), request.skillId));
     }
   }

@@ -88,7 +88,11 @@ public class User extends BaseEntity {
   }
 
   public static long countByCode(String code) {
-    return count("code", code);
+    try {
+      return count("code", code);
+    }catch (Exception e) {
+      throw e;
+    }
   }
 
   public static int updateUser(String query, Map<String, Object> params) {
@@ -108,6 +112,14 @@ public class User extends BaseEntity {
     params.put("pointSkill", pointSkill);
     return updateUser("pointSkill = pointSkill + :pointSkill where id = :id and pointSkill + :pointSkill >=0",
       params) == 1;
+  }
+  public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", id);
+    params.put("pointSkill", pointSkill);
+    params.put("point", point);
+    return updateUser("pointSkill = pointSkill + :pointSkill, point = point + :point where id = :id and pointSkill + :pointSkill >=0",
+            params) == 1;
   }
 
   public static int updatePointAndXpUser(long id, BigDecimal point, BigDecimal xp) {
@@ -161,8 +173,9 @@ public class User extends BaseEntity {
     params.put("userId", userId);
     params.put("levelNew", levelNew);
     params.put("pointSkill", pointSkill);
-    update(
-      "level.id = :levelNew, pointSkill = pointSkill + :pointSkill" + " where id = :userId and level.id < :levelNew and :pointSkill > 0 ",
+    update("level.id = :levelNew, pointSkill = pointSkill + :pointSkill, " +
+              "maximumPower = maximumPower + (select sum(maxMiningPower) from Level where id > level.id and id <= levelNew ) "
+              + " where id = :userId and level.id < :levelNew and :pointSkill > 0 ",
       params);
   }
 
