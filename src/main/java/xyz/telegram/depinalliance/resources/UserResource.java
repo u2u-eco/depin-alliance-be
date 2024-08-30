@@ -7,8 +7,8 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.resteasy.reactive.RestQuery;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
@@ -21,7 +21,6 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.SkillLevel;
 import xyz.telegram.depinalliance.entities.SystemConfig;
 import xyz.telegram.depinalliance.entities.User;
-import xyz.telegram.depinalliance.entities.UserSkill;
 import xyz.telegram.depinalliance.services.JwtService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
@@ -95,6 +94,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
     userInfoResponse.status = user.status;
     userInfoResponse.username = user.username;
+    userInfoResponse.pointSkill = user.pointSkill;
     userInfoResponse.timeStartMining = user.timeStartMining;
     userInfoResponse.lastLoginTime = user.lastLoginTime;
     userInfoResponse.lastCheckin = user.lastCheckIn;
@@ -166,28 +166,21 @@ public class UserResource extends BaseResource {
     return ResponseData.ok(data);
   }
 
-  /*@POST
-  @Path("upgrade-level")
-  @Transactional
-  public ResponseData upgradeLevel() throws Exception {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(userService.upgradeLevel(getUser()));
-    }
-  }*/
   @GET
   @Path("skills/{skillId}/next-level")
-  public ResponseData getSkillNextLevel(Long skillId) throws Exception {
+  public ResponseData getSkillNextLevel(@PathParam("skillId") Long skillId) throws Exception {
     User user = getUser();
-    Optional<SkillLevel> optional = SkillLevel.findBySkillAndLevel(skillId, user.level.id+1);
+    Optional<SkillLevel> optional = SkillLevel.findBySkillAndLevel(skillId, user.level.id + 1);
     SkillLevelNextResponse levelNextResponse = new SkillLevelNextResponse();
-    if(optional.isPresent()) {
+    if (optional.isPresent()) {
       SkillLevel skillLevel = optional.get();
       levelNextResponse.skillId = skillLevel.skill.id;
       levelNextResponse.name = skillLevel.skill.name;
       levelNextResponse.levelCurrent = user.level.id;
       levelNextResponse.levelUpgrade = user.level.id + 1;
       levelNextResponse.feeUpgrade = skillLevel.feeUpgrade.setScale(2, RoundingMode.UP);
-      levelNextResponse.rateEffect = skillLevel.rateMining.add(skillLevel.rateReward).add(skillLevel.ratePurchase).setScale(2, RoundingMode.UP);
+      levelNextResponse.rateEffect = skillLevel.rateMining.add(skillLevel.rateReward).add(skillLevel.ratePurchase)
+        .setScale(2, RoundingMode.UP);
       return ResponseData.ok(levelNextResponse);
     }
     return ResponseData.ok(null);

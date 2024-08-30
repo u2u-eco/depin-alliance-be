@@ -8,8 +8,10 @@ import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.LeagueRequest;
 import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.entities.League;
+import xyz.telegram.depinalliance.entities.LeagueLevel;
 import xyz.telegram.depinalliance.entities.User;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +34,8 @@ public class LeagueService {
     league.user = user;
     league.avatar = "";
     league.totalContributors = 1;
+    league.totalMining = user.miningPower.multiply(user.rateMining);
+    league.level = new LeagueLevel(1L);
     League.createLeague(league);
     Map<String, Object> params = new HashMap<>();
     params.put("league", league.id);
@@ -55,7 +59,10 @@ public class LeagueService {
     User.updateUser("league.id = :league where id = :id", params);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", league.id);
-    League.updateObject("totalContributors = totalContributors + 1 where id = :id", leagueParams);
+    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
+    League.updateObject(
+      "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
+      leagueParams);
     return new LeagueResponse(league, user.code);
   }
 
@@ -74,8 +81,49 @@ public class LeagueService {
     User.updateUser("league.id = :league where id = :id", params);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", user.league.id);
-    League.updateObject("totalContributors = totalContributors - 1 where id = :id", leagueParams);
+    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
+    League.updateObject(
+      "totalContributors = totalContributors - 1, totalMining = totalMining - :totalMining where id = :id",
+      leagueParams);
     return true;
+  }
+
+  @Transactional
+  public boolean kick(User user, long id) throws BusinessException {
+    User userKick = User.findById(id);
+    if (userKick == null) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    if (user.league == null || userKick.league == null || user.id == id || user.league.user.id != user.id || userKick.league.id != user.league.id) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("league", null);
+    params.put("id", id);
+    User.updateUser("league.id = :league where id = :id", params);
+    Map<String, Object> leagueParams = new HashMap<>();
+    leagueParams.put("id", user.league.id);
+    leagueParams.put("totalMining", userKick.miningPower.multiply(userKick.rateMining));
+    League.updateObject(
+      "totalContributors = totalContributors - 1, totalMining = totalMining - :totalMining where id = :id",
+      leagueParams);
+    return true;
+  }
+
+  public void updateXp(User user, BigDecimal xp) {
+    if (user.league == null || xp == null || xp.compareTo(BigDecimal.ZERO) <= 0) {
+      return;
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("xp", xp);
+    params.put("id", user.league.id);
+    League.updateObject("xp = xp + :xp where id = :id", params);
+    Long maxLevel = LeagueLevel.maxLevel();
+    LeagueLevel level = LeagueLevel.getLevelBeExp(xp);
+    if (null != level && level.id - user.level.id > 0 && level.id < maxLevel) {
+      League.updateLevel(user.league.id, level.id);
+    }
   }
 
   public boolean validateName(LeagueRequest request) {

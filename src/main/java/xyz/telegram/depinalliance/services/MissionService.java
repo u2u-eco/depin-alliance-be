@@ -30,6 +30,8 @@ public class MissionService {
 
   @Inject
   UserService userService;
+  @Inject
+  LeagueService leagueService;
 
   public List<DailyCheckinResponse> getListOfDailyCheckin(User user) {
     List<DailyCheckin> dailyCheckins = DailyCheckin.listAll(Sort.ascending("id"));
@@ -133,6 +135,7 @@ public class MissionService {
       User.updatePointAndXpUser(user.id, check.point, check.xp);
       if (check.xp != null || check.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);
+        leagueService.updateXp(user, check.xp);
       }
       return true;
     }

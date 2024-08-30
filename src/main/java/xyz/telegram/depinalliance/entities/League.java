@@ -10,6 +10,7 @@ import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,6 +38,9 @@ public class League extends BaseEntity {
   public BigDecimal totalMining = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
   public BigDecimal xp = BigDecimal.ZERO;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "level_id")
+  public LeagueLevel level;
 
   public static League createLeague(League league) {
     league.create();
@@ -72,7 +76,7 @@ public class League extends BaseEntity {
 
   public static ResponsePage<LeagueResponse> findByPaging(PagingParameters pageable) {
     PanacheQuery<PanacheEntityBase> panacheQuery = find(
-      "select code, name, avatar, totalContributors, totalMining from League", Sort.descending("totalMining","xp"));
+      "select code, name, avatar, totalContributors, totalMining from League", Sort.descending("totalMining", "xp"));
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(LeagueResponse.class).list(), pageable,
       panacheQuery.count());
   }
@@ -80,5 +84,12 @@ public class League extends BaseEntity {
   public static LeagueResponse findDetailById(long id) {
     return find("select code, name, avatar, totalContributors, totalMining from League where id = ?1", id).project(
       LeagueResponse.class).firstResult();
+  }
+
+  public static void updateLevel(Long id, Long levelNew) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", id);
+    params.put("levelNew", levelNew);
+    update("level.id = :levelNew where id = :id and level.id < :levelNew ", params);
   }
 }

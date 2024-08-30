@@ -16,6 +16,7 @@ public class UserInfoResponse {
   public BigDecimal point;
   public BigDecimal pointUnClaimed;
   public BigDecimal xp;
+  public BigDecimal pointSkill;
   public String avatar;
   public long level;
   public long lastLoginTime;

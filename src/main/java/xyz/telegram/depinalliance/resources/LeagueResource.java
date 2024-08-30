@@ -31,7 +31,7 @@ public class LeagueResource extends BaseResource {
 
   @POST
   @Path("")
-  public ResponseData addLeague(LeagueRequest request) throws BusinessException {
+  public ResponseData createLeague(LeagueRequest request) throws BusinessException {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(leagueService.createLeague(getUser(), request));
     }
@@ -42,6 +42,14 @@ public class LeagueResource extends BaseResource {
   public ResponseData joinLeague(@PathParam("code") String code) throws BusinessException {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(leagueService.joinLeague(getUser(), code));
+    }
+  }
+
+  @GET
+  @Path("kick/{id}")
+  public ResponseData joinLeague(@PathParam("id") Long id) throws BusinessException {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(leagueService.kick(getUser(), id));
     }
   }
 

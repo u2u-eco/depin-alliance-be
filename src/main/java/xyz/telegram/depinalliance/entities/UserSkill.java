@@ -10,8 +10,12 @@ import java.util.Map;
 import java.util.Optional;
 
 @Entity
-@Table(name = "user_skill")
+@Table(name = "user_skills")
 public class UserSkill extends BaseEntity {
+  @Id
+  @SequenceGenerator(name = "userSkillSequence", sequenceName = "user_skill_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSkillSequence")
+  private Long id;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   public User user;
@@ -20,19 +24,10 @@ public class UserSkill extends BaseEntity {
   public Skill skill;
   @Column(name = "level")
   public Long level = 0L;
-  //    @Column(name = "rate_mining", scale = 18, precision = 29)
-  //    public BigDecimal rateMining;
-  //
-  //    @Column(name = "power_mining", scale = 18, precision = 29)
-  //    public BigDecimal powerMining;
   @Column(name = "level_upgrade")
   public Long levelUpgrade = 0L;
   @Column(name = "time_upgrade")
   public Long timeUpgrade = 0L;   //Milliseconds
-  @Id
-  @SequenceGenerator(name = "userSkillSequence", sequenceName = "user_skill_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSkillSequence")
-  private Long id;
 
   public static void initUserSkill(User user, List<Skill> skills) {
     skills.forEach(sk -> {
@@ -51,7 +46,7 @@ public class UserSkill extends BaseEntity {
       params.put("skillId", skillId);
       params.put("levelUpdate", levelUpdate);
       return update("level= :levelUpdate " + "WHERE user.id = :userId AND skill.id= :skillId AND level < :levelUpdate",
-        params) == 1 ? true : false;
+        params) == 1;
     } catch (Exception e) {
       throw e;
     }
@@ -74,15 +69,7 @@ public class UserSkill extends BaseEntity {
       throw e;
     }
   }
-  //    public static List<UserSkillResponse> findByUserId (long userId) {
-  //        try {
-  //            return find("select s.id, s.name, us.level, s.maxLevel, us.timeUpgrade from "+Skill.class.getSimpleName()+" us left join "+UserSkill.class.getSimpleName()+" s on us.skill.id = s.id " +
-  //                    "where us.user.id = :userId ", Parameters.with("userId", userId))
-  //                    .project(UserSkillResponse.class).list();
-  //        }catch (Exception e) {
-  //            throw e;
-  //        }
-  //    }
+
   public static boolean upgradeSkillPending(long userId, long skillId, long timeUpgrade, long currentTime) {
     try {
       Map<String, Object> params = new HashMap<>();
@@ -92,7 +79,7 @@ public class UserSkill extends BaseEntity {
       params.put("currentTime", currentTime);
       return update(
         "levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " + "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime ",
-        params) == 1 ? true : false;
+        params) == 1;
     } catch (Exception e) {
         throw e;
     }

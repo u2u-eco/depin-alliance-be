@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Entity
-@Table(name = "skill_level")
+@Table(name = "skill_levels")
 public class SkillLevel extends PanacheEntityBase {
   @Id
   @SequenceGenerator(name = "skillLevelSequence", sequenceName = "skill_level_id_seq", allocationSize = 1)

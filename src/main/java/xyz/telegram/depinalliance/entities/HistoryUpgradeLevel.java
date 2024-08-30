@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "history_upgrade_level")
+@Table(name = "history_upgrade_levels")
 public class HistoryUpgradeLevel extends BaseEntity {
   @Id
   @SequenceGenerator(name = "historyUpgradeLevelSequence", sequenceName = "history_upgrade_level_id_seq", allocationSize = 1)

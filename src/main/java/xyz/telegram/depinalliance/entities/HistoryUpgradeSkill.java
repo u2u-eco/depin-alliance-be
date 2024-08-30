@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "history_upgrade_skill")
+@Table(name = "history_upgrade_skills")
 public class HistoryUpgradeSkill extends BaseEntity {
   @Id
   @SequenceGenerator(name = "historyUpgradeSkillSequence", sequenceName = "history_upgrade_skill_id_seq", allocationSize = 1)

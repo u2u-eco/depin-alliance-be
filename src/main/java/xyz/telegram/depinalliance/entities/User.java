@@ -161,8 +161,9 @@ public class User extends BaseEntity {
     params.put("userId", userId);
     params.put("levelNew", levelNew);
     params.put("pointSkill", pointSkill);
-    update("level.id = :levelNew, pointSkill = pointSkill + :pointSkill" +
-      " where id = :userId and level.id < :levelNew and :pointSkill > 0 ");
+    update(
+      "level.id = :levelNew, pointSkill = pointSkill + :pointSkill" + " where id = :userId and level.id < :levelNew and :pointSkill > 0 ",
+      params);
   }
 
   public static ResponsePage<FriendResponse> findFriendByUserAndPaging(PagingParameters pageable, long userId) {
