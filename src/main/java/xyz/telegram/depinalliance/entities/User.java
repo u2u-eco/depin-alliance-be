@@ -118,7 +118,8 @@ public class User extends BaseEntity {
     params.put("id", id);
     params.put("pointSkill", pointSkill);
     params.put("point", point);
-    return updateUser("pointSkill = pointSkill + :pointSkill, point = point + :point where id = :id and pointSkill + :pointSkill >=0",
+    return updateUser("pointSkill = pointSkill + :pointSkill, point = point + :point " +
+                    "where id = :id and pointSkill + :pointSkill >=0 and point + :point >= 0 ",
             params) == 1;
   }
 
