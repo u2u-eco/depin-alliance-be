@@ -119,8 +119,7 @@ public class UserService {
     paramsUser.put("id", user.id);
     paramsUser.put("status", Enums.UserStatus.CLAIMED);
     paramsUser.put("point", user.pointUnClaimed);
-    paramsUser.put("maximumPower",
-      new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.MAX_MINING_POWER_DEFAULT))));
+    paramsUser.put("maximumPower", user.level.maxMiningPower);
     User.updateUser("status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower where id = :id",
       paramsUser);
     return Utils.stripDecimalZeros(user.pointUnClaimed);
@@ -325,7 +324,8 @@ public class UserService {
           paramsLeague.put("id", user.league.id);
           paramsLeague.put("miningPowerOld", user.miningPower.multiply(user.rateMining));
           paramsLeague.put("miningPowerNew", user.miningPower.multiply(user.rateMining.add(his.rateMining)));
-          League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id", paramsLeague);
+          League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
+            paramsLeague);
         }
       }
       User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward);

@@ -27,6 +27,10 @@ public class LeagueLevel extends PanacheEntityBase {
     this.id = id;
   }
 
+  public LeagueLevel() {
+
+  }
+
   public static Long maxLevel() {
     return find("max(id)").project(Long.class).firstResult();
   }
