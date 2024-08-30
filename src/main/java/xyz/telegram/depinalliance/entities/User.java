@@ -16,7 +16,7 @@ import java.util.Map;
 public class User extends BaseEntity {
   @Id
   public Long id;
-  @Column(name = "username", updatable = false, nullable = false)
+  @Column(name = "username")
   public String username;
   @Column(name = "point", scale = 18, precision = 29)
   public BigDecimal point = BigDecimal.ZERO;

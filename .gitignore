@@ -38,3 +38,4 @@ application-dev.properties
 privateKey.pem
 publicKey.pem
 build.sh
+import-dev.sql

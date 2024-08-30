@@ -21,17 +21,18 @@ public class Item extends BaseEntity {
   @SequenceGenerator(name = "itemSequence", sequenceName = "item_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemSequence")
   public Long id;
+  @Column
   public String name;
   @Column(unique = true)
   public String code;
+  @Column
   public Enums.ItemType type;
   @Column(name = "mining_power", scale = 18, precision = 29)
   public BigDecimal miningPower = BigDecimal.ZERO;
   @Column(name = "price", scale = 18, precision = 29)
   public BigDecimal price = BigDecimal.ZERO;
+  @Column
   public String image;
-  @Column(name = "point", scale = 18, precision = 29)
-  public BigDecimal point = BigDecimal.ZERO;
 
   public static Item findByCode(String code) {
     return find("code", code.toUpperCase()).firstResult();

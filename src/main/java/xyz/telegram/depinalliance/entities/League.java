@@ -72,7 +72,7 @@ public class League extends BaseEntity {
 
   public static ResponsePage<LeagueResponse> findByPaging(PagingParameters pageable) {
     PanacheQuery<PanacheEntityBase> panacheQuery = find(
-      "select code, name, avatar, totalContributors, totalMining from League", Sort.ascending("id"));
+      "select code, name, avatar, totalContributors, totalMining from League", Sort.descending("totalMining"));
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(LeagueResponse.class).list(), pageable,
       panacheQuery.count());
   }

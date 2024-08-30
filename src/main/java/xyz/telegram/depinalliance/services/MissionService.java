@@ -2,6 +2,7 @@ package xyz.telegram.depinalliance.services;
 
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
@@ -26,6 +27,9 @@ import java.util.stream.Collectors;
  */
 @ApplicationScoped
 public class MissionService {
+
+  @Inject
+  UserService userService;
 
   public List<DailyCheckinResponse> getListOfDailyCheckin(User user) {
     List<DailyCheckin> dailyCheckins = DailyCheckin.listAll(Sort.ascending("id"));
@@ -127,6 +131,9 @@ public class MissionService {
     params.put("status", Enums.MissionStatus.CLAIMED);
     if (UserMission.updateObject("status = :status where user.id = :userId and mission.id = :missionId", params) > 0) {
       User.updatePointAndXpUser(user.id, check.point, check.xp);
+      if (check.xp != null || check.xp.compareTo(BigDecimal.ZERO) > 0) {
+        userService.updateLevelByExp(user.id);
+      }
       return true;
     }
     return false;

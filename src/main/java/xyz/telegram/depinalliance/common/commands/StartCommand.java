@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.common.commands;
 
 import io.quarkus.logging.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -43,8 +44,13 @@ public class StartCommand extends BotCommand {
       if (strings != null && strings.length > 0) {
         refCode = strings[0];
       }
+      String username = StringUtils.isBlank(user.getUserName()) ?
+        (StringUtils.isBlank(user.getFirstName()) ?
+          (StringUtils.isBlank(user.getLastName()) ? chat.getId().toString() : user.getLastName()) :
+          user.getFirstName()) :
+        user.getUserName();
       synchronized (chat.getId().toString().intern()) {
-        userService.checkStartUser(chat.getId(), user.getUserName(), refCode);
+        userService.checkStartUser(chat.getId(), username, refCode);
       }
       messageBuilder.append("<b>Welcome to DePIN Alliance!</b> \uD83D\uDEA9\n\n");
       messageBuilder.append(

@@ -92,7 +92,7 @@ public class UserService {
     UserDevice.updateObject(
       "slotCpuUsed = slotCpuUsed + 1, slotRamUsed = slotRamUsed + 1, slotGpuUsed = slotGpuUsed + 1, slotStorageUsed = slotStorageUsed + 1 where id = :id",
       params);
-    BigDecimal pointUnClaimed = itemCpu.point.add(itemGpu.point).add(itemRam.point).add(itemStorage.point);
+    BigDecimal pointUnClaimed = new BigDecimal(5000);
     BigDecimal miningPower = itemCpu.miningPower.add(itemGpu.miningPower).add(itemRam.miningPower)
       .add(itemStorage.miningPower);
     Map<String, Object> paramsUser = new HashMap<>();
@@ -103,10 +103,10 @@ public class UserService {
     User.updateUser("status = :status, pointUnClaimed = :pointUnClaimed, miningPower = :miningPower where id = :id",
       paramsUser);
     List<DetectDeviceResponse> rs = new ArrayList<>();
-    rs.add(new DetectDeviceResponse(Enums.ItemType.CPU, itemCpu.name, itemCpu.point));
-    rs.add(new DetectDeviceResponse(Enums.ItemType.GPU, itemGpu.name, itemGpu.point));
-    rs.add(new DetectDeviceResponse(Enums.ItemType.RAM, itemRam.name, itemRam.point));
-    rs.add(new DetectDeviceResponse(Enums.ItemType.STORAGE, itemStorage.name, itemStorage.point));
+    rs.add(new DetectDeviceResponse(Enums.ItemType.CPU, itemCpu.name));
+    rs.add(new DetectDeviceResponse(Enums.ItemType.GPU, itemGpu.name));
+    rs.add(new DetectDeviceResponse(Enums.ItemType.RAM, itemRam.name));
+    rs.add(new DetectDeviceResponse(Enums.ItemType.STORAGE, itemStorage.name));
     return rs;
   }
 
@@ -155,14 +155,6 @@ public class UserService {
       }
       mining(user);
       user = User.findById(user.id);
-
-      BigDecimal pointUnClaimed = user.pointUnClaimed.multiply(bonusClaim());
-      Map<String, Object> paramsUser = new HashMap<>();
-      paramsUser.put("id", user.id);
-      paramsUser.put("point", pointUnClaimed);
-      paramsUser.put("pointUnClaimed", user.pointUnClaimed);
-      User.updateUser("point = point + :point, pointUnClaimed = pointUnClaimed - :pointUnClaimed where id = :id",
-        paramsUser);
       Long userRefId;
       if (user.ref != null) {
         userRefId = user.ref.id;
@@ -171,9 +163,20 @@ public class UserService {
       }
       BigDecimal refPointClaim = new BigDecimal(
         Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
+      BigDecimal pointUnClaimed = user.pointUnClaimed.multiply(bonusClaim());
+      BigDecimal pointRef = pointUnClaimed.multiply(refPointClaim);
+      Map<String, Object> paramsUser = new HashMap<>();
+      paramsUser.put("id", user.id);
+      paramsUser.put("point", pointUnClaimed);
+      paramsUser.put("pointUnClaimed", user.pointUnClaimed);
+      paramsUser.put("pointRef", pointRef);
+      User.updateUser(
+        "point = point + :point, pointUnClaimed = pointUnClaimed - :pointUnClaimed, pointRef = pointRef + :pointRef where id = :id",
+        paramsUser);
+
       Map<String, Object> paramsUserRef = new HashMap<>();
       paramsUserRef.put("id", userRefId);
-      paramsUserRef.put("point", pointUnClaimed.multiply(refPointClaim));
+      paramsUserRef.put("point", pointRef);
       User.updateUser("point = point + :point where id = :id", paramsUserRef);
       return Utils.stripDecimalZeros(pointUnClaimed);
     }
@@ -215,7 +218,7 @@ public class UserService {
       if (user.league != null) {
         Map<String, Object> paramsLeague = new HashMap<>();
         paramsLeague.put("id", user.league.id);
-        paramsLeague.put("miningPower", miningPower);
+        paramsLeague.put("miningPower", miningPower.multiply(user.rateMining));
         League.updateObject("totalMining = totalMining + :miningPower where id = :id", paramsLeague);
       }
       return Utils.stripDecimalZeros(user.miningPower.add(user.miningPower));
@@ -278,18 +281,18 @@ public class UserService {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
       Skill skill = (Skill) Skill.findByIdOptional(skillId)
-              .orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
       UserSkill userSkill = UserSkill.findByUserIdAndSkillId(user.id, skillId)
         .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_NOT_FOUND));
       if (userSkill.skill.id >= skill.maxLevel)
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL);
-      if(userSkill.timeUpgrade > Utils.getCalendar().getTimeInMillis())
+      if (userSkill.timeUpgrade > Utils.getCalendar().getTimeInMillis())
         throw new BusinessException(ResponseMessageConstants.USER_SKILL_WAITING_UPGRADE);
       SkillLevel userSkillNext = SkillLevel.findBySkillAndLevel(userSkill.skill.id, userSkill.level + 1)
         .orElseThrow(() -> new BusinessException(ResponseMessageConstants.USER_SKILL_MAX_LEVEL));
-      if(user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0)
+      if (user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0)
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
-      if(!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
+      if (!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
       long currentTime = Utils.getCalendar().getTimeInMillis();
       long timeUpgrade = currentTime + 1000 * userSkillNext.timeWaitUpgrade;
@@ -311,19 +314,21 @@ public class UserService {
       return true;
     }
   }
+
   @Transactional
   public void updateSkillLevelForUser(HistoryUpgradeSkill his) {
     boolean status = UserSkill.updateLevel(his.userId, his.skillId, his.levelUpgrade);
-    if(status) {
+    if (status) {
       User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward);
     }
     HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
   }
+
   public void updateLevelByExp(long userId) {
     User user = User.findById(userId);
     Long maxLevel = Level.maxLevel();
     Level level = Level.getLevelBeExp(user.xp);
-    if(null!=level && level.id - user.level.id > 0 && level.id < maxLevel) {
+    if (null != level && level.id - user.level.id > 0 && level.id < maxLevel) {
       User.updateLevelAndPointSkill(userId, level.id, new BigDecimal(level.id - user.level.id));
     }
   }

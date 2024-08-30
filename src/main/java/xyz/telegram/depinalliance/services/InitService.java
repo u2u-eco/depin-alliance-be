@@ -96,7 +96,7 @@ public class InitService {
       if (Level.count() == 0) {
         initLevel();
       }
-      if (DailyCheckin.count() == 0) {
+      /*if (DailyCheckin.count() == 0) {
         for (long i = 1; i < 7; i++) {
           DailyCheckin dailyCheckin = new DailyCheckin();
           dailyCheckin.id = i;
@@ -104,8 +104,8 @@ public class InitService {
           dailyCheckin.point = new BigDecimal(10 * i);
           dailyCheckin.persist();
         }
-      }
-      if (Item.count() == 0) {
+      }*/
+      /*if (Item.count() == 0) {
         for (int i = 1; i < 31; i++) {
           Item item = Item.find("code", "CPU_" + i).firstResult();
           if (item == null) {
@@ -165,7 +165,7 @@ public class InitService {
             item.persist();
           }
         }
-      }
+      }*/
       if (Mission.count() == 0) {
         Mission mission = new Mission();
         mission.groupMission = "Social mission";

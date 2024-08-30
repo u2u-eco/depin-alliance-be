@@ -20,7 +20,7 @@ public class LeagueResponse {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public Boolean isOwner;
 
-  public LeagueResponse(String code, String name, String avatar, long totalContributors, BigDecimal totalMining) {
+  public LeagueResponse(String code, String name, String avatar, Long totalContributors, BigDecimal totalMining) {
     this.code = code;
     this.name = name;
     this.totalContributors = totalContributors;

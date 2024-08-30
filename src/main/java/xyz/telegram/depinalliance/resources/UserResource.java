@@ -12,6 +12,7 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.AvatarRequest;
+import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
 import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
 import xyz.telegram.depinalliance.common.models.response.*;
@@ -55,13 +56,20 @@ public class UserResource extends BaseResource {
     if (user == null) {
       return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
     }
+    String username = StringUtils.isBlank(userTelegramResponse.username) ?
+      (StringUtils.isBlank(userTelegramResponse.firstName) ?
+        (StringUtils.isBlank(userTelegramResponse.lastName) ?
+          userTelegramResponse.id.toString() :
+          userTelegramResponse.lastName) :
+        userTelegramResponse.firstName) :
+      userTelegramResponse.username;
     Map<String, Object> params = new HashMap<>();
     params.put("id", user.id);
     params.put("lastLoginTime", Utils.getCalendar().getTimeInMillis());
     String sql = "";
-    if (!userTelegramResponse.username.equals(user.username)) {
+    if (!username.equals(user.username)) {
       sql = "username = :username,";
-      params.put("username", userTelegramResponse.username);
+      params.put("username", username);
     }
 
     User.updateUser(sql + "lastLoginTime = :lastLoginTime where id = :id", params);
@@ -71,7 +79,7 @@ public class UserResource extends BaseResource {
     Map<String, Object> res = new HashMap<>();
     res.put("currentStatus", user.status);
     res.put("accessToken",
-      jwtService.generateToken(String.valueOf(userTelegramResponse.id), userTelegramResponse.username));
+      jwtService.generateToken(String.valueOf(userTelegramResponse.id), username));
     return ResponseData.ok(res);
   }
 
@@ -140,7 +148,7 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("ranking-engineer")
-  public ResponseData ranking() throws Exception {
+  public ResponseData ranking() {
     Map<String, Object> res = new HashMap<>();
     res.put("currentRank", User.findRankByUserId(getTelegramId()));
     res.put("ranking",
@@ -202,5 +210,11 @@ public class UserResource extends BaseResource {
     params.put("avatar", request.avatar);
     User.updateUser("avatar = :avatar where id = :id", params);
     return ResponseData.ok(request.avatar);
+  }
+
+  @GET
+  @Path("friend")
+  public ResponseData friend(PagingParameters pagingParameters) throws Exception {
+    return ResponseData.ok(User.findFriendByUserAndPaging(pagingParameters, getTelegramId()));
   }
 }

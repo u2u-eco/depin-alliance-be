@@ -11,11 +11,9 @@ import java.math.BigDecimal;
 public class DetectDeviceResponse {
   public String type;
   public String name;
-  public BigDecimal point;
 
-  public DetectDeviceResponse(Enums.ItemType type, String name, BigDecimal point) {
+  public DetectDeviceResponse(Enums.ItemType type, String name) {
     this.type = type.name();
     this.name = name;
-    this.point = Utils.stripDecimalZeros(point);
   }
 }
