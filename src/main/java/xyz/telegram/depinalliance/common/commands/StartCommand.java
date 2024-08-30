@@ -17,6 +17,11 @@ import xyz.telegram.depinalliance.services.UserService;
 import java.util.Collections;
 
 public class StartCommand extends BotCommand {
+  private final String url;
+  private final String botName;
+  private final InlineKeyboardMarkup inlineKeyboardMarkup;
+  private UserService userService;
+
   public StartCommand(UserService userService, String botName, String url) {
     super("start", "With this command you can start the Bot");
     this.userService = userService;
@@ -29,12 +34,6 @@ public class StartCommand extends BotCommand {
     this.inlineKeyboardMarkup = new InlineKeyboardMarkup(Collections.singletonList(inlineKeyboardRow));
 
   }
-
-  private final String url;
-  private final String botName;
-  private final InlineKeyboardMarkup inlineKeyboardMarkup;
-
-  private UserService userService;
 
   @Override
   public void execute(TelegramClient telegramClient, User user, Chat chat, String[] strings) {

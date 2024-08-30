@@ -16,8 +16,8 @@ public class UserItemResponse {
   public BigDecimal miningPower;
   public String image;
 
-  public UserItemResponse(Long id, @ProjectedFieldName("item.name") String name, @ProjectedFieldName("item.code") String code,
-    @ProjectedFieldName("item.type") Enums.ItemType type,
+  public UserItemResponse(Long id, @ProjectedFieldName("item.name") String name,
+    @ProjectedFieldName("item.code") String code, @ProjectedFieldName("item.type") Enums.ItemType type,
     @ProjectedFieldName("item.miningPower") BigDecimal miningPower, @ProjectedFieldName("item.image") String image) {
     this.name = name;
     this.code = code;

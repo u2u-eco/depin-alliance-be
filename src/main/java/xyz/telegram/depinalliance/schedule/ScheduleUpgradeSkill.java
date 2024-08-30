@@ -12,26 +12,26 @@ import java.util.List;
 
 @ApplicationScoped
 public class ScheduleUpgradeSkill {
-    @Inject
-    UserService userService;
-    @Inject
-    Logger logger;
+  @Inject
+  UserService userService;
+  @Inject
+  Logger logger;
 
-    @Scheduled(every = "5s", identity = "task-job")
-    void schedule() {
-        List<HistoryUpgradeSkill> skillsUpgrade = HistoryUpgradeSkill.getPending(Utils.getCalendar().getTimeInMillis());
-        if(skillsUpgrade.size() > 0) {
-            skillsUpgrade.forEach(up -> {
-                try {
-                    userService.updateSkillLevelForUser(up);
-                    logger.infov("Upgrade skill {} for user {} from lv {} to {} success",
-                            up.skillId, up.userId, up.levelCurrent, up.levelUpgrade);
-                }catch (Exception e) {
-                    logger.errorv("ID [{}]: Update level {} skill {} for user {} error ",
-                            up.id, up.levelUpgrade, up.skillId, up.userId);
-                    logger.error(Utils.printLogStackTrace(e));
-                }
-            });
+  @Scheduled(every = "5s", identity = "task-job")
+  void schedule() {
+    List<HistoryUpgradeSkill> skillsUpgrade = HistoryUpgradeSkill.getPending(Utils.getCalendar().getTimeInMillis());
+    if (skillsUpgrade.size() > 0) {
+      skillsUpgrade.forEach(up -> {
+        try {
+          userService.updateSkillLevelForUser(up);
+          logger.infov("Upgrade skill {} for user {} from lv {} to {} success", up.skillId, up.userId, up.levelCurrent,
+            up.levelUpgrade);
+        } catch (Exception e) {
+          logger.errorv("ID [{}]: Update level {} skill {} for user {} error ", up.id, up.levelUpgrade, up.skillId,
+            up.userId);
+          logger.error(Utils.printLogStackTrace(e));
         }
+      });
     }
+  }
 }

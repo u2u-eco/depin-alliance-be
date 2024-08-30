@@ -14,8 +14,6 @@ import xyz.telegram.depinalliance.entities.League;
 import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.services.LeagueService;
 
-import java.math.BigDecimal;
-
 /**
  * @author holden on 29-Aug-2024
  */

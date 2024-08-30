@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 /**
  * @author holden on 26-Aug-2024
@@ -36,11 +35,11 @@ public class Level extends PanacheEntityBase {
   public static Long maxLevel() {
     return find(" select max(id) from Level ").project(Long.class).firstResult();
   }
+
   public static Level getLevelBeExp(BigDecimal exp) {
     try {
-      return find(" expFrom <= :exp and :exp < expTo", Parameters.with("exp", exp))
-              .firstResult();
-    }catch (Exception e) {
+      return find(" expFrom <= :exp and :exp < expTo", Parameters.with("exp", exp)).firstResult();
+    } catch (Exception e) {
       throw e;
     }
   }

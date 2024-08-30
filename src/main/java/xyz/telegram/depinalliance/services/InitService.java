@@ -9,7 +9,6 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -219,7 +218,7 @@ public class InitService {
         mission.create();
         mission.persist();
       }
-      if(Skill.count() == 0) {
+      if (Skill.count() == 0) {
         initSkill();
         initSkillLevel();
         initSkillUser();
@@ -439,6 +438,7 @@ public class InitService {
     level.expTo = new BigDecimal(18084);
     level.persist();
   }
+
   public void initSkill() {
     Skill skill = new Skill();
     skill.id = 1L;
@@ -461,12 +461,13 @@ public class InitService {
     skill.maxLevel = 10L;
     skill.persist();
   }
+
   public void initSkillLevel() {
     Skill skill1 = Skill.findById(1L);
     Skill skill2 = Skill.findById(2L);
     Skill skill3 = Skill.findById(3L);
 
-    for(long i=1; i<=10; i++) {
+    for (long i = 1; i <= 10; i++) {
       SkillLevel skillLevel = new SkillLevel();
       skillLevel.skill = skill1;
       skillLevel.level = i;
@@ -474,21 +475,22 @@ public class InitService {
       skillLevel.rateMining = new BigDecimal(0.01);
       skillLevel.ratePurchase = BigDecimal.ZERO;
       skillLevel.rateReward = BigDecimal.ZERO;
-      skillLevel.timeWaitUpgrade = i*3600;
+      skillLevel.timeWaitUpgrade = i * 3600;
       skillLevel.persist();
     }
-    for(long i=1; i<=10; i++) {
+    for (long i = 1; i <= 10; i++) {
       SkillLevel skillLevel = new SkillLevel();
       skillLevel.skill = skill2;
       skillLevel.level = i;
       skillLevel.feeUpgrade = BigDecimal.ONE;
       skillLevel.rateMining = BigDecimal.ZERO;
-      skillLevel.ratePurchase = new BigDecimal(-0.01);;
+      skillLevel.ratePurchase = new BigDecimal(-0.01);
+      ;
       skillLevel.rateReward = BigDecimal.ZERO;
-      skillLevel.timeWaitUpgrade = i*3600;
+      skillLevel.timeWaitUpgrade = i * 3600;
       skillLevel.persist();
     }
-    for(long i=1; i<=10; i++) {
+    for (long i = 1; i <= 10; i++) {
       SkillLevel skillLevel = new SkillLevel();
       skillLevel.skill = skill3;
       skillLevel.level = i;
@@ -496,13 +498,14 @@ public class InitService {
       skillLevel.rateMining = BigDecimal.ZERO;
       skillLevel.ratePurchase = BigDecimal.ZERO;
       skillLevel.rateReward = new BigDecimal(0.01);
-      skillLevel.timeWaitUpgrade = i*3600;
+      skillLevel.timeWaitUpgrade = i * 3600;
       skillLevel.persist();
     }
   }
+
   public void initSkillUser() {
     List<Skill> skills = Skill.listAll();
-    if(UserSkill.count() == 0) {
+    if (UserSkill.count() == 0) {
       List<User> users = User.findAll().list();
       users.forEach(u -> {
         UserSkill.initUserSkill(u, skills);

@@ -10,7 +10,6 @@ import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.entities.League;
 import xyz.telegram.depinalliance.entities.User;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
