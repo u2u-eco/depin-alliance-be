@@ -30,6 +30,7 @@ public class InitService {
         mission.url = "https://www.google.com/search?q=";
         mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
         mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.image="/assets/images/icons/icon-x-gradient.svg";
         mission.create();
         mission.persist();
 
@@ -43,6 +44,7 @@ public class InitService {
         mission.url = "https://www.google.com/search?q=";
         mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
         mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.image="/assets/images/icons/icon-telegram-gradient.svg";
         mission.create();
         mission.persist();
 
@@ -56,6 +58,7 @@ public class InitService {
         mission.url = "https://www.google.com/search?q=";
         mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
         mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.image="/assets/images/icons/icon-x-gradient.svg";
         mission.create();
         mission.persist();
 
@@ -69,6 +72,7 @@ public class InitService {
         mission.url = "https://www.google.com/search?q=";
         mission.point = new BigDecimal(Utils.getRandomNumber(100, 200));
         mission.xp = new BigDecimal(Utils.getRandomNumber(20, 50));
+        mission.image="/assets/images/icons/icon-x-gradient.svg";
         mission.create();
         mission.persist();
       }
