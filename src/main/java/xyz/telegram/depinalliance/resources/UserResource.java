@@ -9,6 +9,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
@@ -39,6 +40,8 @@ public class UserResource extends BaseResource {
   JwtService jwtService;
   @Inject
   UserService userService;
+  @ConfigProperty(name = "telegram.validate")
+  boolean isValidate;
 
   @POST
   @Path("auth")
@@ -50,9 +53,6 @@ public class UserResource extends BaseResource {
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
     }
     User user = User.findById(userTelegramResponse.id);
-    if (user == null) {
-      return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
-    }
     String username = StringUtils.isBlank(userTelegramResponse.username) ?
       (StringUtils.isBlank(userTelegramResponse.firstName) ?
         (StringUtils.isBlank(userTelegramResponse.lastName) ?
@@ -60,6 +60,13 @@ public class UserResource extends BaseResource {
           userTelegramResponse.lastName) :
         userTelegramResponse.firstName) :
       userTelegramResponse.username;
+
+    if (user == null && isValidate) {
+      return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
+    } else if (user == null) {
+      user = userService.checkStartUser(userTelegramResponse.id, username, "");
+    }
+
     Map<String, Object> params = new HashMap<>();
     params.put("id", user.id);
     params.put("lastLoginTime", Utils.getCalendar().getTimeInMillis());
@@ -93,7 +100,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
     userInfoResponse.status = user.status;
     userInfoResponse.username = user.username;
-    userInfoResponse.pointSkill = user.pointSkill;
+    userInfoResponse.pointSkill = Utils.stripDecimalZeros(user.pointSkill);
     userInfoResponse.timeStartMining = user.timeStartMining;
     userInfoResponse.lastLoginTime = user.lastLoginTime;
     userInfoResponse.lastCheckin = user.lastCheckIn;

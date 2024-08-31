@@ -47,7 +47,7 @@ public class LeagueResource extends BaseResource {
 
   @GET
   @Path("kick/{id}")
-  public ResponseData joinLeague(@PathParam("id") Long id) throws BusinessException {
+  public ResponseData kick(@PathParam("id") Long id) throws BusinessException {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(leagueService.kick(getUser(), id));
     }

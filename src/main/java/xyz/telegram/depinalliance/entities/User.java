@@ -30,6 +30,8 @@ public class User extends BaseEntity {
   public BigDecimal pointSkill = BigDecimal.ZERO;
   @Column(name = "point_un_claimed", scale = 18, precision = 29)
   public BigDecimal pointUnClaimed = BigDecimal.ZERO;
+  @Column(name = "point_claimed", scale = 18, precision = 29)
+  public BigDecimal pointClaimed = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
   public BigDecimal xp = BigDecimal.ZERO;
   @Column(name = "mining_power", scale = 18, precision = 29)
@@ -94,7 +96,7 @@ public class User extends BaseEntity {
   public static long countByCode(String code) {
     try {
       return count("code", code);
-    }catch (Exception e) {
+    } catch (Exception e) {
       throw e;
     }
   }
@@ -107,7 +109,7 @@ public class User extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("point", point);
-    return updateUser("point = point + :point where id = :id and point + :point >=0", params);
+    return updateUser("point = point + :point where id = :id and point + :point >= 0", params);
   }
 
   public static boolean updatePointSkill(long id, BigDecimal pointSkill) {
@@ -117,14 +119,15 @@ public class User extends BaseEntity {
     return updateUser("pointSkill = pointSkill + :pointSkill where id = :id and pointSkill + :pointSkill >=0",
       params) == 1;
   }
+
   public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("pointSkill", pointSkill);
     params.put("point", point);
-    return updateUser("pointSkill = pointSkill + :pointSkill, point = point + :point " +
-                    "where id = :id and pointSkill + :pointSkill >=0 and point + :point >= 0 ",
-            params) == 1;
+    return updateUser(
+      "pointSkill = pointSkill + :pointSkill, point = point + :point " + "where id = :id and pointSkill + :pointSkill >=0 and point + :point >= 0 ",
+      params) == 1;
   }
 
   public static int updatePointAndXpUser(long id, BigDecimal point, BigDecimal xp) {
@@ -183,9 +186,8 @@ public class User extends BaseEntity {
     params.put("userId", userId);
     params.put("levelNew", levelNew);
     params.put("pointSkill", pointSkill);
-    update("level.id = :levelNew, pointSkill = pointSkill + :pointSkill, " +
-              "maximumPower = maximumPower + (select sum(maxMiningPower) from Level where id > level.id and id <= levelNew ) "
-              + " where id = :userId and level.id < :levelNew and :pointSkill > 0 ",
+    update(
+      "level.id = :levelNew, pointSkill = pointSkill + :pointSkill, " + "maximumPower = maximumPower + (select sum(maxMiningPower) from Level where id > level.id and id <= :levelNew ) " + " where id = :userId and level.id < :levelNew and :pointSkill > 0 ",
       params);
   }
 

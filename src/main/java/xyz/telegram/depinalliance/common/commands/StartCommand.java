@@ -43,6 +43,12 @@ public class StartCommand extends BotCommand {
       if (strings != null && strings.length > 0) {
         refCode = strings[0];
       }
+//      String league = "";
+      if (StringUtils.isNotBlank(refCode) && refCode.contains("_")) {
+        String [] arrays = refCode.split("_");
+        refCode = arrays[0];
+//        league = arrays[1];
+      }
       String username = StringUtils.isBlank(user.getUserName()) ?
         (StringUtils.isBlank(user.getFirstName()) ?
           (StringUtils.isBlank(user.getLastName()) ? chat.getId().toString() : user.getLastName()) :

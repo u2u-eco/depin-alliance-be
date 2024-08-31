@@ -81,11 +81,6 @@ public class League extends BaseEntity {
       panacheQuery.count());
   }
 
-  public static LeagueResponse findDetailById(long id) {
-    return find("select code, name, avatar, totalContributors, totalMining from League where id = ?1", id).project(
-      LeagueResponse.class).firstResult();
-  }
-
   public static void updateLevel(Long id, Long levelNew) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);

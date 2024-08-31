@@ -32,7 +32,7 @@ public class LeagueLevel extends PanacheEntityBase {
   }
 
   public static Long maxLevel() {
-    return find("max(id)").project(Long.class).firstResult();
+    return find("select max(id) from LeagueLevel").project(Long.class).firstResult();
   }
 
   public static LeagueLevel getLevelBeExp(BigDecimal exp) {

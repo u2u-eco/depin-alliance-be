@@ -49,7 +49,12 @@ public class MissionService {
     }
 
     if (today - user.lastCheckIn == 86400) {
-      calendar.setTimeInMillis(user.startCheckIn * 1000);
+      System.out.println((today - user.startCheckIn) / 86400);
+      if ((today - user.startCheckIn) / 86400 == dailyCheckins.size()) {
+        calendar.setTimeInMillis(today * 1000);
+      } else {
+        calendar.setTimeInMillis(user.startCheckIn * 1000);
+      }
       return dailyCheckins.stream().map(dailyCheckin -> {
         long time = calendar.getTimeInMillis() / 1000;
         DailyCheckinResponse dailyCheckinResponse = new DailyCheckinResponse(dailyCheckin.name, time,
@@ -89,7 +94,7 @@ public class MissionService {
       User.updateUser(
         "startCheckIn = :startCheckIn, lastCheckIn = :lastCheckIn, point = point + :point, xp = xp + :xp where id = :id",
         paramsUser);
-      if (dailyCheckin.xp != null || dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
+      if (dailyCheckin.xp != null && dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);
         leagueService.updateXp(user, dailyCheckin.xp);
       }
@@ -98,14 +103,25 @@ public class MissionService {
     //checkin lien tiep
     if (today - user.lastCheckIn == 86400) {
       long day = ((today - user.startCheckIn) / 86400) + 1;
-      DailyCheckin dailyCheckin = DailyCheckin.findById(day);
+      long countDays = DailyCheckin.count();
+      String sql = "";
+      DailyCheckin dailyCheckin;
       Map<String, Object> paramsUser = new HashMap<>();
+      if (day == countDays) {
+        dailyCheckin = DailyCheckin.findById(1);
+        paramsUser.put("startCheckIn", today);
+        sql += "startCheckIn = :startCheckIn";
+      } else {
+        dailyCheckin = DailyCheckin.findById(day);
+      }
+
       paramsUser.put("id", user.id);
       paramsUser.put("lastCheckIn", today);
       paramsUser.put("point", dailyCheckin.point);
       paramsUser.put("xp", dailyCheckin.xp);
-      User.updateUser("lastCheckIn = :lastCheckIn, point = point + :point, xp = xp + :xp where id = :id", paramsUser);
-      if (dailyCheckin.xp != null || dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
+      User.updateUser(sql + "lastCheckIn = :lastCheckIn, point = point + :point, xp = xp + :xp where id = :id",
+        paramsUser);
+      if (dailyCheckin.xp != null && dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);
         leagueService.updateXp(user, dailyCheckin.xp);
       }
@@ -144,7 +160,7 @@ public class MissionService {
     params.put("status", Enums.MissionStatus.CLAIMED);
     if (UserMission.updateObject("status = :status where user.id = :userId and mission.id = :missionId", params) > 0) {
       User.updatePointAndXpUser(user.id, check.point, check.xp);
-      if (check.xp != null || check.xp.compareTo(BigDecimal.ZERO) > 0) {
+      if (check.xp != null && check.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);
         leagueService.updateXp(user, check.xp);
       }

@@ -43,6 +43,7 @@ public class UserService {
           User.updatePointUser(ref.id,
             new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF))));
           user.pointRef = new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF)));
+          user.league = ref.league;
         }
       }
       user.ref = ref;
@@ -53,7 +54,7 @@ public class UserService {
       userDevice.index = 1;
       UserDevice.create(userDevice);
       UserSkill.initUserSkill(user, Skill.findAll().list());
-      logger.info("User " + user.username + " created");
+      logger.info("User " + user.username + " created with ref code " + refCode);
       return user;
     }
     if (!user.username.equals(username)) {
@@ -150,7 +151,7 @@ public class UserService {
   public BigDecimal claim(User user) throws Exception {
     synchronized (user.id.toString().intern()) {
       if (user.status != Enums.UserStatus.MINING) {
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+        return BigDecimal.ZERO;
       }
       mining(user);
       user = User.findById(user.id);
@@ -162,15 +163,17 @@ public class UserService {
       }
       BigDecimal refPointClaim = new BigDecimal(
         Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
+
       BigDecimal pointUnClaimed = user.pointUnClaimed.multiply(bonusClaim());
       BigDecimal pointRef = pointUnClaimed.multiply(refPointClaim);
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
       paramsUser.put("point", pointUnClaimed);
+      paramsUser.put("pointClaimed", user.pointUnClaimed);
       paramsUser.put("pointUnClaimed", user.pointUnClaimed);
       paramsUser.put("pointRef", pointRef);
       User.updateUser(
-        "point = point + :point, pointUnClaimed = pointUnClaimed - :pointUnClaimed, pointRef = pointRef + :pointRef where id = :id",
+        "point = point + :point, pointUnClaimed = pointUnClaimed - :pointUnClaimed, pointRef = pointRef + :pointRef, pointClaimed = pointClaimed + :pointClaimed  where id = :id",
         paramsUser);
 
       Map<String, Object> paramsUserRef = new HashMap<>();
