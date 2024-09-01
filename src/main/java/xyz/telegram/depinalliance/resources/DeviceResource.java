@@ -35,8 +35,9 @@ public class DeviceResource extends BaseResource {
 
   @Path("user-device-item")
   @GET
-  public ResponseData getUserDeviceItem(@QueryParam("index") Long index) {
-    return ResponseData.ok(UserItem.findByUserId(getTelegramId(), index));
+  public ResponseData getUserDeviceItem(@QueryParam("index") Long index, @QueryParam("type") String type,
+    PagingParameters pagingParameters) {
+    return ResponseData.ok(UserItem.findByUserId(pagingParameters, getTelegramId(), index, type));
   }
 
   @Path("buy-item")

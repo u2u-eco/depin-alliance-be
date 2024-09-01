@@ -4,12 +4,13 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
+import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 import xyz.telegram.depinalliance.common.models.response.UserItemResponse;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,13 +44,30 @@ public class UserItem extends BaseEntity {
   public UserItem() {
   }
 
-  public static List<UserItemResponse> findByUserId(long userId, Long deviceIndex) {
-    if (deviceIndex == null) {
-      return find("user.id = ?1 and userDevice is null and isSold = false", Sort.ascending("id"), userId).project(
-        UserItemResponse.class).list();
+  public static ResponsePage<UserItemResponse> findByUserId(PagingParameters pageable, long userId, Long deviceIndex,
+    String type) {
+    String sql = "user.id = :userId and isSold = false ";
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
+    if (deviceIndex != null && deviceIndex > 0) {
+      sql += " and userDevice.index = :deviceIndex";
+      params.put("deviceIndex", deviceIndex);
+    } else {
+      sql += " and userDevice is null";
     }
-    return find("user.id = ?1 and userDevice.index = ?2 and isSold = false", Sort.ascending("id"), userId,
-      deviceIndex).project(UserItemResponse.class).list();
+    if (StringUtils.isNotBlank(type)) {
+      sql += " and item.type = :type";
+      params.put("type", Enums.ItemType.valueOf(type.toUpperCase()));
+    }
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, Sort.ascending("id"), params);
+    return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
+      panacheQuery.count());
+    //    if (deviceIndex == null) {
+    //      return find("user.id = ?1 and userDevice is null and isSold = false", Sort.ascending("id"), userId).project(
+    //        UserItemResponse.class).list();
+    //    }
+    //    return find("user.id = ?1 and userDevice.index = ?2 and isSold = false", Sort.ascending("id"), userId,
+    //      deviceIndex).project(UserItemResponse.class).list();
   }
 
   public static ResponsePage<UserItemResponse> findByTypeAndPaging(PagingParameters pageable, Enums.ItemType type) {

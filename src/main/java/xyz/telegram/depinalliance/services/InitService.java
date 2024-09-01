@@ -81,6 +81,7 @@ public class InitService {
         initSkillLevel();
         initSkillUser();
       }
+      initSkillPoint();
     }
   }
 
@@ -162,6 +163,7 @@ public class InitService {
       skillLevel.timeWaitUpgrade = i * 3600;
       skillLevel.persist();
     }
+
   }
 
   public void initSkillUser() {
@@ -171,6 +173,15 @@ public class InitService {
       users.forEach(u -> {
         UserSkill.initUserSkill(u, skills);
       });
+    }
+  }
+
+  public void initSkillPoint(){
+    for (long i = 1; i <= 100; i++) {
+      SkillPoint skillPoint = new SkillPoint();
+      skillPoint.id  = i;
+      skillPoint.point = new BigDecimal(1*i);
+      skillPoint.persist();
     }
   }
 }
