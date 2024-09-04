@@ -176,7 +176,7 @@ public class User extends BaseEntity {
       update(
         "rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, "
                 + " rateReward = rateReward + :rateReward,  rateCountDown = rateCountDown + :rateCountDown, rateCapacity = rateCapacity + :rateCapacity "
-                + " where id= :id and :rateMining > 0 and :rateReward > 0 and :rateCapacity > 0 ",
+                + " where id= :id and rateMining >= 0 and rateReward >= 0 and rateCapacity >= 0 ",
         params);
     } catch (Exception e) {
       throw e;
