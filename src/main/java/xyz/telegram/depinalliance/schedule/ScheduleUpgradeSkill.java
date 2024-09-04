@@ -17,7 +17,7 @@ public class ScheduleUpgradeSkill {
   @Inject
   Logger logger;
 
-  @Scheduled(every = "5s", identity = "task-job")
+  @Scheduled(every = "${upgrade.every.expr}", identity = "task-job")
   void schedule() {
     List<HistoryUpgradeSkill> skillsUpgrade = HistoryUpgradeSkill.getPending(Utils.getCalendar().getTimeInMillis());
     if (!skillsUpgrade.isEmpty()) {

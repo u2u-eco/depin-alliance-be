@@ -78,13 +78,12 @@ public class InitService {
         mission.create();
         mission.persist();
       }
-      if (Skill.count() == 0) {
-        initSkill();
-        initSkillLevel();
-        initSkillUser();
-//        initSkillPoint();
-      }
-
+//      if (Skill.count() == 0) {
+////        initSkill();
+////        initSkillLevel();
+////        initSkillUser();
+////        initSkillPoint();
+//      }
     }
   }
 
@@ -130,7 +129,7 @@ public class InitService {
     skill.persist();
   }
 
-  public void initSkillLevel() {
+  /*public void initSkillLevel() {
     Skill skill1 = Skill.findById(1L);
     Skill skill2 = Skill.findById(2L);
     Skill skill3 = Skill.findById(3L);
@@ -183,17 +182,17 @@ public class InitService {
       skillLevel.persist();
     }
 
-  }
+  }*/
 
-  public void initSkillUser() {
-    List<Skill> skills = Skill.listAll();
-    if (UserSkill.count() == 0) {
-      List<User> users = User.findAll().list();
-      users.forEach(u -> {
-        UserSkill.initUserSkill(u, skills);
-      });
-    }
-  }
+//  public void initSkillUser() {
+//    List<Skill> skills = Skill.listAll();
+//    if (UserSkill.count() == 0) {
+//      List<User> users = User.findAll().list();
+//      users.forEach(u -> {
+//        UserSkill.initUserSkill(u, skills);
+//      });
+//    }
+//  }
 
   public void initSkillPoint(){
     if(SkillPoint.count() == 0) {

@@ -33,7 +33,7 @@ public class Enums {
   }
 
   public enum MissionType {
-    TELEGRAM, TWITTER, QUIZ
+    TELEGRAM, TWITTER, QUIZ, ON_TIME_IN_APP
   }
 
   public enum MissionStatus {

@@ -93,8 +93,9 @@ public class UserResource extends BaseResource {
     UserInfoResponse userInfoResponse = new UserInfoResponse();
     userInfoResponse.avatar = user.avatar;
     userInfoResponse.level = user.level.id;
-    userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPower.multiply(user.rateMining));
-    userInfoResponse.maximumPower = Utils.stripDecimalZeros(user.maximumPower);
+    userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPowerReal);
+    userInfoResponse.ratePurchase = Utils.stripDecimalZeros(user.ratePurchase);
+    userInfoResponse.maximumPower = Utils.stripDecimalZeros(user.maximumPower.multiply(user.rateCapacity));
     userInfoResponse.point = user.point.setScale(0, RoundingMode.DOWN);
     userInfoResponse.pointUnClaimed = user.pointUnClaimed;
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
@@ -159,7 +160,7 @@ public class UserResource extends BaseResource {
     Map<String, Object> res = new HashMap<>();
     res.put("currentRank", User.findRankByUserId(getTelegramId()));
     res.put("ranking",
-      User.findAll(Sort.descending("miningPower").and("createdAt", Sort.Direction.Ascending)).page(0, 30)
+      User.findAll(Sort.descending("miningPowerReal").and("createdAt", Sort.Direction.Ascending)).page(0, 30)
         .project(RankingResponse.class).list());
     return ResponseData.ok(res);
   }
@@ -175,13 +176,19 @@ public class UserResource extends BaseResource {
     data.put("point", user.point.setScale(2, RoundingMode.UP));
     return ResponseData.ok(data);
   }
+
   private BigDecimal getUserRate(int skillId, User user, SkillLevel skillLevel) {
     switch (skillId) {
-      case 1: return null!=user ? user.rateMining : skillLevel.rateMining;
-      case 2: return null!=user ? user.ratePurchase : skillLevel.ratePurchase;
-      case 3: return null!=user ? user.rateCountDown : skillLevel.rateCountDown;
-      case 4: return null!=user ? user.rateReward : skillLevel.rateReward;
-      case 5: return null!=user ? user.rateCapacity : skillLevel.rateCapacity;
+    case 1:
+      return null != user ? user.rateMining : skillLevel.rateMining;
+    case 2:
+      return null != user ? user.ratePurchase : skillLevel.ratePurchase;
+    case 3:
+      return null != user ? user.rateCountDown : skillLevel.rateCountDown;
+    case 4:
+      return null != user ? user.rateReward : skillLevel.rateReward;
+    case 5:
+      return null != user ? user.rateCapacity : skillLevel.rateCapacity;
     }
     return BigDecimal.ZERO;
   }

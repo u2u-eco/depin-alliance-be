@@ -40,7 +40,7 @@ public class DeviceService {
     if (item == null) {
       throw new BusinessException(ResponseMessageConstants.DEVICE_ITEM_NOT_FOUND);
     }
-    BigDecimal amount = item.price.multiply(new BigDecimal(request.number));
+    BigDecimal amount = item.price.multiply(new BigDecimal(request.number)).multiply(user.ratePurchase);
     if (user.point.compareTo(amount) < 0) {
       throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
     }
@@ -92,7 +92,7 @@ public class DeviceService {
         UserItem.create(new UserItem(user, item, null));
       }
     }
-    User.updatePointUser(user.id, amount.multiply(user.ratePurchase).multiply(new BigDecimal("-1")));
+    User.updatePointUser(user.id, amount.multiply(new BigDecimal("-1")));
     return true;
   }
 
@@ -243,7 +243,7 @@ public class DeviceService {
     Map<String, Object> paramsDevice = new HashMap<>();
     paramsDevice.put("id", userDevice.id);
     paramsDevice.put("name", request.name.trim());
-    UserItem.updateObject(" name = :name where id = :id", paramsDevice);
+    UserDevice.updateObject(" name = :name where id = :id", paramsDevice);
     return true;
   }
 }

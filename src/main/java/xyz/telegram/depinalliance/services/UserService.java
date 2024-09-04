@@ -10,7 +10,6 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.ClaimResponse;
-import xyz.telegram.depinalliance.common.models.response.DetectDeviceResponse;
 import xyz.telegram.depinalliance.common.models.response.UserSkillResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
@@ -115,11 +114,11 @@ public class UserService {
         "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
         leagueParams);
     }
-//    List<DetectDeviceResponse> rs = new ArrayList<>();
-//    rs.add(new DetectDeviceResponse(Enums.ItemType.CPU, itemCpu.name));
-//    rs.add(new DetectDeviceResponse(Enums.ItemType.GPU, itemGpu.name));
-//    rs.add(new DetectDeviceResponse(Enums.ItemType.RAM, itemRam.name));
-//    rs.add(new DetectDeviceResponse(Enums.ItemType.STORAGE, itemStorage.name));
+    //    List<DetectDeviceResponse> rs = new ArrayList<>();
+    //    rs.add(new DetectDeviceResponse(Enums.ItemType.CPU, itemCpu.name));
+    //    rs.add(new DetectDeviceResponse(Enums.ItemType.GPU, itemGpu.name));
+    //    rs.add(new DetectDeviceResponse(Enums.ItemType.RAM, itemRam.name));
+    //    rs.add(new DetectDeviceResponse(Enums.ItemType.STORAGE, itemStorage.name));
     return pointUnClaimed;
   }
 
@@ -175,7 +174,8 @@ public class UserService {
       }
       BigDecimal refPointClaim = new BigDecimal(
         Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
-      BigDecimal percentBonus = bonusClaim();
+      BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
+      BigDecimal percentBonus = bonusClaim(rateBonus.intValue());
       BigDecimal pointBonus = user.pointUnClaimed.multiply(percentBonus);
       BigDecimal pointUnClaimed = user.pointUnClaimed.multiply(percentBonus.add(BigDecimal.ONE));
       BigDecimal pointRef = pointUnClaimed.multiply(refPointClaim);
@@ -197,9 +197,10 @@ public class UserService {
     }
   }
 
-  public BigDecimal bonusClaim() {
+  public BigDecimal bonusClaim(int rate) {
     int a = new Random().nextInt(100);
-    if (a < 5) {
+    System.out.println(5 + rate);
+    if (a < (5 + rate)) {
       // 5% chance
       a = new Random().nextInt(100);
       if (a < 65) {
@@ -229,7 +230,9 @@ public class UserService {
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
       paramsUser.put("miningPower", miningPower);
-      User.updateUser("miningPower = miningPower + :miningPower where id = :id", paramsUser);
+      User.updateUser(
+        "miningPower = miningPower + :miningPower, miningPowerReal = (select sum(ui.item.miningPower) from UserItem ui where ui.user.id = :id and userDevice is not null ) * rateMining where id = :id",
+        paramsUser);
       if (user.league != null) {
         Map<String, Object> paramsLeague = new HashMap<>();
         paramsLeague.put("id", user.league.id);
@@ -246,8 +249,9 @@ public class UserService {
     }
     BigDecimal pointUnClaimed = user.miningPower.multiply(user.rateMining)
       .divide(new BigDecimal(3600), 18, RoundingMode.FLOOR).multiply(new BigDecimal(time - user.timeStartMining));
-    if (user.pointUnClaimed.add(pointUnClaimed).compareTo(user.maximumPower) > 0) {
-      pointUnClaimed = user.maximumPower.subtract(user.pointUnClaimed);
+    BigDecimal maximumPower = user.maximumPower.multiply(user.rateCapacity);
+    if (user.pointUnClaimed.add(pointUnClaimed).compareTo(maximumPower) > 0) {
+      pointUnClaimed = maximumPower.subtract(user.pointUnClaimed);
     }
     Map<String, Object> paramsUser = new HashMap<>();
     paramsUser.put("id", user.id);
@@ -332,7 +336,7 @@ public class UserService {
       history.rateCapacity = userSkillNext.rateCapacity;
       history.feeUpgrade = userSkillNext.feeUpgrade;
       history.feePointUpgrade = skillPoint.point;
-      history.timeWaitUpgrade = userSkillNext.timeWaitUpgrade;
+      history.timeWaitUpgrade = skillPoint.upgradeTime;
       history.timeUpgrade = timeUpgrade;
       HistoryUpgradeSkill.createHistory(history);
       return true;
@@ -352,6 +356,7 @@ public class UserService {
           paramsLeague.put("miningPowerNew", user.miningPower.multiply(user.rateMining.add(his.rateMining)));
           League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
             paramsLeague);
+          User.updateMiningPowerReal(user.id);
         }
       }
       User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward, his.rateCountDown,

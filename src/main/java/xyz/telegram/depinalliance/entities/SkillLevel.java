@@ -17,13 +17,10 @@ public class SkillLevel extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "skill_id")
   public Skill skill;
-
   @Column(name = "level")
   public Long level;
   @Column(name = "fee_upgrade", scale = 18, precision = 29)
   public BigDecimal feeUpgrade = BigDecimal.ZERO;  //point skill
-  @Column(name = "time_wait_upgrade")
-  public Long timeWaitUpgrade = 0L; //seconds
   @Column(name = "rate_mining", scale = 18, precision = 29)
   public BigDecimal rateMining = BigDecimal.ZERO; //percent
   @Column(name = "rate_purchase", scale = 18, precision = 29)

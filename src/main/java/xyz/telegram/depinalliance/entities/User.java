@@ -4,6 +4,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
@@ -36,6 +37,8 @@ public class User extends BaseEntity {
   public BigDecimal xp = BigDecimal.ZERO;
   @Column(name = "mining_power", scale = 18, precision = 29)
   public BigDecimal miningPower = BigDecimal.ZERO;
+  @Column(name = "mining_power_real", scale = 18, precision = 29)
+  public BigDecimal miningPowerReal = BigDecimal.ZERO;
   @Column(name = "maximum_power", scale = 18, precision = 29)
   public BigDecimal maximumPower = BigDecimal.ZERO;
   @Column(name = "rate_mining", scale = 18, precision = 29)
@@ -143,7 +146,7 @@ public class User extends BaseEntity {
 
   public static long findRankByUserId(long userId) {
     return find(
-      "select position from ( select id as id, row_number() over(order by miningPower desc, createdAt asc) as position from User) result where id =?1",
+      "select position from ( select id as id, row_number() over(order by miningPowerReal desc, createdAt asc) as position from User) result where id =?1",
       userId).project(Long.class).firstResult();
   }
 
@@ -164,7 +167,7 @@ public class User extends BaseEntity {
   }
 
   public static void updateRate(long id, BigDecimal rateMining, BigDecimal ratePurchase, BigDecimal rateReward,
-                                BigDecimal rateCountDown, BigDecimal rateCapacity) {
+    BigDecimal rateCountDown, BigDecimal rateCapacity) {
     try {
       Map<String, Object> params = new HashMap<>();
       params.put("id", id);
@@ -174,9 +177,7 @@ public class User extends BaseEntity {
       params.put("rateCountDown", rateCountDown);
       params.put("rateCapacity", rateCapacity);
       update(
-        "rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, "
-                + " rateReward = rateReward + :rateReward,  rateCountDown = rateCountDown + :rateCountDown, rateCapacity = rateCapacity + :rateCapacity "
-                + " where id= :id and rateMining >= 0 and rateReward >= 0 and rateCapacity >= 0 ",
+        "rateMining = rateMining + :rateMining, ratePurchase = ratePurchase + :ratePurchase, " + " rateReward = rateReward + :rateReward,  rateCountDown = rateCountDown + :rateCountDown, rateCapacity = rateCapacity + :rateCapacity " + " where id= :id and rateMining >= 0 and rateReward >= 0 and rateCapacity >= 0 ",
         params);
     } catch (Exception e) {
       throw e;
@@ -191,6 +192,12 @@ public class User extends BaseEntity {
     update(
       "level.id = :levelNew, pointSkill = pointSkill + :pointSkill, " + "maximumPower = maximumPower + (select sum(maxMiningPower) from Level where id > level.id and id <= :levelNew ) " + " where id = :userId and level.id < :levelNew and :pointSkill > 0 ",
       params);
+  }
+
+  public static void updateMiningPowerReal(long userId) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
+    update("update User set miningPowerReal = (select sum(ui.item.miningPower) from UserItem ui where ui.user.id = :userId and userDevice is not null ) * rateMining where id = :userId", params);
   }
 
   public static ResponsePage<FriendResponse> findFriendByUserAndPaging(PagingParameters pageable, long userId) {

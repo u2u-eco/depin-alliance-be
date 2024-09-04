@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
+import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
@@ -26,6 +27,8 @@ public class LeagueService {
 
   @Inject
   S3Service s3Service;
+  @Inject
+  AmazonS3Config amazonS3Config;
 
   @Transactional
   public LeagueResponse createLeague(User user, LeagueRequest request) throws Exception {
@@ -41,7 +44,7 @@ public class LeagueService {
     League league = new League();
     league.name = request.name;
     league.user = user;
-    league.avatar = urlImage;
+    league.avatar = amazonS3Config.awsUrl() + urlImage;
     league.totalContributors = 1;
     league.totalMining = user.miningPower.multiply(user.rateMining);
     league.level = new LeagueLevel(1L);

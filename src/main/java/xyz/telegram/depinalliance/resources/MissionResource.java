@@ -63,10 +63,6 @@ public class MissionResource extends BaseResource {
   @Path("v2")
   public ResponseData getAllMissionsV2() {
     List<UserMissionResponse> userMissions = Mission.findByUserId(getTelegramId());
-
-
-
-
     List<GroupMissionResponse> groupMissions = new ArrayList<>();
     for (UserMissionResponse userMission : userMissions) {
       GroupMissionResponse groupMission = groupMissions.stream()
