@@ -11,6 +11,7 @@ import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 import xyz.telegram.depinalliance.common.models.response.UserItemResponse;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,10 +79,17 @@ public class UserItem extends BaseEntity {
     } else {
       sql += " and userDevice is null";
     }
-
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
       panacheQuery.count());
+  }
+
+  public static List<Long> findItemForSell(long userId, String code, int number) {
+    String sql = "select ui.id from UserItem ui inner join Item i on item.id = i.id and i.code = :code where userDevice is null and user.id = :userId and isSold = false";
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
+    params.put("code", code);
+    return find(sql, params).page(0, number).project(Long.class).list();
   }
 
   public static ResponsePage<UserItemResponse> findByTypeAndPaging(PagingParameters pageable, Enums.ItemType type) {

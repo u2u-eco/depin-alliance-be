@@ -5,6 +5,7 @@ import jakarta.ws.rs.*;
 import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
 import xyz.telegram.depinalliance.common.models.request.ChangeNameDeviceRequest;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
+import xyz.telegram.depinalliance.common.models.request.SellItemRequest;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.entities.Item;
 import xyz.telegram.depinalliance.entities.UserDevice;
@@ -77,6 +78,14 @@ public class DeviceResource extends BaseResource {
   public ResponseData sellItem(@PathParam("itemId") long itemId) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(deviceService.sellItem(getUser(), itemId));
+    }
+  }
+
+  @Path("sell-item")
+  @POST
+  public ResponseData sellItemMulti(SellItemRequest request) throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.sellItem(getUser(), request));
     }
   }
 

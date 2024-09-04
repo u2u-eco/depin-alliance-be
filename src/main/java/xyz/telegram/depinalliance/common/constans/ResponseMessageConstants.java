@@ -27,4 +27,6 @@ public interface ResponseMessageConstants {
   //
   String UPLOAD_WRONG_FORMAT = "MSG_UPLOAD_WRONG_FORMAT";
   String UPLOAD_IMAGE_EXCEPTION = "MSG_UPLOAD_IMAGE_EXCEPTION";
+  //ITEM
+  String ITEM_SELL_NOT_ENOUGH = "MSG_ITEM_SELL_NOT_ENOUGH";
 }

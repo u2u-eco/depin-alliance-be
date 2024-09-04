@@ -9,6 +9,7 @@ import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
 import xyz.telegram.depinalliance.common.models.request.ChangeNameDeviceRequest;
+import xyz.telegram.depinalliance.common.models.request.SellItemRequest;
 import xyz.telegram.depinalliance.entities.Item;
 import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.entities.UserDevice;
@@ -16,6 +17,7 @@ import xyz.telegram.depinalliance.entities.UserItem;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -200,6 +202,31 @@ public class DeviceService {
     paramsUserItem.put("isSold", true);
     UserItem.updateObject(" isSold = :isSold where id = :id", paramsUserItem);
     User.updatePointUser(user.id, userItem.item.price.multiply(new BigDecimal("0.5")));
+    return true;
+  }
+
+  @Transactional
+  public boolean sellItem(User user, SellItemRequest request) throws Exception {
+    if (request == null || StringUtils.isBlank(request.code) || request.number <= 0) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Item item = Item.findByCode(request.code);
+    if (item == null) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    List<Long> itemIds = UserItem.findItemForSell(user.id, request.code, request.number);
+    if (itemIds.isEmpty() || itemIds.size() < request.number) {
+      throw new BusinessException(ResponseMessageConstants.ITEM_SELL_NOT_ENOUGH);
+    }
+
+    Map<String, Object> paramsUserItem = new HashMap<>();
+    paramsUserItem.put("ids", itemIds);
+    paramsUserItem.put("isSold", true);
+//    UserItem.updateObject(" isSold = :isSold where id in (:id)", paramsUserItem);
+    if (UserItem.updateObject(" isSold = :isSold where id in (:ids)", paramsUserItem) < request.number) {
+      throw new BusinessException(ResponseMessageConstants.ITEM_SELL_NOT_ENOUGH);
+    }
+    User.updatePointUser(user.id, item.price.multiply(new BigDecimal(request.number)).multiply(new BigDecimal("0.5")));
     return true;
   }
 
