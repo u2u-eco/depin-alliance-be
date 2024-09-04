@@ -52,7 +52,7 @@ public class User extends BaseEntity {
   @JoinColumn(name = "ref_id")
   public User ref;
   @Column(name = "point_ref", scale = 18, precision = 29)
-  public BigDecimal pointRef;
+  public BigDecimal pointRef = BigDecimal.ZERO;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "level_id")
   public Level level;

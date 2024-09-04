@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
+import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.LeagueRequest;
@@ -23,18 +24,24 @@ public class LeagueService {
   public static final List<String> IMAGE_CONTENT_TYPE = new ArrayList<>(
     Arrays.asList("image/jpg", "image/jpeg", "image/png"));
 
+  @Inject
+  S3Service s3Service;
+
   @Transactional
-  public LeagueResponse createLeague(User user, LeagueRequest request) throws BusinessException {
-    if (user.league != null || request == null || request.file == null || StringUtils.isBlank(request.name)) {
+  public LeagueResponse createLeague(User user, LeagueRequest request) throws Exception {
+    if (user.league != null || request == null || request.file == null || !s3Service.validateFileType(request.file,
+      IMAGE_CONTENT_TYPE) || StringUtils.isBlank(request.name)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     if (!validateName(request)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
+    String urlImage = s3Service.uploadFile(Enums.FolderImage.LEAGUE.getFolder(), UUID.randomUUID().toString(),
+      request.file);
     League league = new League();
     league.name = request.name;
     league.user = user;
-    league.avatar = "";
+    league.avatar = urlImage;
     league.totalContributors = 1;
     league.totalMining = user.miningPower.multiply(user.rateMining);
     league.level = new LeagueLevel(1L);

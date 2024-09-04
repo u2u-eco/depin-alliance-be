@@ -7,16 +7,5 @@ import io.smallrye.config.ConfigMapping;
  */
 @ConfigMapping(prefix = "amazon")
 public interface AmazonS3Config {
-  String awsKeyId();
-
-  String awsKeySecret();
-
-  String awsRegion();
-
-  String awsS3BucketName();
-
-  String awsS3FolderName();
-
   String awsUrl();
-
 }

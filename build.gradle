@@ -22,8 +22,8 @@ dependencies {
     implementation 'org.telegram:telegrambots-longpolling:7.9.0'
     implementation 'org.telegram:telegrambots-client:7.9.0'
     implementation 'org.telegram:telegrambots-extensions:7.9.1'
-//    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:2.5.2'
-//    implementation 'software.amazon.awssdk:url-connection-client:2.5.2'
+    implementation 'io.quarkiverse.amazonservices:quarkus-amazon-s3:2.16.2'
+    implementation 'software.amazon.awssdk:url-connection-client:2.16.2'
 }
 
 group 'xyz.telegram'

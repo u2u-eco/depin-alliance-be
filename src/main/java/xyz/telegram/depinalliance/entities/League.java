@@ -45,7 +45,7 @@ public class League extends BaseEntity {
   public static League createLeague(League league) {
     league.create();
     league.nameNormalize = league.name.toLowerCase();
-    league.code = getCodeUser();
+    league.code = getCodeLeague();
     league.persistAndFlush();
     return league;
   }
@@ -54,7 +54,7 @@ public class League extends BaseEntity {
     return update(query, params);
   }
 
-  public static String getCodeUser() {
+  public static String getCodeLeague() {
     while (true) {
       String code = RandomStringUtils.randomAlphanumeric(6);
       if (countByCode(code) <= 0)
