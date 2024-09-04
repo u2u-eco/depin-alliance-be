@@ -9,6 +9,7 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -212,12 +213,26 @@ public class InitService {
         new BigDecimal("2916000"),
         new BigDecimal("5832000")
       );
-      for (long i = 1; i <= 100; i++) {
-        SkillPoint skillPoint = new SkillPoint();
-        skillPoint.id  = i;
-        skillPoint.point = i >= datas.size() ? datas.get(datas.size()-1) : datas.get((int) (i-1));
-        skillPoint.persist();
-      }
+      List<Long> times = Arrays.asList(
+        30L,
+        120L,
+        600L,
+        3600L,
+        3600L*2,
+        3600L*4,
+        3600L*8,
+        3600L*12,
+        3600L*20,
+        3600L*24
+      );
+      if(SkillPoint.count() == 0)
+        for (long i = 1; i <= 100; i++) {
+          SkillPoint skillPoint = new SkillPoint();
+          skillPoint.id  = i;
+          skillPoint.point = i >= datas.size() ? datas.get(datas.size()-1) : datas.get((int) (i-1));
+          skillPoint.upgradeTime = i >= times.size() ? times.get(times.size() - 1) : times.get((int) i - 1);
+          skillPoint.persist();
+        }
     }
   }
 }

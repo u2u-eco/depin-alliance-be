@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import xyz.telegram.depinalliance.common.models.response.UserSkillResponse;
 
@@ -63,8 +64,8 @@ public class UserSkill extends BaseEntity {
   public static List<UserSkillResponse> findByUserId(long userId) {
     try {
       return find(
-        "select s.id, s.name, us.level, s.maxLevel, us.timeUpgrade from " + UserSkill.class.getSimpleName() + " us inner join " + Skill.class.getSimpleName() + " s on us.skill.id = s.id " + "where us.user.id = :userId ",
-        Parameters.with("userId", userId)).project(UserSkillResponse.class).list();
+        "select s.id as id, s.name, us.level, s.maxLevel, us.timeUpgrade from " + UserSkill.class.getSimpleName() + " us inner join " + Skill.class.getSimpleName() + " s on us.skill.id = s.id " + "where us.user.id = :userId ",
+              Sort.by("id").ascending(), Parameters.with("userId", userId)).project(UserSkillResponse.class).list();
     } catch (Exception e) {
       throw e;
     }

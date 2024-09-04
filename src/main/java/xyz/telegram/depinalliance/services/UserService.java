@@ -316,7 +316,7 @@ public class UserService {
         throw new BusinessException(ResponseMessageConstants.USER_POINT_OR_POINT_SKILL_NOT_ENOUGH);
       long currentTime = Utils.getCalendar().getTimeInMillis();
       long currentDiscount = user.rateCountDown.multiply(new BigDecimal(100)).longValue();
-      long timeUpgrade = currentTime + ((1000 * userSkillNext.timeWaitUpgrade * currentDiscount) / 100);
+      long timeUpgrade = currentTime + ((1000 * skillPoint.upgradeTime * currentDiscount) / 100);
       if (!UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime))
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       HistoryUpgradeSkill history = new HistoryUpgradeSkill();
