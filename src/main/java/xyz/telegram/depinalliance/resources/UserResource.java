@@ -98,6 +98,8 @@ public class UserResource extends BaseResource {
     userInfoResponse.point = user.point.setScale(0, RoundingMode.DOWN);
     userInfoResponse.pointUnClaimed = user.pointUnClaimed;
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
+    userInfoResponse.xpLevelFrom = Utils.stripDecimalZeros(user.level.expFrom);
+    userInfoResponse.xpLevelTo = Utils.stripDecimalZeros(user.level.expTo);
     userInfoResponse.status = user.status;
     userInfoResponse.username = user.username;
     userInfoResponse.pointSkill = Utils.stripDecimalZeros(user.pointSkill);
@@ -105,6 +107,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.lastLoginTime = user.lastLoginTime;
     userInfoResponse.lastCheckin = user.lastCheckIn;
     userInfoResponse.code = user.code;
+    userInfoResponse.totalDevice = user.totalDevice;
     return ResponseData.ok(userInfoResponse);
   }
 

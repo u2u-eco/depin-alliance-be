@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
@@ -12,18 +13,19 @@ import xyz.telegram.depinalliance.entities.LeagueLevel;
 import xyz.telegram.depinalliance.entities.User;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author holden on 28-Aug-2024
  */
 @ApplicationScoped
 public class LeagueService {
+  public static final List<String> IMAGE_CONTENT_TYPE = new ArrayList<>(
+    Arrays.asList("image/jpg", "image/jpeg", "image/png"));
 
   @Transactional
   public LeagueResponse createLeague(User user, LeagueRequest request) throws BusinessException {
-    if (user.league != null || request == null || request.image == null || StringUtils.isBlank(request.name)) {
+    if (user.league != null || request == null || request.file == null || StringUtils.isBlank(request.name)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     if (!validateName(request)) {

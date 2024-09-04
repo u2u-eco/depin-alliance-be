@@ -80,8 +80,9 @@ public class InitService {
         initSkill();
         initSkillLevel();
         initSkillUser();
+        initSkillPoint();
       }
-      initSkillPoint();
+
     }
   }
 

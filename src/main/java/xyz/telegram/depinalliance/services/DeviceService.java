@@ -8,6 +8,7 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
+import xyz.telegram.depinalliance.common.models.request.ChangeNameDeviceRequest;
 import xyz.telegram.depinalliance.entities.Item;
 import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.entities.UserDevice;
@@ -74,15 +75,20 @@ public class DeviceService {
       if (slotUsed + request.number > maxSlot) {
         throw new BusinessException(ResponseMessageConstants.DEVICE_USER_CANNOT_ADD_MORE_ITEM);
       }
-      UserItem.create(new UserItem(user, item, userDevice));
+      for (int i = 0; i < request.number; i++) {
+        UserItem.create(new UserItem(user, item, userDevice));
+      }
       Map<String, Object> params = new HashMap<>();
       params.put("id", userDevice.id);
       params.put("item", request.number);
-      UserDevice.updateObject(query + " where id = :id", params);
+      params.put("miningPower", item.miningPower);
+      UserDevice.updateObject(query + ", totalMiningPower = totalMiningPower + :miningPower where id = :id", params);
       BigDecimal miningPower = item.miningPower.multiply(new BigDecimal(request.number));
       userService.changeMiningPower(user, miningPower);
     } else {
-      UserItem.create(new UserItem(user, item, null));
+      for (int i = 0; i < request.number; i++) {
+        UserItem.create(new UserItem(user, item, null));
+      }
     }
     User.updatePointUser(user.id, amount.multiply(user.ratePurchase).multiply(new BigDecimal("-1")));
     return true;
@@ -102,7 +108,7 @@ public class DeviceService {
     }
     int maxSlot = 0;
     int slotUsed = 0;
-    String query = "{field} = {field} + 1 where id =:id and {field} + 1 <= :maxSlot";
+    String query = "{field} = {field} + 1, totalMiningPower = totalMiningPower + :miningPower where id =:id and {field} + 1 <= :maxSlot";
     switch (userItem.item.type) {
     case CPU:
       maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.CPU_SLOT);
@@ -131,6 +137,7 @@ public class DeviceService {
     Map<String, Object> params = new HashMap<>();
     params.put("id", userDevice.id);
     params.put("maxSlot", maxSlot);
+    params.put("miningPower", userItem.item.miningPower);
     if (UserDevice.updateObject(query, params) <= 0) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
@@ -150,7 +157,7 @@ public class DeviceService {
     } else if (userItem.userDevice == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    String query = "{field} = {field} - 1 where id =:id and {field} - 1 >=0 ";
+    String query = "{field} = {field} - 1, totalMiningPower = totalMiningPower - :miningPower where id =:id and {field} - 1 >=0 ";
     switch (userItem.item.type) {
     case CPU:
       query = query.replace("{field}", "slotCpuUsed");
@@ -167,6 +174,7 @@ public class DeviceService {
     }
     Map<String, Object> params = new HashMap<>();
     params.put("id", userItem.userDevice.id);
+    params.put("miningPower", userItem.item.miningPower);
     if (UserDevice.updateObject(query, params) <= 0) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
@@ -192,6 +200,23 @@ public class DeviceService {
     paramsUserItem.put("isSold", true);
     UserItem.updateObject(" isSold = :isSold where id = :id", paramsUserItem);
     User.updatePointUser(user.id, userItem.item.price.multiply(new BigDecimal("0.5")));
+    return true;
+  }
+
+  @Transactional
+  public boolean changeNameDevice(User user, ChangeNameDeviceRequest request) throws Exception {
+    if (request == null || request.index <= 0 || StringUtils.isBlank(request.name) || request.name.trim()
+      .length() > 40) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, request.index);
+    if (userDevice == null) {
+      throw new BusinessException(ResponseMessageConstants.DEVICE_USER_NOT_FOUND);
+    }
+    Map<String, Object> paramsDevice = new HashMap<>();
+    paramsDevice.put("id", userDevice.id);
+    paramsDevice.put("name", request.name.trim());
+    UserItem.updateObject(" name = :name where id = :id", paramsDevice);
     return true;
   }
 }

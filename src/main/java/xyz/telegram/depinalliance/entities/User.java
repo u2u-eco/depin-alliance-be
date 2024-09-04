@@ -73,6 +73,8 @@ public class User extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "league_id")
   public League league;
+  @Column(name = "total_device")
+  public Integer totalDevice = 0;
 
   public static User createUser(User user) {
     user.create();

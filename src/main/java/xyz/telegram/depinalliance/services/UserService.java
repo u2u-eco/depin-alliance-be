@@ -9,6 +9,7 @@ import org.jboss.logging.Logger;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
+import xyz.telegram.depinalliance.common.models.response.ClaimResponse;
 import xyz.telegram.depinalliance.common.models.response.DetectDeviceResponse;
 import xyz.telegram.depinalliance.common.models.response.UserSkillResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
@@ -87,28 +88,39 @@ public class UserService {
     String codeStorage = SystemConfig.findByKey(Enums.Config.STORAGE_DEFAULT);
     Item itemStorage = Item.find("code", codeStorage).firstResult();
     UserItem.create(new UserItem(user, itemStorage, userDevice));
-    Map<String, Object> params = new HashMap<>();
-    params.put("id", userDevice.id);
 
-    UserDevice.updateObject(
-      "slotCpuUsed = slotCpuUsed + 1, slotRamUsed = slotRamUsed + 1, slotGpuUsed = slotGpuUsed + 1, slotStorageUsed = slotStorageUsed + 1 where id = :id",
-      params);
-    BigDecimal pointUnClaimed = new BigDecimal(5000);
     BigDecimal miningPower = itemCpu.miningPower.add(itemGpu.miningPower).add(itemRam.miningPower)
       .add(itemStorage.miningPower);
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", userDevice.id);
+    params.put("totalMiningPower", miningPower);
+    UserDevice.updateObject(
+      "slotCpuUsed = slotCpuUsed + 1, slotRamUsed = slotRamUsed + 1, slotGpuUsed = slotGpuUsed + 1, slotStorageUsed = slotStorageUsed + 1, totalMiningPower = :totalMiningPower where id = :id",
+      params);
+    BigDecimal pointUnClaimed = new BigDecimal(5000);
+
     Map<String, Object> paramsUser = new HashMap<>();
     paramsUser.put("id", user.id);
     paramsUser.put("status", Enums.UserStatus.DETECTED_DEVICE_INFO);
     paramsUser.put("pointUnClaimed", pointUnClaimed);
     paramsUser.put("miningPower", miningPower);
-    User.updateUser("status = :status, pointUnClaimed = :pointUnClaimed, miningPower = :miningPower where id = :id",
+    User.updateUser(
+      "status = :status, pointUnClaimed = :pointUnClaimed, miningPower = :miningPower, totalDevice = 1 where id = :id",
       paramsUser);
-    List<DetectDeviceResponse> rs = new ArrayList<>();
-    rs.add(new DetectDeviceResponse(Enums.ItemType.CPU, itemCpu.name));
-    rs.add(new DetectDeviceResponse(Enums.ItemType.GPU, itemGpu.name));
-    rs.add(new DetectDeviceResponse(Enums.ItemType.RAM, itemRam.name));
-    rs.add(new DetectDeviceResponse(Enums.ItemType.STORAGE, itemStorage.name));
-    return rs;
+    if (user.league != null) {
+      Map<String, Object> leagueParams = new HashMap<>();
+      leagueParams.put("id", user.league.id);
+      leagueParams.put("totalMining", miningPower);
+      League.updateObject(
+        "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
+        leagueParams);
+    }
+//    List<DetectDeviceResponse> rs = new ArrayList<>();
+//    rs.add(new DetectDeviceResponse(Enums.ItemType.CPU, itemCpu.name));
+//    rs.add(new DetectDeviceResponse(Enums.ItemType.GPU, itemGpu.name));
+//    rs.add(new DetectDeviceResponse(Enums.ItemType.RAM, itemRam.name));
+//    rs.add(new DetectDeviceResponse(Enums.ItemType.STORAGE, itemStorage.name));
+    return pointUnClaimed;
   }
 
   @Transactional
@@ -148,10 +160,10 @@ public class UserService {
   }
 
   @Transactional
-  public BigDecimal claim(User user) throws Exception {
+  public ClaimResponse claim(User user) throws Exception {
     synchronized (user.id.toString().intern()) {
       if (user.status != Enums.UserStatus.MINING) {
-        return BigDecimal.ZERO;
+        return new ClaimResponse(BigDecimal.ZERO, BigDecimal.ZERO);
       }
       mining(user);
       user = User.findById(user.id);
@@ -163,8 +175,9 @@ public class UserService {
       }
       BigDecimal refPointClaim = new BigDecimal(
         Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
-
-      BigDecimal pointUnClaimed = user.pointUnClaimed.multiply(bonusClaim());
+      BigDecimal percentBonus = bonusClaim();
+      BigDecimal pointBonus = user.pointUnClaimed.multiply(percentBonus);
+      BigDecimal pointUnClaimed = user.pointUnClaimed.multiply(percentBonus.add(BigDecimal.ONE));
       BigDecimal pointRef = pointUnClaimed.multiply(refPointClaim);
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
@@ -180,7 +193,7 @@ public class UserService {
       paramsUserRef.put("id", userRefId);
       paramsUserRef.put("point", pointRef);
       User.updateUser("point = point + :point where id = :id", paramsUserRef);
-      return Utils.stripDecimalZeros(pointUnClaimed);
+      return new ClaimResponse(pointUnClaimed, pointBonus);
     }
   }
 
@@ -191,22 +204,22 @@ public class UserService {
       a = new Random().nextInt(100);
       if (a < 65) {
         // 65% chance
-        return new BigDecimal("1.05");
+        return new BigDecimal("0.05");
       } else if (a < 85) {
         // 20% chance
-        return new BigDecimal("1.1");
+        return new BigDecimal("0.1");
       } else if (a < 95) {
         // 10% chance
-        return new BigDecimal("1.15");
+        return new BigDecimal("0.15");
       } else if (a < 99) {
         // 4%
-        return new BigDecimal("1.35");
+        return new BigDecimal("0.35");
       } else {
         //1 %
-        return new BigDecimal("1.4");
+        return new BigDecimal("0.4");
       }
     }
-    return BigDecimal.ONE;
+    return BigDecimal.ZERO;
   }
 
   @Transactional
@@ -294,12 +307,12 @@ public class UserService {
       if (user.pointSkill.compareTo(userSkillNext.feeUpgrade) < 0)
         throw new BusinessException(ResponseMessageConstants.USER_POINT_SKILL_NOT_ENOUGH);
       SkillPoint skillPoint = SkillPoint.getPointRequire(user.id);
-      if(skillPoint!=null && user.point.compareTo(skillPoint.point) < 0)
-          throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
-//      if (!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
-//        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+      if (skillPoint != null && user.point.compareTo(skillPoint.point) < 0)
+        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+      //      if (!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
+      //        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
       if (!User.updatePointSkillAndPoint(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)),
-              skillPoint.point.multiply(new BigDecimal(-1))))
+        skillPoint.point.multiply(new BigDecimal(-1))))
         throw new BusinessException(ResponseMessageConstants.USER_POINT_OR_POINT_SKILL_NOT_ENOUGH);
       long currentTime = Utils.getCalendar().getTimeInMillis();
       long currentDiscount = user.rateCountDown.multiply(new BigDecimal(100)).longValue();
@@ -341,7 +354,8 @@ public class UserService {
             paramsLeague);
         }
       }
-      User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward, his.rateCountDown, his.rateCapacity);
+      User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward, his.rateCountDown,
+        his.rateCapacity);
     }
     HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
   }

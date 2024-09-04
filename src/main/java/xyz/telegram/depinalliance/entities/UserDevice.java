@@ -4,6 +4,7 @@ import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import xyz.telegram.depinalliance.common.models.response.UserDeviceResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ public class UserDevice extends BaseEntity {
   public int slotGpuUsed = 0;
   @Column(name = "slot_storage_used")
   public int slotStorageUsed = 0;
+  @Column(name = "total_mining_power", scale = 18, precision = 29)
+  public BigDecimal totalMiningPower = BigDecimal.ZERO;
 
   public static UserDevice create(UserDevice userDevice) {
     userDevice.create();

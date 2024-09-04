@@ -2,8 +2,8 @@ package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
+import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ItemResponse;
@@ -38,8 +38,13 @@ public class Item extends BaseEntity {
     return find("code", code.toUpperCase()).firstResult();
   }
 
-  public static ResponsePage<ItemResponse> findByTypeAndPaging(PagingParameters pageable, Enums.ItemType type) {
-    PanacheQuery<PanacheEntityBase> panacheQuery = find("type = ?1", Sort.ascending("id"), type);
+  public static ResponsePage<ItemResponse> findByTypeAndPaging(PagingParameters pageable, String type) {
+    PanacheQuery<PanacheEntityBase> panacheQuery;
+    if (StringUtils.isNotBlank(type)) {
+      panacheQuery = find("type = ?1", pageable.getSort(), Enums.ItemType.valueOf(type.toUpperCase()));
+    } else {
+      panacheQuery = find("", pageable.getSort());
+    }
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(ItemResponse.class).list(), pageable,
       panacheQuery.count());
   }

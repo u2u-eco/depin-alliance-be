@@ -39,4 +39,18 @@ public class Enums {
   public enum MissionStatus {
     VERIFIED, CLAIMED
   }
+
+  public enum FolderImage {
+    LEAGUE("league");
+
+    private final String folder;
+
+    FolderImage(String folder) {
+      this.folder = folder;
+    }
+
+    public String getFolder() {
+      return folder;
+    }
+  }
 }

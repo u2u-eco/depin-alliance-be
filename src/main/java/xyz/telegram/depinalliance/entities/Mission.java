@@ -20,6 +20,9 @@ public class Mission extends BaseEntity {
   public Long id;
   @Column(name = "group_mission")
   public String groupMission;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "partner_id")
+  public Partner partner;
   public String image;
   public String name;
   public String description;

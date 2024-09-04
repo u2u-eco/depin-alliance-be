@@ -14,6 +14,7 @@ import xyz.telegram.depinalliance.services.MissionService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author holden on 26-Aug-2024
@@ -55,7 +56,30 @@ public class MissionResource extends BaseResource {
         groupMission.missions.add(userMission);
       }
     }
+    return ResponseData.ok(groupMissions);
+  }
 
+  @GET
+  @Path("v2")
+  public ResponseData getAllMissionsV2() {
+    List<UserMissionResponse> userMissions = Mission.findByUserId(getTelegramId());
+
+
+
+
+    List<GroupMissionResponse> groupMissions = new ArrayList<>();
+    for (UserMissionResponse userMission : userMissions) {
+      GroupMissionResponse groupMission = groupMissions.stream()
+        .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
+      if (groupMission == null) {
+        groupMission = new GroupMissionResponse();
+        groupMission.group = userMission.groupMission;
+        groupMission.missions.add(userMission);
+        groupMissions.add(groupMission);
+      } else {
+        groupMission.missions.add(userMission);
+      }
+    }
     return ResponseData.ok(groupMissions);
   }
 

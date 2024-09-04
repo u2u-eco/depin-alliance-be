@@ -2,8 +2,8 @@ package xyz.telegram.depinalliance.resources;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
+import xyz.telegram.depinalliance.common.models.request.ChangeNameDeviceRequest;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.entities.Item;
@@ -22,9 +22,9 @@ public class DeviceResource extends BaseResource {
 
   @Path("item")
   @GET
-  public ResponseData getDeviceItem(@QueryParam("type") @DefaultValue(value = "CPU") String type,
-    PagingParameters pagingParameters) {
-    return ResponseData.ok(Item.findByTypeAndPaging(pagingParameters, Enums.ItemType.valueOf(type.toUpperCase())));
+  public ResponseData getDeviceItem(@QueryParam("type") String type, PagingParameters pagingParameters) {
+    pagingParameters.setSortByDefault("price");
+    return ResponseData.ok(Item.findByTypeAndPaging(pagingParameters, type));
   }
 
   @Path("user-device")
@@ -33,11 +33,19 @@ public class DeviceResource extends BaseResource {
     return ResponseData.ok(UserDevice.findByUser(getTelegramId()));
   }
 
+  @Path("user-item")
+  @GET
+  public ResponseData getUserItem(@QueryParam("type") String type, PagingParameters pagingParameters) {
+    pagingParameters.setSortByDefault("price");
+    return ResponseData.ok(UserItem.findByUserIdAndType(pagingParameters, getTelegramId(), type));
+  }
+
   @Path("user-device-item")
   @GET
   public ResponseData getUserDeviceItem(@QueryParam("index") Long index, @QueryParam("type") String type,
     PagingParameters pagingParameters) {
-    return ResponseData.ok(UserItem.findByUserId(pagingParameters, getTelegramId(), index, type));
+    pagingParameters.setSortByDefault("price");
+    return ResponseData.ok(UserItem.findByUserIdAndIndexAndType(pagingParameters, getTelegramId(), index, type));
   }
 
   @Path("buy-item")
@@ -69,6 +77,14 @@ public class DeviceResource extends BaseResource {
   public ResponseData sellItem(@PathParam("itemId") long itemId) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(deviceService.sellItem(getUser(), itemId));
+    }
+  }
+
+  @Path("change-name")
+  @POST
+  public ResponseData changeName(ChangeNameDeviceRequest request) throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.changeNameDevice(getUser(), request));
     }
   }
 }

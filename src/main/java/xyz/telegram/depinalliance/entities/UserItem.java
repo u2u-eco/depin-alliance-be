@@ -44,30 +44,44 @@ public class UserItem extends BaseEntity {
   public UserItem() {
   }
 
-  public static ResponsePage<UserItemResponse> findByUserId(PagingParameters pageable, long userId, Long deviceIndex,
+  public static ResponsePage<UserItemResponse> findByUserIdAndType(PagingParameters pageable, long userId,
     String type) {
-    String sql = "user.id = :userId and isSold = false ";
+    String sqlSelect = "select i.name, i.code, i.type, i.miningPower, i.image, i.price, count(1) ";
+    String sqlFrom = " from UserItem ui inner join Item i on item.id = i.id ";
+    String sqlWhere = " where ui.user.id = :userId and isSold = false ";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
-    if (deviceIndex != null && deviceIndex > 0) {
-      sql += " and userDevice.index = :deviceIndex";
-      params.put("deviceIndex", deviceIndex);
-    } else {
-      sql += " and userDevice is null";
+    sqlWhere += " and userDevice is null";
+    if (StringUtils.isNotBlank(type)) {
+      sqlWhere += " and item.type = :type";
+      params.put("type", Enums.ItemType.valueOf(type.toUpperCase()));
     }
+    String sqlGroup = " group by i.name, i.code, i.type, i.miningPower, i.image, i.price";
+    return new ResponsePage<>(
+      find(sqlSelect + sqlFrom + sqlWhere + sqlGroup, pageable.getSort(), params).page(pageable.getPage())
+        .project(UserItemResponse.class).list(), pageable,
+      find("select count(distinct i.id) " + sqlFrom + sqlWhere, params).project(Long.class).firstResult());
+  }
+
+  public static ResponsePage<UserItemResponse> findByUserIdAndIndexAndType(PagingParameters pageable, long userId,
+    Long index, String type) {
+    String sql = "select ui.id, i.name, i.code, i.type, i.miningPower, i.image, i.price from UserItem ui inner join Item i on item.id = i.id left join UserDevice ud on ud.id= ui.userDevice.id where ui.user.id = :userId and isSold = false";
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
     if (StringUtils.isNotBlank(type)) {
       sql += " and item.type = :type";
       params.put("type", Enums.ItemType.valueOf(type.toUpperCase()));
     }
-    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, Sort.ascending("id"), params);
+    if (index != null && index > 0) {
+      sql += " and userDevice.index = :index";
+      params.put("index", index);
+    } else {
+      sql += " and userDevice is null";
+    }
+
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
       panacheQuery.count());
-    //    if (deviceIndex == null) {
-    //      return find("user.id = ?1 and userDevice is null and isSold = false", Sort.ascending("id"), userId).project(
-    //        UserItemResponse.class).list();
-    //    }
-    //    return find("user.id = ?1 and userDevice.index = ?2 and isSold = false", Sort.ascending("id"), userId,
-    //      deviceIndex).project(UserItemResponse.class).list();
   }
 
   public static ResponsePage<UserItemResponse> findByTypeAndPaging(PagingParameters pageable, Enums.ItemType type) {

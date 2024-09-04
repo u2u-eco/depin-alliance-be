@@ -16,8 +16,11 @@ public class UserInfoResponse {
   public BigDecimal point;
   public BigDecimal pointUnClaimed;
   public BigDecimal xp;
+  public BigDecimal xpLevelFrom;
+  public BigDecimal xpLevelTo;
   public BigDecimal pointSkill;
   public String avatar;
+  public Integer totalDevice;
   public long level;
   public long lastLoginTime;
   public Long timeStartMining;
