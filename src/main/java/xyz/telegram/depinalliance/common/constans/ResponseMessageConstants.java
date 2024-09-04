@@ -4,7 +4,7 @@ package xyz.telegram.depinalliance.common.constans;
  * @author holden on 25-Jul-2024
  */
 public interface ResponseMessageConstants {
-
+  String USER_NOT_ACTIVE = "MSG_USER_NOT_ACTIVE";
   String DATA_INVALID = "MSG_DATA_INVALID";
   String NOT_FOUND = "MSG_NOT_FOUND";
   String HAS_ERROR = "MSG_HAS_ERROR";

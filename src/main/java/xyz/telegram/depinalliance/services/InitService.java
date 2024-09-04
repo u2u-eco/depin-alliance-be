@@ -90,6 +90,7 @@ public class InitService {
     Skill skill = new Skill();
     skill.id = 1L;
     skill.name = "Programming";
+    skill.description = "Increase mining power";
     skill.orderDisplay = 1;
     skill.maxLevel = 10L;
     skill.persist();
@@ -97,6 +98,7 @@ public class InitService {
     skill = new Skill();
     skill.id = 2L;
     skill.name = "Financial";
+    skill.description = "Decrease purchase price";
     skill.orderDisplay = 2;
     skill.maxLevel = 10L;
     skill.persist();
@@ -104,6 +106,7 @@ public class InitService {
     skill = new Skill();
     skill.id = 3L;
     skill.name = "Innovation";
+    skill.description = "Decrease countdown time";
     skill.orderDisplay = 3;
     skill.maxLevel = 10L;
     skill.persist();
@@ -111,6 +114,7 @@ public class InitService {
     skill = new Skill();
     skill.id = 4L;
     skill.name = "Data Analysis";
+    skill.description = "Increase high reward rate when claim reward";
     skill.orderDisplay = 4;
     skill.maxLevel = 10L;
     skill.persist();
@@ -118,6 +122,7 @@ public class InitService {
     skill = new Skill();
     skill.id = 5L;
     skill.name = "Strategic Planning";
+    skill.description = "Increase max capacity";
     skill.orderDisplay = 5;
     skill.maxLevel = 10L;
     skill.persist();
@@ -136,8 +141,6 @@ public class InitService {
       skillLevel.level = i;
       skillLevel.feeUpgrade = BigDecimal.ONE;
       skillLevel.rateMining = new BigDecimal(0.01);
-      skillLevel.ratePurchase = BigDecimal.ZERO;
-      skillLevel.rateReward = BigDecimal.ZERO;
       skillLevel.timeWaitUpgrade = i * 3600;
       skillLevel.persist();
     }
@@ -146,10 +149,7 @@ public class InitService {
       skillLevel.skill = skill2;
       skillLevel.level = i;
       skillLevel.feeUpgrade = BigDecimal.ONE;
-      skillLevel.rateMining = BigDecimal.ZERO;
-      skillLevel.ratePurchase = new BigDecimal(-0.01);
-      ;
-      skillLevel.rateReward = BigDecimal.ZERO;
+      skillLevel.ratePurchase = new BigDecimal(-0.01);;
       skillLevel.timeWaitUpgrade = i * 3600;
       skillLevel.persist();
     }
@@ -158,9 +158,25 @@ public class InitService {
       skillLevel.skill = skill3;
       skillLevel.level = i;
       skillLevel.feeUpgrade = BigDecimal.ONE;
-      skillLevel.rateMining = BigDecimal.ZERO;
-      skillLevel.ratePurchase = BigDecimal.ZERO;
+      skillLevel.rateCountDown = new BigDecimal(-0.01);
+      skillLevel.timeWaitUpgrade = i * 3600;
+      skillLevel.persist();
+    }
+    for (long i = 1; i <= 10; i++) {
+      SkillLevel skillLevel = new SkillLevel();
+      skillLevel.skill = skill4;
+      skillLevel.level = i;
+      skillLevel.feeUpgrade = BigDecimal.ONE;
       skillLevel.rateReward = new BigDecimal(0.01);
+      skillLevel.timeWaitUpgrade = i * 3600;
+      skillLevel.persist();
+    }
+    for (long i = 1; i <= 10; i++) {
+      SkillLevel skillLevel = new SkillLevel();
+      skillLevel.skill = skill5;
+      skillLevel.level = i;
+      skillLevel.feeUpgrade = BigDecimal.ONE;
+      skillLevel.rateCapacity = new BigDecimal(0.01);
       skillLevel.timeWaitUpgrade = i * 3600;
       skillLevel.persist();
     }
@@ -178,11 +194,13 @@ public class InitService {
   }
 
   public void initSkillPoint(){
-    for (long i = 1; i <= 100; i++) {
-      SkillPoint skillPoint = new SkillPoint();
-      skillPoint.id  = i;
-      skillPoint.point = new BigDecimal(1*i);
-      skillPoint.persist();
+    if(SkillPoint.count() == 0) {
+      for (long i = 1; i <= 100; i++) {
+        SkillPoint skillPoint = new SkillPoint();
+        skillPoint.id  = i;
+        skillPoint.point = new BigDecimal(1*i);
+        skillPoint.persist();
+      }
     }
   }
 }

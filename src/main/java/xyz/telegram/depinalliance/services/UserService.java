@@ -292,7 +292,7 @@ public class UserService {
   public boolean upgradeSkill(User user, Long skillId) throws Exception {
     synchronized (user.id.toString().intern()) {
       if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+        throw new BusinessException(ResponseMessageConstants.USER_NOT_ACTIVE);
       }
       Skill skill = (Skill) Skill.findByIdOptional(skillId)
         .orElseThrow(() -> new BusinessException(ResponseMessageConstants.SKILL_NOT_FOUND));
