@@ -5,7 +5,7 @@ import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 /**
  * @author holden on 25-Jul-2024
  */
-public class BusinessException extends Exception {
+public class BusinessException extends RuntimeException {
   private long error;
 
   public BusinessException(String message) {

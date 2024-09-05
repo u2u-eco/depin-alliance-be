@@ -79,7 +79,8 @@ public class UserSkill extends BaseEntity {
       params.put("timeUpgrade", timeUpgrade);
       params.put("currentTime", currentTime);
       return update(
-        "levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " + "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime ",
+        "levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " + "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime " +
+                "and (select count(id) from UserSkill where user.id = :userId and timeUpgrade >= :currentTime) = 0 ",
         params) == 1;
     } catch (Exception e) {
         throw e;

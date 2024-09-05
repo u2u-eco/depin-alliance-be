@@ -313,8 +313,6 @@ public class UserService {
       SkillPoint skillPoint = SkillPoint.getPointRequire(user.id);
       if (skillPoint != null && user.point.compareTo(skillPoint.point) < 0)
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
-      //      if (!User.updatePointSkill(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1))))
-      //        throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
       if (!User.updatePointSkillAndPoint(user.id, userSkillNext.feeUpgrade.multiply(new BigDecimal(-1)),
         skillPoint.point.multiply(new BigDecimal(-1))))
         throw new BusinessException(ResponseMessageConstants.USER_POINT_OR_POINT_SKILL_NOT_ENOUGH);
@@ -322,7 +320,7 @@ public class UserService {
       long currentDiscount = user.rateCountDown.multiply(new BigDecimal(100)).longValue();
       long timeUpgrade = currentTime + ((1000 * skillPoint.upgradeTime * currentDiscount) / 100);
       if (!UserSkill.upgradeSkillPending(user.id, skillId, timeUpgrade, currentTime))
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+        throw new BusinessException(ResponseMessageConstants.USER_SKILL_ANOTHER_WAITING_UPGRADE);
       HistoryUpgradeSkill history = new HistoryUpgradeSkill();
       history.create();
       history.userId = user.id;

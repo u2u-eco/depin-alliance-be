@@ -19,7 +19,7 @@ public class SkillPoint extends PanacheEntityBase {
     @Column(name = "upgrade_time")
     public long upgradeTime;
     public static SkillPoint getPointRequire(long userId) {
-        return find("id = (select count(id)+1 from HistoryUpgradeSkill where userId = :userId) ",
+        return find("id = (select count(id)+1 from "+HistoryUpgradeSkill.class.getSimpleName()+" where userId = :userId) ",
                 Parameters.with("userId", userId)).firstResult();
     }
 }
