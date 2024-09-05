@@ -18,4 +18,6 @@ public class Skill extends PanacheEntityBase {
   public Long maxLevel;
   @Column
   public String description;
+  @Column
+  public String image;
 }
