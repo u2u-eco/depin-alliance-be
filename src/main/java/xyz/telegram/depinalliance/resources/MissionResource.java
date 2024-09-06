@@ -12,6 +12,7 @@ import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.entities.Mission;
 import xyz.telegram.depinalliance.entities.Partner;
+import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.services.MissionService;
 
 import java.util.ArrayList;
@@ -58,9 +59,28 @@ public class MissionResource extends BaseResource {
         groupMission.missions.add(userMission);
       }
     }
-
+    User user = getUser();
+    long level = user.level.id;
     List<UserMissionResponse> userMissionProduct = Mission.findTypeOnTimeInAppByUserId(getTelegramId());
     for (UserMissionResponse userMission : userMissionProduct) {
+      if (userMission.missionRequire.name().contains("LEVEL_")) {
+        long levelRequire = Long.valueOf(userMission.missionRequire.name().replace("LEVEL_", ""));
+        if (level < 5 && levelRequire > 5) {
+          break;
+        }
+        if (level < 10 && levelRequire > 10) {
+          break;
+        }
+        if (level < 20 && levelRequire > 20) {
+          break;
+        }
+        if (level < 35 && levelRequire > 35) {
+          break;
+        }
+        if (level < 50 && levelRequire > 50) {
+          break;
+        }
+      }
       GroupMissionResponse groupMission = groupMissions.stream()
         .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
       if (groupMission == null) {
@@ -72,7 +92,6 @@ public class MissionResource extends BaseResource {
         groupMission.missions.add(userMission);
       }
     }
-
     return ResponseData.ok(groupMissions);
   }
 
@@ -83,7 +102,6 @@ public class MissionResource extends BaseResource {
     List<UserMissionResponse> userMissionsPartner = Mission.findByUserId(getTelegramId(), true);
     partners.forEach(partner -> partner.missions = userMissionsPartner.stream()
       .filter(mission -> mission.groupMission.equalsIgnoreCase(partner.name)).collect(Collectors.toList()));
-
     return ResponseData.ok(partners);
   }
 

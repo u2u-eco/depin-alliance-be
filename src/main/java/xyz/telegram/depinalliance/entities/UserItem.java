@@ -33,8 +33,8 @@ public class UserItem extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_device_id")
   public UserDevice userDevice;
-  @Column(name = "is_sold", columnDefinition = "boolean default false")
-  public boolean isSold = false;
+  @Column(name = "is_active", columnDefinition = "boolean default false")
+  public boolean isActive = true;
 
   public UserItem(User user, Item item, UserDevice userDevice) {
     this.user = user;
@@ -49,7 +49,7 @@ public class UserItem extends BaseEntity {
     String type) {
     String sqlSelect = "select i.name, i.code, i.type, i.miningPower, i.image, i.price, count(1) ";
     String sqlFrom = " from UserItem ui inner join Item i on item.id = i.id ";
-    String sqlWhere = " where ui.user.id = :userId and isSold = false ";
+    String sqlWhere = " where ui.user.id = :userId and isActive = true ";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
     sqlWhere += " and userDevice is null";
@@ -66,7 +66,7 @@ public class UserItem extends BaseEntity {
 
   public static ResponsePage<UserItemResponse> findByUserIdAndIndexAndType(PagingParameters pageable, long userId,
     Long index, String type) {
-    String sql = "select ui.id, i.name, i.code, i.type, i.miningPower, i.image, i.price from UserItem ui inner join Item i on item.id = i.id left join UserDevice ud on ud.id= ui.userDevice.id where ui.user.id = :userId and isSold = false";
+    String sql = "select ui.id, i.name, i.code, i.type, i.miningPower, i.image, i.price from UserItem ui inner join Item i on item.id = i.id left join UserDevice ud on ud.id= ui.userDevice.id where ui.user.id = :userId and isActive = true";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
     if (StringUtils.isNotBlank(type)) {
@@ -85,7 +85,7 @@ public class UserItem extends BaseEntity {
   }
 
   public static List<Long> findItemForSell(long userId, String code, int number) {
-    String sql = "select ui.id from UserItem ui inner join Item i on item.id = i.id and i.code = :code where userDevice is null and user.id = :userId and isSold = false";
+    String sql = "select ui.id from UserItem ui inner join Item i on item.id = i.id and i.code = :code where userDevice is null and user.id = :userId and isActive = true";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
     params.put("code", code);
@@ -93,7 +93,7 @@ public class UserItem extends BaseEntity {
   }
 
   public static ResponsePage<UserItemResponse> findByTypeAndPaging(PagingParameters pageable, Enums.ItemType type) {
-    PanacheQuery<PanacheEntityBase> panacheQuery = find("item.type = ?1 and isSold = false", Sort.ascending("id"),
+    PanacheQuery<PanacheEntityBase> panacheQuery = find("item.type = ?1 and isActive = true", Sort.ascending("id"),
       type);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
       panacheQuery.count());
@@ -104,7 +104,7 @@ public class UserItem extends BaseEntity {
   }
 
   public static UserItem findByIdAndUser(Long id, long userId) {
-    return find("id = ?1 and user.id = ?2 and isSold = false", id, userId).firstResult();
+    return find("id = ?1 and user.id = ?2 and isActive = true", id, userId).firstResult();
   }
 
   public static UserItem create(UserItem userItem) {

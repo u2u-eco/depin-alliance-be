@@ -40,12 +40,15 @@ public class UserService {
       if (StringUtils.isNotBlank(refCode)) {
         ref = User.findByCode(refCode);
         if (ref != null) {
-          User.updatePointUser(ref.id,
-            new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF))));
-          user.pointRef = new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF)));
+          BigDecimal pointRef = new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF)));
+          user.pointRef = pointRef;
           if (StringUtils.isNotBlank(league)) {
             user.league = ref.league;
           }
+          Map<String, Object> params = new HashMap<>();
+          params.put("id", ref.id);
+          params.put("point", pointRef);
+          User.updateUser("point = point + :point, totalFriend = totalFriend + 1 where id = :id", params);
         }
       }
       user.ref = ref;

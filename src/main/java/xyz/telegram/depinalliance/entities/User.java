@@ -77,6 +77,8 @@ public class User extends BaseEntity {
   public League league;
   @Column(name = "total_device")
   public Integer totalDevice = 0;
+  @Column(name = "total_friend")
+  public long totalFriend = 0;
 
   public User(Long id) {
     this.id = id;
@@ -212,5 +214,9 @@ public class User extends BaseEntity {
       Sort.descending("pointRef").and("createdAt", Sort.Direction.Ascending), userId);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(FriendResponse.class).list(), pageable,
       panacheQuery.count());
+  }
+
+  public static long countFriendByUser(long userId) {
+    return count("ref.id =?1", userId);
   }
 }

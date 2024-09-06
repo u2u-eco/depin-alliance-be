@@ -13,10 +13,6 @@ public class UserDeviceResponse {
   public int slotRamUsed;
   public int slotGpuUsed;
   public int slotStorageUsed;
-  public int slotCpuMax;
-  public int slotGpuMax;
-  public int slotRamMax;
-  public int slotStorageMax;
   public BigDecimal totalMiningPower;
 
   public UserDeviceResponse(String name, int index, int slotCpuUsed, int slotRamUsed, int slotGpuUsed,

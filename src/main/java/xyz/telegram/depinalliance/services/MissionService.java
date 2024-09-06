@@ -155,6 +155,21 @@ public class MissionService {
             isChecked = true;
           }
           break;
+        case INVITE_1_FRIEND:
+          if (User.countFriendByUser(user.id) >= 1) {
+            isChecked = true;
+          }
+          break;
+        case INVITE_5_FRIEND:
+          if (User.countFriendByUser(user.id) >= 5) {
+            isChecked = true;
+          }
+          break;
+        case INVITE_10_FRIEND:
+          if (User.countFriendByUser(user.id) >= 10) {
+            isChecked = true;
+          }
+          break;
         }
       }
     }

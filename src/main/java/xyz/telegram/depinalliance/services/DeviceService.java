@@ -208,8 +208,8 @@ public class DeviceService {
     }
     Map<String, Object> paramsUserItem = new HashMap<>();
     paramsUserItem.put("id", itemId);
-    paramsUserItem.put("isSold", true);
-    if (UserItem.updateObject(" isSold = :isSold where id = :id and isSold = false", paramsUserItem) <= 0) {
+    paramsUserItem.put("isActive", false);
+    if (UserItem.updateObject(" isActive = :isActive where id = :id and isActive = true", paramsUserItem) <= 0) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     User.updatePointUser(user.id, userItem.item.price.multiply(new BigDecimal("0.5")));
@@ -237,8 +237,8 @@ public class DeviceService {
 
     Map<String, Object> paramsUserItem = new HashMap<>();
     paramsUserItem.put("ids", itemIds);
-    paramsUserItem.put("isSold", true);
-    if (UserItem.updateObject(" isSold = :isSold where id in (:ids) and isSold = false",
+    paramsUserItem.put("isActive", false);
+    if (UserItem.updateObject(" isActive = :isActive where id in (:ids) and isActive = true",
       paramsUserItem) < request.number) {
       throw new BusinessException(ResponseMessageConstants.ITEM_SELL_NOT_ENOUGH);
     }

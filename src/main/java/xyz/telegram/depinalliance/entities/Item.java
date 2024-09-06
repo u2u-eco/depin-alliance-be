@@ -37,6 +37,9 @@ public class Item extends BaseEntity {
   public boolean isCanBuy = true;
   @Column(name = "is_can_sell", columnDefinition = "boolean default true")
   public boolean isCanSell = true;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "event_id")
+  public Event event;
 
   public static Item findByCode(String code) {
     return find("code", code.toUpperCase()).firstResult();

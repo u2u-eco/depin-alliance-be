@@ -13,10 +13,6 @@ import java.util.Optional;
 @Entity
 @Table(name = "user_skills")
 public class UserSkill extends BaseEntity {
-  @Id
-  @SequenceGenerator(name = "userSkillSequence", sequenceName = "user_skill_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSkillSequence")
-  private Long id;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   public User user;
@@ -29,6 +25,10 @@ public class UserSkill extends BaseEntity {
   public Long levelUpgrade = 0L;
   @Column(name = "time_upgrade")
   public Long timeUpgrade = 0L;   //Milliseconds
+  @Id
+  @SequenceGenerator(name = "userSkillSequence", sequenceName = "user_skill_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSkillSequence")
+  private Long id;
 
   public static void initUserSkill(User user, List<Skill> skills) {
     skills.forEach(sk -> {

@@ -98,6 +98,7 @@ public class InitService {
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -112,6 +113,7 @@ public class InitService {
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -126,6 +128,7 @@ public class InitService {
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
       }
@@ -153,6 +156,7 @@ public class InitService {
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -167,6 +171,7 @@ public class InitService {
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -181,6 +186,7 @@ public class InitService {
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
       }
@@ -208,6 +214,7 @@ public class InitService {
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -222,6 +229,7 @@ public class InitService {
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -236,6 +244,7 @@ public class InitService {
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
       }
@@ -263,6 +272,7 @@ public class InitService {
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -277,6 +287,7 @@ public class InitService {
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
 
@@ -291,6 +302,7 @@ public class InitService {
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
         mission.create();
         mission.persist();
       }
@@ -338,6 +350,77 @@ public class InitService {
         mission.create();
         mission.persist();
       }
+      if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_5) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Achieve Level 5";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Achieve Level 5";
+        mission.orders = 1003;
+        mission.missionRequire = Enums.MissionRequire.LEVEL_5;
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(500);
+        mission.create();
+        mission.persist();
+      }
+      if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_10) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Achieve Level 10";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Achieve Level 10";
+        mission.orders = 1004;
+        mission.missionRequire = Enums.MissionRequire.LEVEL_10;
+        mission.point = new BigDecimal(100000);
+        mission.xp = new BigDecimal(500);
+        mission.create();
+        mission.persist();
+      }
+      if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_20) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Achieve Level 20";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Achieve Level 20";
+        mission.orders = 1005;
+        mission.missionRequire = Enums.MissionRequire.LEVEL_20;
+        mission.point = new BigDecimal(500000);
+        mission.xp = new BigDecimal(500);
+        mission.create();
+        mission.persist();
+      }
+      /*if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_35) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Achieve Level 35";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Achieve Level 35";
+        mission.orders = 1006;
+        mission.missionRequire = Enums.MissionRequire.LEVEL_35;
+        mission.point = new BigDecimal(2000000);
+        mission.xp = new BigDecimal(500);
+        mission.create();
+        mission.persist();
+      }
+
+      if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_50) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Achieve Level 50";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Achieve Level 50";
+        mission.orders = 1007;
+        mission.missionRequire = Enums.MissionRequire.LEVEL_50;
+        mission.point = new BigDecimal(5000000);
+        mission.xp = new BigDecimal(500);
+        mission.create();
+        mission.persist();
+      }*/
 
     }
   }
