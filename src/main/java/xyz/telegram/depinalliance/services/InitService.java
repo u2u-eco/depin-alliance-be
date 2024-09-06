@@ -85,7 +85,7 @@ public class InitService {
         partner.participants = 0;
         partner.isActive = true;
         partner.create();
-        partner.persistAndFlush();
+        partner.persist();
 
         Mission mission = new Mission();
         mission.groupMission = partner.name;
@@ -140,7 +140,7 @@ public class InitService {
         partner.participants = 0;
         partner.isActive = true;
         partner.create();
-        partner.persistAndFlush();
+        partner.persist();
 
         Mission mission = new Mission();
         mission.groupMission = partner.name;
@@ -195,7 +195,7 @@ public class InitService {
         partner.participants = 0;
         partner.isActive = true;
         partner.create();
-        partner.persistAndFlush();
+        partner.persist();
 
         Mission mission = new Mission();
         mission.groupMission = partner.name;
@@ -250,7 +250,7 @@ public class InitService {
         partner.participants = 0;
         partner.isActive = true;
         partner.create();
-        partner.persistAndFlush();
+        partner.persist();
 
         Mission mission = new Mission();
         mission.groupMission = partner.name;

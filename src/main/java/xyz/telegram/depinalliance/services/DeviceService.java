@@ -285,6 +285,13 @@ public class DeviceService {
     userDevice.name = "Device " + (numberDeviceUser + 1);
     userDevice.index = (int) (numberDeviceUser + 1);
     UserDevice.create(userDevice);
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", user.id);
+    params.put("maxDevice", maxDevice);
+    if (User.updateUser("totalDevice = totalDevice + 1 where id = :id and totalDevice + 1 = :maxDevice",
+      params) <= 0) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
     return userDevice.index;
   }
 }
