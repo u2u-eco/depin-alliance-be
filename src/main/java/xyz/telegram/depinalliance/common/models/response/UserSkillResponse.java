@@ -8,7 +8,8 @@ public class UserSkillResponse {
   public Long maxLevel;
   public Long timeWaiting;
 
-  public UserSkillResponse(Long skillId, String name, String image, Long levelCurrent, Long maxLevel, Long timeWaiting) {
+  public UserSkillResponse(Long skillId, String name, String image, Long levelCurrent, Long maxLevel,
+    Long timeWaiting) {
     this.skillId = skillId;
     this.name = name;
     this.image = image;

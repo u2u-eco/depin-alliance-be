@@ -43,11 +43,11 @@ public class StartCommand extends BotCommand {
       if (strings != null && strings.length > 0) {
         refCode = strings[0];
       }
-//      String league = "";
+      String league = "";
       if (StringUtils.isNotBlank(refCode) && refCode.contains("_")) {
-        String [] arrays = refCode.split("_");
+        String[] arrays = refCode.split("_");
         refCode = arrays[0];
-//        league = arrays[1];
+        league = arrays[1];
       }
       String username = StringUtils.isBlank(user.getUserName()) ?
         (StringUtils.isBlank(user.getFirstName()) ?
@@ -55,7 +55,7 @@ public class StartCommand extends BotCommand {
           user.getFirstName()) :
         user.getUserName();
       synchronized (chat.getId().toString().intern()) {
-        userService.checkStartUser(chat.getId(), username, refCode);
+        userService.checkStartUser(chat.getId(), username, refCode, league);
       }
       messageBuilder.append("<b>Welcome to DePIN Alliance!</b> \uD83D\uDEA9\n\n");
       messageBuilder.append(

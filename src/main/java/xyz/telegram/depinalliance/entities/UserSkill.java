@@ -65,7 +65,7 @@ public class UserSkill extends BaseEntity {
     try {
       return find(
         "select s.id as id, s.name, s.image, us.level, s.maxLevel, us.timeUpgrade from " + UserSkill.class.getSimpleName() + " us inner join " + Skill.class.getSimpleName() + " s on us.skill.id = s.id " + "where us.user.id = :userId ",
-              Sort.by("id").ascending(), Parameters.with("userId", userId)).project(UserSkillResponse.class).list();
+        Sort.by("id").ascending(), Parameters.with("userId", userId)).project(UserSkillResponse.class).list();
     } catch (Exception e) {
       throw e;
     }
@@ -79,11 +79,10 @@ public class UserSkill extends BaseEntity {
       params.put("timeUpgrade", timeUpgrade);
       params.put("currentTime", currentTime);
       return update(
-        "levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " + "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime " +
-                "and (select count(id) from UserSkill where user.id = :userId and timeUpgrade >= :currentTime) = 0 ",
+        "levelUpgrade = level + 1, timeUpgrade= :timeUpgrade " + "where user.id = :userId and skill.id = :skillId and timeUpgrade < :currentTime " + "and (select count(id) from UserSkill where user.id = :userId and timeUpgrade >= :currentTime) = 0 ",
         params) == 1;
     } catch (Exception e) {
-        throw e;
+      throw e;
     }
   }
 }

@@ -40,8 +40,8 @@ public class UserDevice extends BaseEntity {
     return userDevice;
   }
 
-  public static int updateObject(String query, Map<String, Object> params) {
-    return update(query, params);
+  public static boolean updateObject(String query, Map<String, Object> params) {
+    return update(query, params) > 0;
   }
 
   public static UserDevice findByUserAndIndex(long userId, int index) {

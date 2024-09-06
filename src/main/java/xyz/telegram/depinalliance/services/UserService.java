@@ -27,7 +27,7 @@ public class UserService {
   Logger logger;
 
   @Transactional
-  public User checkStartUser(Long id, String username, String refCode) {
+  public User checkStartUser(Long id, String username, String refCode, String league) {
     User user = User.findById(id);
     if (user == null) {
       user = new User();
@@ -43,7 +43,9 @@ public class UserService {
           User.updatePointUser(ref.id,
             new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF))));
           user.pointRef = new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF)));
-          user.league = ref.league;
+          if (StringUtils.isNotBlank(league)) {
+            user.league = ref.league;
+          }
         }
       }
       user.ref = ref;
@@ -135,7 +137,7 @@ public class UserService {
   @Transactional(Transactional.TxType.REQUIRES_NEW)
   public void initMissionUser(long userId) {
     try {
-//      findMissionAndInsert(Enums.MissionRequire.CLAIM_FIRST_10000_POINT, userId);
+      //      findMissionAndInsert(Enums.MissionRequire.CLAIM_FIRST_10000_POINT, userId);
     } catch (Exception e) {
     }
   }
@@ -283,32 +285,6 @@ public class UserService {
   public List<UserSkillResponse> getUserSkill(Long userId) {
     return UserSkill.findByUserId(userId);
   }
-
-  //  public boolean upgradeLevel(User user) throws Exception {
-  //    synchronized (user.id.toString().intern()) {
-  //      if (user.status != Enums.UserStatus.CLAIMED && user.status != Enums.UserStatus.MINING) {
-  //        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-  //      }
-  //      long maxLevel = Level.maxLevel();
-  //      if (user.level.id >= maxLevel)
-  //        throw new BusinessException(ResponseMessageConstants.USER_MAX_LEVEL);
-  //      Level nextLevel = Level.findById(user.level.id + 1);
-  //      if (user.point.compareTo(nextLevel.point) < 0 || user.xp.compareTo(nextLevel.exp) < 0)
-  //        throw new BusinessException(ResponseMessageConstants.USER_BALANCE_NOT_ENOUGH);
-  //      if (!User.updateLevel(user.id, nextLevel.id, maxLevel, nextLevel.point.multiply(new BigDecimal(-1)),
-  //        nextLevel.exp.multiply(new BigDecimal(-1))))
-  //        throw new BusinessException(ResponseMessageConstants.USER_UPGRADE_LEVEL_FAILED);
-  //      HistoryUpgradeLevel history = new HistoryUpgradeLevel();
-  //      history.create();
-  //      history.userId = user.id;
-  //      history.levelCurrent = user.level.id;
-  //      history.levelUpgrade = nextLevel.id;
-  //      history.pointUsed = nextLevel.point;
-  //      history.expUsed = nextLevel.exp;
-  //      HistoryUpgradeLevel.createHistory(history);
-  //      return true;
-  //    }
-  //  }
 
   public boolean upgradeSkill(User user, Long skillId) throws Exception {
     synchronized (user.id.toString().intern()) {

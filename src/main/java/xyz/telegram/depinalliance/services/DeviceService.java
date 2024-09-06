@@ -149,7 +149,7 @@ public class DeviceService {
     params.put("id", userDevice.id);
     params.put("maxSlot", maxSlot);
     params.put("miningPower", userItem.item.miningPower);
-    if (UserDevice.updateObject(query, params) <= 0) {
+    if (!UserDevice.updateObject(query, params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     Map<String, Object> paramsUserItem = new HashMap<>();
@@ -186,7 +186,7 @@ public class DeviceService {
     Map<String, Object> params = new HashMap<>();
     params.put("id", userItem.userDevice.id);
     params.put("miningPower", userItem.item.miningPower);
-    if (UserDevice.updateObject(query, params) <= 0) {
+    if (!UserDevice.updateObject(query, params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
 
@@ -209,7 +209,9 @@ public class DeviceService {
     Map<String, Object> paramsUserItem = new HashMap<>();
     paramsUserItem.put("id", itemId);
     paramsUserItem.put("isSold", true);
-    UserItem.updateObject(" isSold = :isSold where id = :id and isSold = false", paramsUserItem);
+    if (UserItem.updateObject(" isSold = :isSold where id = :id and isSold = false", paramsUserItem) <= 0) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
     User.updatePointUser(user.id, userItem.item.price.multiply(new BigDecimal("0.5")));
     new UserItemTradeHistory(user, userItem, userItem.item.price, userItem.item.price.multiply(new BigDecimal("0.5")),
       false).create();
@@ -288,8 +290,7 @@ public class DeviceService {
     Map<String, Object> params = new HashMap<>();
     params.put("id", user.id);
     params.put("maxDevice", maxDevice);
-    if (User.updateUser("totalDevice = totalDevice + 1 where id = :id and totalDevice + 1 = :maxDevice",
-      params) <= 0) {
+    if (!User.updateUser("totalDevice = totalDevice + 1 where id = :id and totalDevice + 1 = :maxDevice", params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     return userDevice.index;

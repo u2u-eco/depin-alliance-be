@@ -26,7 +26,7 @@ public class SkillLevel extends PanacheEntityBase {
   @Column(name = "rate_purchase", scale = 18, precision = 29)
   public BigDecimal ratePurchase = BigDecimal.ZERO; //percent
   @Column(name = "rate_reward", scale = 18, precision = 29)
-  public BigDecimal rateReward= BigDecimal.ZERO; //percent
+  public BigDecimal rateReward = BigDecimal.ZERO; //percent
   @Column(name = "rate_count_down", scale = 18, precision = 29)
   public BigDecimal rateCountDown = BigDecimal.ZERO; //percent
   @Column(name = "rate_capacity", scale = 18, precision = 29)

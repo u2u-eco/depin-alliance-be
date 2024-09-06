@@ -12,14 +12,16 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "skill_points")
 public class SkillPoint extends PanacheEntityBase {
-    @Id
-    public Long id;
-    @Column(name = "point")
-    public BigDecimal point;
-    @Column(name = "upgrade_time")
-    public long upgradeTime;
-    public static SkillPoint getPointRequire(long userId) {
-        return find("id = (select count(id)+1 from "+HistoryUpgradeSkill.class.getSimpleName()+" where userId = :userId) ",
-                Parameters.with("userId", userId)).firstResult();
-    }
+  @Id
+  public Long id;
+  @Column(name = "point")
+  public BigDecimal point;
+  @Column(name = "upgrade_time")
+  public long upgradeTime;
+
+  public static SkillPoint getPointRequire(long userId) {
+    return find(
+      "id = (select count(id)+1 from " + HistoryUpgradeSkill.class.getSimpleName() + " where userId = :userId) ",
+      Parameters.with("userId", userId)).firstResult();
+  }
 }

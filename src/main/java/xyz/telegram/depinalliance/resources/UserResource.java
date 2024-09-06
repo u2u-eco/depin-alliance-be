@@ -67,7 +67,7 @@ public class UserResource extends BaseResource {
     if (user == null && isValidate) {
       return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
     } else if (user == null) {
-      user = userService.checkStartUser(userTelegramResponse.id, username, "");
+      user = userService.checkStartUser(userTelegramResponse.id, username, "", "");
     }
 
     Map<String, Object> params = new HashMap<>();

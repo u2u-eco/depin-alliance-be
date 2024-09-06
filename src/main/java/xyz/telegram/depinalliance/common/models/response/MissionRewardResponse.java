@@ -5,5 +5,5 @@ package xyz.telegram.depinalliance.common.models.response;
  */
 public class MissionRewardResponse {
   public String type;
-//  public List<Object>
+  //  public List<Object>
 }

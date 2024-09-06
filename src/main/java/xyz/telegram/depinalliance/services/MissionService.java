@@ -181,7 +181,7 @@ public class MissionService {
     params.put("missionId", missionId);
     params.put("userId", user.id);
     params.put("status", Enums.MissionStatus.CLAIMED);
-    if (UserMission.updateObject("status = :status where user.id = :userId and mission.id = :missionId", params) > 0) {
+    if (UserMission.updateObject("status = :status where user.id = :userId and mission.id = :missionId", params)) {
       User.updatePointAndXpUser(user.id, check.point, check.xp);
       if (check.xp != null && check.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);

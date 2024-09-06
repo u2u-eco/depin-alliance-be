@@ -50,8 +50,8 @@ public class League extends BaseEntity {
     return league;
   }
 
-  public static int updateObject(String query, Map<String, Object> params) {
-    return update(query, params);
+  public static boolean updateObject(String query, Map<String, Object> params) {
+    return update(query, params) > 0;
   }
 
   public static String getCodeLeague() {
@@ -81,10 +81,10 @@ public class League extends BaseEntity {
       panacheQuery.count());
   }
 
-  public static void updateLevel(Long id, Long levelNew) {
+  public static boolean updateLevel(Long id, Long levelNew) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("levelNew", levelNew);
-    update("level.id = :levelNew where id = :id and level.id < :levelNew ", params);
+    return update("level.id = :levelNew where id = :id and level.id < :levelNew ", params) > 0;
   }
 }

@@ -35,11 +35,11 @@ public class UserItemTradeHistory extends BaseEntity {
     this.isBuy = isBuy;
   }
 
-  public static long countBuy(long userId) {
-    return count("user.id = ?1 and isBuy = true", userId);
+  public UserItemTradeHistory() {
   }
 
-  public UserItemTradeHistory() {
+  public static long countBuy(long userId) {
+    return count("user.id = ?1 and isBuy = true", userId);
   }
 
   public UserItemTradeHistory create() {

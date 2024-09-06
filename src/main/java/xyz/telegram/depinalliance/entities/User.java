@@ -4,7 +4,6 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
@@ -113,11 +112,11 @@ public class User extends BaseEntity {
     }
   }
 
-  public static int updateUser(String query, Map<String, Object> params) {
-    return update(query, params);
+  public static boolean updateUser(String query, Map<String, Object> params) {
+    return update(query, params) > 0;
   }
 
-  public static int updatePointUser(long id, BigDecimal point) {
+  public static boolean updatePointUser(long id, BigDecimal point) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("point", point);
@@ -128,8 +127,7 @@ public class User extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("pointSkill", pointSkill);
-    return updateUser("pointSkill = pointSkill + :pointSkill where id = :id and pointSkill + :pointSkill >=0",
-      params) == 1;
+    return updateUser("pointSkill = pointSkill + :pointSkill where id = :id and pointSkill + :pointSkill >=0", params);
   }
 
   public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
@@ -139,10 +137,10 @@ public class User extends BaseEntity {
     params.put("point", point);
     return updateUser(
       "pointSkill = pointSkill + :pointSkill, point = point + :point " + "where id = :id and pointSkill + :pointSkill >=0 and point + :point >= 0 ",
-      params) == 1;
+      params);
   }
 
-  public static int updatePointAndXpUser(long id, BigDecimal point, BigDecimal xp) {
+  public static boolean updatePointAndXpUser(long id, BigDecimal point, BigDecimal xp) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("point", point);
@@ -167,7 +165,7 @@ public class User extends BaseEntity {
       params.put("expUse", expUse);
       return update(
         "level.id = :nextLevel, point = point + :pointUse, xp = xp + :expUse " + "where id = :id and level.id < :nextLevel " + "and point + :pointUse >= 0 and xp + :expUse >= 0 and :nextLevel <= :maxLevel",
-        params) == 1;
+        params) > 0;
     } catch (Exception e) {
       throw e;
     }
@@ -204,7 +202,9 @@ public class User extends BaseEntity {
   public static void updateMiningPowerReal(long userId) {
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
-    update("update User set miningPowerReal = (select sum(ui.item.miningPower) from UserItem ui where ui.user.id = :userId and userDevice is not null ) * rateMining where id = :userId", params);
+    update(
+      "update User set miningPowerReal = (select sum(ui.item.miningPower) from UserItem ui where ui.user.id = :userId and userDevice is not null ) * rateMining where id = :userId",
+      params);
   }
 
   public static ResponsePage<FriendResponse> findFriendByUserAndPaging(PagingParameters pageable, long userId) {
