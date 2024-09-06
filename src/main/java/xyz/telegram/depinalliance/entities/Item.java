@@ -33,6 +33,10 @@ public class Item extends BaseEntity {
   public BigDecimal price = BigDecimal.ZERO;
   @Column
   public String image;
+  @Column(name = "is_can_buy", columnDefinition = "boolean default true")
+  public boolean isCanBuy = true;
+  @Column(name = "is_can_sell", columnDefinition = "boolean default true")
+  public boolean isCanSell = true;
 
   public static Item findByCode(String code) {
     return find("code", code.toUpperCase()).firstResult();
@@ -41,9 +45,10 @@ public class Item extends BaseEntity {
   public static ResponsePage<ItemResponse> findByTypeAndPaging(PagingParameters pageable, String type) {
     PanacheQuery<PanacheEntityBase> panacheQuery;
     if (StringUtils.isNotBlank(type)) {
-      panacheQuery = find("type = ?1", pageable.getSort(), Enums.ItemType.valueOf(type.toUpperCase()));
+      panacheQuery = find("type = ?1 and isCanBuy = true", pageable.getSort(),
+        Enums.ItemType.valueOf(type.toUpperCase()));
     } else {
-      panacheQuery = find("", pageable.getSort());
+      panacheQuery = find("isCanBuy = true", pageable.getSort());
     }
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(ItemResponse.class).list(), pageable,
       panacheQuery.count());

@@ -67,7 +67,7 @@ public class UserService {
   }
 
   @Transactional
-  public Object detectDeviceInfo(User user) throws Exception {
+  public Object detectDeviceInfo(User user) {
     if (user.status != Enums.UserStatus.STARTED) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
@@ -104,7 +104,7 @@ public class UserService {
     paramsUser.put("pointUnClaimed", pointUnClaimed);
     paramsUser.put("miningPower", miningPower);
     User.updateUser(
-      "status = :status, pointUnClaimed = :pointUnClaimed, miningPower = :miningPower, totalDevice = 1 where id = :id",
+      "status = :status, pointUnClaimed = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1 where id = :id",
       paramsUser);
     if (user.league != null) {
       Map<String, Object> leagueParams = new HashMap<>();
@@ -114,16 +114,11 @@ public class UserService {
         "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
         leagueParams);
     }
-    //    List<DetectDeviceResponse> rs = new ArrayList<>();
-    //    rs.add(new DetectDeviceResponse(Enums.ItemType.CPU, itemCpu.name));
-    //    rs.add(new DetectDeviceResponse(Enums.ItemType.GPU, itemGpu.name));
-    //    rs.add(new DetectDeviceResponse(Enums.ItemType.RAM, itemRam.name));
-    //    rs.add(new DetectDeviceResponse(Enums.ItemType.STORAGE, itemStorage.name));
     return pointUnClaimed;
   }
 
   @Transactional
-  public BigDecimal claimRewardNewUser(User user) throws Exception {
+  public BigDecimal claimRewardNewUser(User user) {
     if (user.status != Enums.UserStatus.DETECTED_DEVICE_INFO) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
@@ -137,8 +132,31 @@ public class UserService {
     return Utils.stripDecimalZeros(user.pointUnClaimed);
   }
 
+  @Transactional(Transactional.TxType.REQUIRES_NEW)
+  public void initMissionUser(long userId) {
+    try {
+//      findMissionAndInsert(Enums.MissionRequire.CLAIM_FIRST_10000_POINT, userId);
+    } catch (Exception e) {
+    }
+  }
+
+  public void findMissionAndInsert(Enums.MissionRequire missionRequire, long userId) {
+    try {
+      Mission mission = Mission.findByMissionRequire(missionRequire);
+      if (mission != null) {
+        UserMission userMission = new UserMission();
+        userMission.user = new User(userId);
+        userMission.mission = mission;
+        userMission.status = Enums.MissionStatus.NOT_VERIFIED;
+        userMission.persistAndFlush();
+      }
+    } catch (Exception e) {
+      logger.error("Error inserting mission " + userId + " " + missionRequire.name(), e);
+    }
+  }
+
   @Transactional
-  public BigDecimal startContributing(User user) throws Exception {
+  public BigDecimal startContributing(User user) {
     if (user.status != Enums.UserStatus.CLAIMED) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
@@ -199,7 +217,6 @@ public class UserService {
 
   public BigDecimal bonusClaim(int rate) {
     int a = new Random().nextInt(100);
-    System.out.println(5 + rate);
     if (a < (5 + rate)) {
       // 5% chance
       a = new Random().nextInt(100);
@@ -354,11 +371,13 @@ public class UserService {
           paramsLeague.put("miningPowerNew", user.miningPower.multiply(user.rateMining.add(his.rateMining)));
           League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
             paramsLeague);
-          User.updateMiningPowerReal(user.id);
         }
       }
       User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward, his.rateCountDown,
         his.rateCapacity);
+      if (his.rateMining != null && his.rateMining.compareTo(BigDecimal.ZERO) > 0) {
+        User.updateMiningPowerReal(his.userId);
+      }
     }
     HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
   }
@@ -369,6 +388,16 @@ public class UserService {
     Level level = Level.getLevelBeExp(user.xp);
     if (null != level && level.id - user.level.id > 0 && level.id < maxLevel) {
       User.updateLevelAndPointSkill(userId, level.id, new BigDecimal(level.id - user.level.id));
+    }
+  }
+
+  public long maxDeviceUserByLevel(long levelId) {
+    if (levelId <= 9) {
+      return 1;
+    } else if (levelId <= 19) {
+      return 2;
+    } else {
+      return 3;
     }
   }
 }

@@ -79,6 +79,13 @@ public class User extends BaseEntity {
   @Column(name = "total_device")
   public Integer totalDevice = 0;
 
+  public User(Long id) {
+    this.id = id;
+  }
+
+  public User() {
+  }
+
   public static User createUser(User user) {
     user.create();
     user.persist();

@@ -55,4 +55,8 @@ public class HistoryUpgradeSkill extends BaseEntity {
       throw e;
     }
   }
+
+  public static long countUpgradeSkillByUserId(long userId) {
+    return count("userId = ?1", userId);
+  }
 }

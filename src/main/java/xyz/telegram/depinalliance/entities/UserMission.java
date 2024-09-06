@@ -9,7 +9,7 @@ import java.util.Map;
  * @author holden on 28-Aug-2024
  */
 @Entity
-@Table(name = "user_missions")
+@Table(name = "user_missions", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "mission_id" }) })
 public class UserMission extends BaseEntity {
   @Id
   @SequenceGenerator(name = "userMissionSequence", sequenceName = "user_mission_id_seq", allocationSize = 1)

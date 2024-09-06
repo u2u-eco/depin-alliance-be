@@ -20,6 +20,7 @@ public class UserInfoResponse {
   public BigDecimal xpLevelTo;
   public BigDecimal pointSkill;
   public BigDecimal ratePurchase;
+  public BigDecimal rateBonusReward;
   public String avatar;
   public Integer totalDevice;
   public long level;

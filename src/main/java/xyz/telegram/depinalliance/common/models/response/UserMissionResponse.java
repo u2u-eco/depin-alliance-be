@@ -21,9 +21,14 @@ public class UserMissionResponse {
   public BigDecimal point;
   public BigDecimal xp;
   public Enums.MissionStatus status;
+  @JsonIgnore
+  public Boolean isFake;
+  @JsonIgnore
+  public Enums.MissionRequire missionRequire;
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
-    Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status) {
+    Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,
+    Enums.MissionRequire missionRequire) {
     this.groupMission = groupMission;
     this.name = name;
     this.description = description;
@@ -34,5 +39,7 @@ public class UserMissionResponse {
     this.status = status;
     this.id = id;
     this.image = image;
+    this.isFake = isFake;
+    this.missionRequire = missionRequire;
   }
 }

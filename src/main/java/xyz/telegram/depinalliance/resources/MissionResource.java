@@ -7,14 +7,16 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.GroupMissionResponse;
+import xyz.telegram.depinalliance.common.models.response.PartnerResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.entities.Mission;
+import xyz.telegram.depinalliance.entities.Partner;
 import xyz.telegram.depinalliance.services.MissionService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author holden on 26-Aug-2024
@@ -42,7 +44,7 @@ public class MissionResource extends BaseResource {
   @GET
   @Path("")
   public ResponseData getAllMissions() {
-    List<UserMissionResponse> userMissions = Mission.findByUserId(getTelegramId());
+    List<UserMissionResponse> userMissions = Mission.findByUserId(getTelegramId(), false);
     List<GroupMissionResponse> groupMissions = new ArrayList<>();
     for (UserMissionResponse userMission : userMissions) {
       GroupMissionResponse groupMission = groupMissions.stream()
@@ -56,27 +58,33 @@ public class MissionResource extends BaseResource {
         groupMission.missions.add(userMission);
       }
     }
+
+    List<UserMissionResponse> userMissionProduct = Mission.findTypeOnTimeInAppByUserId(getTelegramId());
+    for (UserMissionResponse userMission : userMissionProduct) {
+      GroupMissionResponse groupMission = groupMissions.stream()
+        .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
+      if (groupMission == null) {
+        groupMission = new GroupMissionResponse();
+        groupMission.group = userMission.groupMission;
+        groupMission.missions.add(userMission);
+        groupMissions.add(groupMission);
+      } else {
+        groupMission.missions.add(userMission);
+      }
+    }
+
     return ResponseData.ok(groupMissions);
   }
 
   @GET
-  @Path("v2")
-  public ResponseData getAllMissionsV2() {
-    List<UserMissionResponse> userMissions = Mission.findByUserId(getTelegramId());
-    List<GroupMissionResponse> groupMissions = new ArrayList<>();
-    for (UserMissionResponse userMission : userMissions) {
-      GroupMissionResponse groupMission = groupMissions.stream()
-        .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
-      if (groupMission == null) {
-        groupMission = new GroupMissionResponse();
-        groupMission.group = userMission.groupMission;
-        groupMission.missions.add(userMission);
-        groupMissions.add(groupMission);
-      } else {
-        groupMission.missions.add(userMission);
-      }
-    }
-    return ResponseData.ok(groupMissions);
+  @Path("partner")
+  public ResponseData getMissionPartner() {
+    List<PartnerResponse> partners = Partner.findAllPartner();
+    List<UserMissionResponse> userMissionsPartner = Mission.findByUserId(getTelegramId(), true);
+    partners.forEach(partner -> partner.missions = userMissionsPartner.stream()
+      .filter(mission -> mission.groupMission.equalsIgnoreCase(partner.name)).collect(Collectors.toList()));
+
+    return ResponseData.ok(partners);
   }
 
   @GET

@@ -10,6 +10,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
@@ -42,6 +43,8 @@ public class UserResource extends BaseResource {
   UserService userService;
   @ConfigProperty(name = "telegram.validate")
   boolean isValidate;
+  @Inject
+  AmazonS3Config amazonS3Config;
 
   @POST
   @Path("auth")
@@ -109,7 +112,21 @@ public class UserResource extends BaseResource {
     userInfoResponse.lastCheckin = user.lastCheckIn;
     userInfoResponse.code = user.code;
     userInfoResponse.totalDevice = user.totalDevice;
+    BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
+    userInfoResponse.rateBonusReward = new BigDecimal("5").add(rateBonus);
     return ResponseData.ok(userInfoResponse);
+  }
+
+  @GET
+  @Path("config")
+  public ResponseData config() throws BusinessException {
+    User user = getUser();
+    SystemConfigResponse systemConfigResponse = new SystemConfigResponse();
+    systemConfigResponse.maxDevice = userService.maxDeviceUserByLevel(user.level.id);
+    systemConfigResponse.pointBuyDevice = new BigDecimal(
+      Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_BUY_DEVICE)));
+    systemConfigResponse.urlImage = amazonS3Config.awsUrl();
+    return ResponseData.ok(systemConfigResponse);
   }
 
   @GET

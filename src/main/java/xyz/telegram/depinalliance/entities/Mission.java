@@ -27,6 +27,8 @@ public class Mission extends BaseEntity {
   public String name;
   public String description;
   public Enums.MissionType type;
+  @Column(name = "mission_require")
+  public Enums.MissionRequire missionRequire;
   public String url;
   public int orders = 0;
   @Column(name = "is_fake")
@@ -43,15 +45,29 @@ public class Mission extends BaseEntity {
   public Mission() {
   }
 
-  public static List<UserMissionResponse> findByUserId(long userId) {
+  public static Mission findByMissionRequire(Enums.MissionRequire missionRequire) {
+    return find("missionRequire = ?1", missionRequire).firstResult();
+  }
+
+  public static List<UserMissionResponse> findByUserId(long userId, boolean isPartner) {
     return find(
-      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1",
-      Sort.ascending("m.orders"), userId).project(UserMissionResponse.class).list();
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.type != ?2 " + (
+        isPartner ?
+          " and partner is not null" :
+          " and partner is null"), Sort.ascending("m.orders"), userId, Enums.MissionType.ON_TIME_IN_APP).project(
+      UserMissionResponse.class).list();
+  }
+
+  public static List<UserMissionResponse> findTypeOnTimeInAppByUserId(long userId) {
+    return find(
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.type = ?2 and (um.status is null or um.status != ?3) ",
+      Sort.ascending("m.orders"), userId, Enums.MissionType.ON_TIME_IN_APP, Enums.MissionStatus.CLAIMED).project(
+      UserMissionResponse.class).list();
   }
 
   public static UserMissionResponse findByUserIdAndMissionId(long userId, long missionId) {
     return find(
-      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2",
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2",
       Sort.ascending("m.orders"), userId, missionId).project(UserMissionResponse.class).firstResult();
   }
 }

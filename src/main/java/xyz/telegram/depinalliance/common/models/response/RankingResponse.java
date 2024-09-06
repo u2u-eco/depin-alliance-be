@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 public class RankingResponse {
   public String username;
   public String avatar;
-  public BigDecimal miningPower;
+  public BigDecimal miningPowerReal;
 
-  public RankingResponse(String username, String avatar, BigDecimal miningPower) {
+  public RankingResponse(String username, String avatar, BigDecimal miningPowerReal) {
     this.username = username;
     this.avatar = avatar;
-    this.miningPower = Utils.stripDecimalZeros(miningPower);
+    this.miningPowerReal = Utils.stripDecimalZeros(miningPowerReal);
   }
 }

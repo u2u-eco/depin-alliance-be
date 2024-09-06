@@ -10,10 +10,7 @@ import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.DailyCheckinResponse;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
-import xyz.telegram.depinalliance.entities.DailyCheckin;
-import xyz.telegram.depinalliance.entities.Mission;
-import xyz.telegram.depinalliance.entities.User;
-import xyz.telegram.depinalliance.entities.UserMission;
+import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -49,7 +46,6 @@ public class MissionService {
     }
 
     if (today - user.lastCheckIn == 86400) {
-      System.out.println((today - user.startCheckIn) / 86400);
       if ((today - user.startCheckIn) / 86400 == dailyCheckins.size()) {
         calendar.setTimeInMillis(today * 1000);
       } else {
@@ -135,15 +131,42 @@ public class MissionService {
     UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
     if (check == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
-    } else if (check.status != null) {
+    } else if (check.status != null && check.status != Enums.MissionStatus.NOT_VERIFIED) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    UserMission userMission = new UserMission();
-    userMission.mission = new Mission(check.id);
-    userMission.user = user;
-    userMission.status = Enums.MissionStatus.VERIFIED;
-    UserMission.create(userMission);
-    return true;
+    boolean isChecked = false;
+    if (check.isFake) {
+      isChecked = true;
+    } else {
+      if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+        switch (check.missionRequire) {
+        case CLAIM_FIRST_10000_POINT:
+          if (user.pointClaimed.compareTo(new BigDecimal("10000")) >= 0) {
+            isChecked = true;
+          }
+          break;
+        case BUY_ANY_DEVICE:
+          if (UserItemTradeHistory.countBuy(user.id) > 0) {
+            isChecked = true;
+          }
+          break;
+        case LEARN_ANY_SKILL:
+          if (HistoryUpgradeSkill.countUpgradeSkillByUserId(user.id) > 0) {
+            isChecked = true;
+          }
+          break;
+        }
+      }
+    }
+    if (isChecked) {
+      UserMission userMission = new UserMission();
+      userMission.mission = new Mission(check.id);
+      userMission.user = user;
+      userMission.status = Enums.MissionStatus.VERIFIED;
+      UserMission.create(userMission);
+      return true;
+    }
+    return false;
   }
 
   @Transactional

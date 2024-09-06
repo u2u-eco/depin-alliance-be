@@ -34,6 +34,14 @@ public class DeviceResource extends BaseResource {
     return ResponseData.ok(UserDevice.findByUser(getTelegramId()));
   }
 
+  @Path("add-device")
+  @GET
+  public ResponseData addDevice() {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.addDevice(getUser()));
+    }
+  }
+
   @Path("user-item")
   @GET
   public ResponseData getUserItem(@QueryParam("type") String type, PagingParameters pagingParameters) {

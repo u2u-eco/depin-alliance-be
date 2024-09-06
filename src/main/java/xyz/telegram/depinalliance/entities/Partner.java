@@ -21,8 +21,15 @@ public class Partner extends BaseEntity {
   public long participants;
   public String image;
   public int orders;
+  public String rewards;
+  @Column(name = "is_active")
+  public Boolean isActive;
 
-  public List<PartnerResponse> findAllPartner() {
-    return findAll(Sort.ascending("orders")).project(PartnerResponse.class).list();
+  public static List<PartnerResponse> findAllPartner() {
+    return find("isActive = true", Sort.ascending("orders")).project(PartnerResponse.class).list();
+  }
+
+  public static Partner findByName(String name) {
+    return find("name=?1", name).firstResult();
   }
 }
