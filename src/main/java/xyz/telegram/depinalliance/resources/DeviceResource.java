@@ -2,10 +2,7 @@ package xyz.telegram.depinalliance.resources;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
-import xyz.telegram.depinalliance.common.models.request.ChangeNameDeviceRequest;
-import xyz.telegram.depinalliance.common.models.request.PagingParameters;
-import xyz.telegram.depinalliance.common.models.request.SellItemRequest;
+import xyz.telegram.depinalliance.common.models.request.*;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.entities.Item;
 import xyz.telegram.depinalliance.entities.UserDevice;
@@ -102,6 +99,14 @@ public class DeviceResource extends BaseResource {
   public ResponseData changeName(ChangeNameDeviceRequest request) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(deviceService.changeNameDevice(getUser(), request));
+    }
+  }
+
+  @Path("estimate-use-key")
+  @POST
+  public ResponseData estimateUseKey(BoxUseKeyRequest request) {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok();
     }
   }
 }

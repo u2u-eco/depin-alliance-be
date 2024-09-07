@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
+import xyz.telegram.depinalliance.common.models.request.BoxUseKeyRequest;
 import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
 import xyz.telegram.depinalliance.common.models.request.ChangeNameDeviceRequest;
 import xyz.telegram.depinalliance.common.models.request.SellItemRequest;
@@ -296,5 +297,9 @@ public class DeviceService {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     return userDevice.index;
+  }
+
+  public BigDecimal estimateUseKeyBox(User user, BoxUseKeyRequest request) {
+    return BigDecimal.ZERO;
   }
 }

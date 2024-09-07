@@ -32,6 +32,8 @@ public class User extends BaseEntity {
   public BigDecimal pointUnClaimed = BigDecimal.ZERO;
   @Column(name = "point_claimed", scale = 18, precision = 29)
   public BigDecimal pointClaimed = BigDecimal.ZERO;
+  @Column(name = "point_bonus", scale = 18, precision = 29)
+  public BigDecimal pointBonus = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
   public BigDecimal xp = BigDecimal.ZERO;
   @Column(name = "mining_power", scale = 18, precision = 29)
@@ -79,6 +81,10 @@ public class User extends BaseEntity {
   public Integer totalDevice = 0;
   @Column(name = "total_friend")
   public long totalFriend = 0;
+  @Column(name = "detect_device")
+  public String detectDevice;
+  @Column(name = "is_premium")
+  public Boolean isPremium;
 
   public User(Long id) {
     this.id = id;
