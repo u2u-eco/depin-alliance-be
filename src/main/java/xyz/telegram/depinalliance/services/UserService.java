@@ -25,6 +25,8 @@ import java.util.*;
 public class UserService {
   @Inject
   Logger logger;
+  private static final long RATE_BONUS_DEFAULT = Long.parseLong(
+    SystemConfig.findByKey(Enums.Config.BONUS_REWARD_DEFAULT, "5"));
 
   @Transactional
   public User checkStartUser(Long id, String username, String refCode, String league) {
@@ -74,7 +76,7 @@ public class UserService {
   @Transactional
   public Object detectDeviceInfo(User user) {
     if (user.status != Enums.UserStatus.STARTED) {
-      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+      return BigDecimal.ZERO;
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
     String codeCpu = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
@@ -125,7 +127,7 @@ public class UserService {
   @Transactional
   public BigDecimal claimRewardNewUser(User user) {
     if (user.status != Enums.UserStatus.DETECTED_DEVICE_INFO) {
-      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+      return BigDecimal.ZERO;
     }
     Map<String, Object> paramsUser = new HashMap<>();
     paramsUser.put("id", user.id);
@@ -205,11 +207,9 @@ public class UserService {
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
       paramsUser.put("point", pointUnClaimed);
-      paramsUser.put("pointClaimed", user.pointUnClaimed);
-      paramsUser.put("pointUnClaimed", user.pointUnClaimed);
       paramsUser.put("pointRef", pointRef);
       User.updateUser(
-        "point = point + :point, pointUnClaimed = pointUnClaimed - :pointUnClaimed, pointRef = pointRef + :pointRef, pointClaimed = pointClaimed + :pointClaimed  where id = :id",
+        "point = point + :point, pointClaimed = pointClaimed + pointUnClaimed, pointUnClaimed = 0, pointRef = pointRef + :pointRef  where id = :id",
         paramsUser);
 
       Map<String, Object> paramsUserRef = new HashMap<>();
@@ -222,7 +222,7 @@ public class UserService {
 
   public BigDecimal bonusClaim(int rate) {
     int a = new Random().nextInt(100);
-    if (a < (5 + rate)) {
+    if (a < (RATE_BONUS_DEFAULT + rate)) {
       // 5% chance
       a = new Random().nextInt(100);
       if (a < 65) {
@@ -280,7 +280,7 @@ public class UserService {
     paramsUser.put("pointUnClaimed", pointUnClaimed);
     paramsUser.put("timeStartMining", time);
     User.updateUser(
-      "pointUnClaimed = pointUnClaimed + :pointUnClaimed, timeStartMining = :timeStartMining where id = :id",
+      "pointUnClaimed = pointUnClaimed + :pointUnClaimed, timeStartMining = :timeStartMining where id = :id and pointUnClaimed + :pointUnClaimed >= 0",
       paramsUser);
     return Utils.stripDecimalZeros(pointUnClaimed);
   }
