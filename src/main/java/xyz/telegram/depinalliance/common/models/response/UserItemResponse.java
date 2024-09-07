@@ -22,9 +22,13 @@ public class UserItemResponse {
   public BigDecimal price;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public Boolean isCanSell;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Boolean isCanOpen;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Boolean isCanClaim;
 
   public UserItemResponse(String name, String code, Enums.ItemType type, BigDecimal miningPower, String image,
-    BigDecimal price, Long totalItem, Boolean isCanSell) {
+    BigDecimal price, Long totalItem, Boolean isCanSell, Boolean isCanOpen, Boolean isCanClaim) {
     this.name = name;
     this.code = code;
     this.type = type;
@@ -33,6 +37,8 @@ public class UserItemResponse {
     this.totalItem = totalItem;
     this.price = Utils.stripDecimalZeros(price);
     this.isCanSell = isCanSell;
+    this.isCanOpen = isCanOpen;
+    this.isCanClaim = isCanClaim;
   }
 
   public UserItemResponse(Long id, String name, String code, Enums.ItemType type, BigDecimal miningPower, String image,
