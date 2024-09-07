@@ -29,8 +29,9 @@ public class UserService {
     SystemConfig.findByKey(Enums.Config.BONUS_REWARD_DEFAULT, "5"));
 
   @Transactional
-  public User checkStartUser(Long id, String username, String refCode, String league) {
+  public User checkStartUser(Long id, String username, String refCode, String league, Boolean isPremium) {
     User user = User.findById(id);
+    isPremium = isPremium != null && isPremium;
     if (user == null) {
       user = new User();
       user.id = id;
@@ -38,6 +39,7 @@ public class UserService {
       user.level = new Level(1L);
       user.status = Enums.UserStatus.STARTED;
       user.avatar = SystemConfig.findByKey(Enums.Config.AVATAR_DEFAULT);
+      user.isPremium = isPremium;
       User ref = null;
       if (StringUtils.isNotBlank(refCode)) {
         ref = User.findByCode(refCode);
@@ -64,17 +66,30 @@ public class UserService {
       logger.info("User " + user.username + " created with ref code " + refCode);
       return user;
     }
+    boolean hasChange = false;
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", id);
+    List<String> sql = Arrays.asList();
     if (!user.username.equals(username)) {
-      Map<String, Object> params = new HashMap<>();
-      params.put("id", id);
+      hasChange = true;
       params.put("username", username);
-      User.updateUser("username = :username where id = :id", params);
+      sql.add("username = :username");
+    }
+    boolean userPremium = user.isPremium != null && user.isPremium;
+    if (userPremium != isPremium) {
+      hasChange = true;
+      params.put("isPremium", isPremium);
+      sql.add("isPremium = :isPremium");
+    }
+
+    if (hasChange) {
+      User.updateUser(String.join(" , ", sql) + " where id = :id", params);
     }
     return user;
   }
 
   @Transactional
-  public Object detectDeviceInfo(User user) {
+  public Object detectDeviceInfo(User user, String deviceInfo) {
     if (user.status != Enums.UserStatus.STARTED) {
       return BigDecimal.ZERO;
     }
@@ -83,9 +98,9 @@ public class UserService {
     Item itemCpu = Item.find("code", codeCpu).firstResult();
     UserItem.create(new UserItem(user, itemCpu, userDevice));
 
-    String codeGpu = SystemConfig.findByKey(Enums.Config.GPU_DEFAULT);
-    Item itemGpu = Item.find("code", codeGpu).firstResult();
-    UserItem.create(new UserItem(user, itemGpu, userDevice));
+//    String codeGpu = SystemConfig.findByKey(Enums.Config.GPU_DEFAULT);
+//    Item itemGpu = Item.find("code", codeGpu).firstResult();
+//    UserItem.create(new UserItem(user, itemGpu, userDevice));
 
     String codeRam = SystemConfig.findByKey(Enums.Config.RAM_DEFAULT);
     Item itemRam = Item.find("code", codeRam).firstResult();
@@ -95,23 +110,29 @@ public class UserService {
     Item itemStorage = Item.find("code", codeStorage).firstResult();
     UserItem.create(new UserItem(user, itemStorage, userDevice));
 
-    BigDecimal miningPower = itemCpu.miningPower.add(itemGpu.miningPower).add(itemRam.miningPower)
+    BigDecimal miningPower = itemCpu.miningPower.add(itemRam.miningPower)
       .add(itemStorage.miningPower);
     Map<String, Object> params = new HashMap<>();
     params.put("id", userDevice.id);
     params.put("totalMiningPower", miningPower);
     UserDevice.updateObject(
-      "slotCpuUsed = slotCpuUsed + 1, slotRamUsed = slotRamUsed + 1, slotGpuUsed = slotGpuUsed + 1, slotStorageUsed = slotStorageUsed + 1, totalMiningPower = :totalMiningPower where id = :id",
+      "slotCpuUsed = slotCpuUsed + 1, slotRamUsed = slotRamUsed + 1, slotStorageUsed = slotStorageUsed + 1, totalMiningPower = :totalMiningPower where id = :id",
       params);
+
+    //TODO : get...
     BigDecimal pointUnClaimed = new BigDecimal(5000);
+    if (StringUtils.isBlank(deviceInfo)) {
+      deviceInfo = "Unknown Device";
+    }
 
     Map<String, Object> paramsUser = new HashMap<>();
     paramsUser.put("id", user.id);
     paramsUser.put("status", Enums.UserStatus.DETECTED_DEVICE_INFO);
     paramsUser.put("pointUnClaimed", pointUnClaimed);
     paramsUser.put("miningPower", miningPower);
+    paramsUser.put("detectDevice", deviceInfo);
     User.updateUser(
-      "status = :status, pointUnClaimed = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1 where id = :id",
+      "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1, detectDevice = :detectDevice where id = :id",
       paramsUser);
     if (user.league != null) {
       Map<String, Object> leagueParams = new HashMap<>();

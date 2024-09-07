@@ -10,6 +10,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.resteasy.reactive.RestHeader;
 import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
@@ -67,7 +68,7 @@ public class UserResource extends BaseResource {
     if (user == null && isValidate) {
       return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
     } else if (user == null) {
-      user = userService.checkStartUser(userTelegramResponse.id, username, "", "");
+      user = userService.checkStartUser(userTelegramResponse.id, username, "", "", false);
     }
 
     Map<String, Object> params = new HashMap<>();
@@ -114,6 +115,8 @@ public class UserResource extends BaseResource {
     userInfoResponse.totalDevice = user.totalDevice;
     BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
     userInfoResponse.rateBonusReward = new BigDecimal("5").add(rateBonus);
+    userInfoResponse.pointBonus = Utils.stripDecimalZeros(user.pointBonus);
+    userInfoResponse.isPremium = user.isPremium != null && user.isPremium;
     return ResponseData.ok(userInfoResponse);
   }
 
@@ -131,9 +134,9 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("detect-device-info")
-  public ResponseData detectDeviceInfo() throws Exception {
+  public ResponseData detectDeviceInfo(@RestHeader("device-info") String device) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
-      Object res = userService.detectDeviceInfo(getUser());
+      Object res = userService.detectDeviceInfo(getUser(), device);
       Thread.sleep(1000);
       return ResponseData.ok(res);
     }

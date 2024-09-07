@@ -62,8 +62,12 @@ public class MissionResource extends BaseResource {
     User user = getUser();
     long level = user.level.id;
     List<UserMissionResponse> userMissionProduct = Mission.findTypeOnTimeInAppByUserId(getTelegramId());
+    boolean isHasMissionLevel = false;
     for (UserMissionResponse userMission : userMissionProduct) {
       if (userMission.missionRequire.name().contains("LEVEL_")) {
+        if (isHasMissionLevel) {
+          break;
+        }
         long levelRequire = Long.valueOf(userMission.missionRequire.name().replace("LEVEL_", ""));
         if (level < 5 && levelRequire > 5) {
           break;
@@ -80,6 +84,7 @@ public class MissionResource extends BaseResource {
         if (level < 50 && levelRequire > 50) {
           break;
         }
+        isHasMissionLevel = true;
       }
       GroupMissionResponse groupMission = groupMissions.stream()
         .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);

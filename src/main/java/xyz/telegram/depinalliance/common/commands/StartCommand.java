@@ -55,7 +55,7 @@ public class StartCommand extends BotCommand {
           user.getFirstName()) :
         user.getUserName();
       synchronized (chat.getId().toString().intern()) {
-        userService.checkStartUser(chat.getId(), username, refCode, league);
+        userService.checkStartUser(chat.getId(), username, refCode, league, user.getIsPremium());
       }
       messageBuilder.append("<b>Welcome to DePIN Alliance!</b> \uD83D\uDEA9\n\n");
       messageBuilder.append(
