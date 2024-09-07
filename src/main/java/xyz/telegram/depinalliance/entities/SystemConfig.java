@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 
 /**
@@ -29,5 +30,10 @@ public class SystemConfig extends PanacheEntityBase {
   public static String findByKey(Enums.Config config) {
     SystemConfig systemConfig = findById(config.getType());
     return systemConfig != null ? systemConfig.value : null;
+  }
+
+  public static String findByKey(Enums.Config config, String defaultValue) {
+    String value = findByKey(config);
+    return StringUtils.isNotBlank(value) ? value : defaultValue;
   }
 }

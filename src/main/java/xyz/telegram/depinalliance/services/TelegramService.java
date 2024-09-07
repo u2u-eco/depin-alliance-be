@@ -3,6 +3,7 @@ package xyz.telegram.depinalliance.services;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
@@ -22,18 +23,24 @@ public class TelegramService {
   String botToken;
   @ConfigProperty(name = "telegram.validate")
   boolean isValidate;
+  @ConfigProperty(name = "login.time-out")
+  long timeOut;
 
   public UserTelegramResponse validateInitData(String initData) {
     Map<String, String> params = new TreeMap<>();
     String[] pairs = initData.split("&");
     String receivedHash = null;
     String userStr = null;
+    String authDateStr = null;
     for (String pair : pairs) {
       String[] kv = pair.split("=");
       String key = kv[0];
       String value = kv[1];
       if ("hash".equals(key)) {
         receivedHash = value;
+      } else if ("auth_date".equals(key)) {
+        authDateStr = value;
+        params.put(key, value);
       } else {
         try {
           String decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
@@ -52,6 +59,12 @@ public class TelegramService {
     if (receivedHash == null) {
       return null;
     }
+    if (StringUtils.isBlank(authDateStr)) {
+      return null;
+    } else if ((Long.parseLong(authDateStr) + timeOut) <= Utils.getCalendar().getTimeInMillis() / 1000) {
+      return null;
+    }
+
     StringBuilder dataCheckString = new StringBuilder();
     for (Map.Entry<String, String> entry : params.entrySet()) {
       if (dataCheckString.length() > 0) {

@@ -170,6 +170,31 @@ public class MissionService {
             isChecked = true;
           }
           break;
+        case LEVEL_5:
+          if (user.level.id >= 5) {
+            isChecked = true;
+          }
+          break;
+        case LEVEL_10:
+          if (user.level.id >= 10) {
+            isChecked = true;
+          }
+          break;
+        case LEVEL_20:
+          if (user.level.id >= 20) {
+            isChecked = true;
+          }
+          break;
+        case LEVEL_35:
+          if (user.level.id >= 35) {
+            isChecked = true;
+          }
+          break;
+        case LEVEL_50:
+          if (user.level.id >= 50) {
+            isChecked = true;
+          }
+          break;
         }
       }
     }
@@ -179,9 +204,20 @@ public class MissionService {
       userMission.user = user;
       userMission.status = Enums.MissionStatus.VERIFIED;
       UserMission.create(userMission);
+      event1(user.id, check.id);
       return true;
     }
     return false;
+  }
+
+  public void event1(long userId, long missionId) throws BusinessException {
+    EventMission eventMission = EventMission.findByEventAndMission(1L, missionId);
+    if (eventMission == null) {
+      return;
+    }
+    for (int i = 0; i < eventMission.number; i++) {
+      UserItem.create(new UserItem(new User(userId), eventMission.item, null));
+    }
   }
 
   @Transactional

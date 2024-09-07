@@ -20,9 +20,11 @@ public class UserItemResponse {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public Long totalItem;
   public BigDecimal price;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Boolean isCanSell;
 
   public UserItemResponse(String name, String code, Enums.ItemType type, BigDecimal miningPower, String image,
-    BigDecimal price, Long totalItem) {
+    BigDecimal price, Long totalItem, Boolean isCanSell) {
     this.name = name;
     this.code = code;
     this.type = type;
@@ -30,6 +32,7 @@ public class UserItemResponse {
     this.image = image;
     this.totalItem = totalItem;
     this.price = Utils.stripDecimalZeros(price);
+    this.isCanSell = isCanSell;
   }
 
   public UserItemResponse(Long id, String name, String code, Enums.ItemType type, BigDecimal miningPower, String image,

@@ -37,6 +37,10 @@ public class Item extends BaseEntity {
   public boolean isCanBuy = true;
   @Column(name = "is_can_sell", columnDefinition = "boolean default true")
   public boolean isCanSell = true;
+  @Column(name = "is_can_open", columnDefinition = "boolean default false")
+  public boolean isCanOpen = false;
+  @Column(name = "is_can_claim", columnDefinition = "boolean default false")
+  public boolean isCanClaim = false;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id")
   public Event event;

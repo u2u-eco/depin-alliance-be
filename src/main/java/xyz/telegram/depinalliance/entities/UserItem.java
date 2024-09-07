@@ -2,7 +2,6 @@ package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -47,7 +46,7 @@ public class UserItem extends BaseEntity {
 
   public static ResponsePage<UserItemResponse> findByUserIdAndType(PagingParameters pageable, long userId,
     String type) {
-    String sqlSelect = "select i.name, i.code, i.type, i.miningPower, i.image, i.price, count(1) ";
+    String sqlSelect = "select i.name, i.code, i.type, i.miningPower, i.image, i.price, count(1), i.isCanSell, i.isCanOpen, i.isCanClaim ";
     String sqlFrom = " from UserItem ui inner join Item i on item.id = i.id ";
     String sqlWhere = " where ui.user.id = :userId and isActive = true ";
     Map<String, Object> params = new HashMap<>();
@@ -57,7 +56,7 @@ public class UserItem extends BaseEntity {
       sqlWhere += " and item.type = :type";
       params.put("type", Enums.ItemType.valueOf(type.toUpperCase()));
     }
-    String sqlGroup = " group by i.name, i.code, i.type, i.miningPower, i.image, i.price";
+    String sqlGroup = " group by i.name, i.code, i.type, i.miningPower, i.image, i.price, i.isCanSell, i.isCanOpen, i.isCanClaim";
     return new ResponsePage<>(
       find(sqlSelect + sqlFrom + sqlWhere + sqlGroup, pageable.getSort(), params).page(pageable.getPage())
         .project(UserItemResponse.class).list(), pageable,
@@ -90,13 +89,6 @@ public class UserItem extends BaseEntity {
     params.put("userId", userId);
     params.put("code", code);
     return find(sql, params).page(0, number).project(Long.class).list();
-  }
-
-  public static ResponsePage<UserItemResponse> findByTypeAndPaging(PagingParameters pageable, Enums.ItemType type) {
-    PanacheQuery<PanacheEntityBase> panacheQuery = find("item.type = ?1 and isActive = true", Sort.ascending("id"),
-      type);
-    return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
-      panacheQuery.count());
   }
 
   public static int updateObject(String query, Map<String, Object> params) {

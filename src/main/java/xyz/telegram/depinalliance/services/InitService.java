@@ -5,8 +5,7 @@ import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.event.Observes;
 import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
-import xyz.telegram.depinalliance.entities.Mission;
-import xyz.telegram.depinalliance.entities.Partner;
+import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
 
@@ -26,7 +25,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 1;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -40,7 +39,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our Telegram channel";
         mission.orders = 2;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -54,7 +53,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 3;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -68,7 +67,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 4;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(4000);
         mission.xp = new BigDecimal(4000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -94,7 +93,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 1;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -109,7 +108,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our Telegram channel";
         mission.orders = 2;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -124,7 +123,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 3;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -152,7 +151,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 1;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -167,7 +166,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our Telegram channel";
         mission.orders = 2;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -182,7 +181,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 3;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -210,7 +209,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 1;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -225,7 +224,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our Telegram channel";
         mission.orders = 2;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -240,7 +239,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 3;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -268,7 +267,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 1;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(1000);
         mission.xp = new BigDecimal(1000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -283,7 +282,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our Telegram channel";
         mission.orders = 2;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(2000);
         mission.xp = new BigDecimal(2000);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -298,7 +297,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Follow Our X Account";
         mission.orders = 3;
-        mission.url = "https://www.google.com/search?q=";
+        mission.url = "https://www.google.com";
         mission.point = new BigDecimal(3000);
         mission.xp = new BigDecimal(3000);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
@@ -391,6 +390,71 @@ public class InitService {
         mission.xp = new BigDecimal(500);
         mission.create();
         mission.persist();
+      }
+
+      if (Event.findById(1L) == null) {
+        Event event1 = new Event();
+        event1.name = "Event 1";
+        event1.code = "EVENT_1";
+        event1.isActive = true;
+        event1.create();
+        event1.persist();
+
+        Item item = Item.findByCode("CYBER_BOX");
+
+        Partner partnerEvent = new Partner();
+        partnerEvent.name = "Wizzwoods";
+        partnerEvent.description = "This is Wizzwoods";
+        partnerEvent.rewards = "Up to +3000 points";
+        partnerEvent.orders = 1;
+        partnerEvent.participants = 0;
+        partnerEvent.isActive = true;
+        partnerEvent.create();
+        partnerEvent.persist();
+
+        Mission mission1 = new Mission();
+        mission1.groupMission = partnerEvent.name;
+        mission1.name = "Follow AAAAAA";
+        mission1.type = Enums.MissionType.TWITTER;
+        mission1.isFake = true;
+        mission1.description = "Follow AAAAAAAA";
+        mission1.orders = 1;
+        mission1.url = "https://www.google.com";
+        mission1.point = new BigDecimal(1000);
+        mission1.xp = new BigDecimal(1000);
+        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission1.partner = partnerEvent;
+        mission1.create();
+        mission1.persist();
+
+        Mission mission2 = new Mission();
+        mission2.groupMission = partnerEvent.name;
+        mission2.name = "Follow BBBBBBBB";
+        mission2.type = Enums.MissionType.TELEGRAM;
+        mission2.isFake = true;
+        mission2.description = "Follow BBBBBB";
+        mission2.orders = 3;
+        mission2.url = "https://www.google.com";
+        mission2.point = new BigDecimal(3000);
+        mission2.xp = new BigDecimal(3000);
+        mission2.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission2.partner = partnerEvent;
+        mission2.create();
+        mission2.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = event1;
+        eventMission.mission = mission1;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = event1;
+        eventMission.mission = mission2;
+        eventMission.item = item;
+        eventMission.number = 2;
+        eventMission.persist();
       }
       /*if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_35) == null) {
         Mission mission = new Mission();

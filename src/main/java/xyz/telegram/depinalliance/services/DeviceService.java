@@ -115,8 +115,8 @@ public class DeviceService {
     } else if (userItem.userDevice != null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    int maxSlot = 0;
-    int slotUsed = 0;
+    int maxSlot;
+    int slotUsed;
     String query = "{field} = {field} + 1, totalMiningPower = totalMiningPower + :miningPower where id =:id and {field} + 1 <= :maxSlot";
     switch (userItem.item.type) {
     case CPU:
@@ -205,6 +205,8 @@ public class DeviceService {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
     } else if (userItem.userDevice != null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    } else if (!userItem.item.isCanSell) {
+      throw new BusinessException(ResponseMessageConstants.ITEM_CANNOT_SELL);
     }
     Map<String, Object> paramsUserItem = new HashMap<>();
     paramsUserItem.put("id", itemId);
@@ -290,7 +292,7 @@ public class DeviceService {
     Map<String, Object> params = new HashMap<>();
     params.put("id", user.id);
     params.put("maxDevice", maxDevice);
-    if (!User.updateUser("totalDevice = totalDevice + 1 where id = :id and totalDevice + 1 = :maxDevice", params)) {
+    if (!User.updateUser("totalDevice = totalDevice + 1 where id = :id and totalDevice + 1 <= :maxDevice", params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     return userDevice.index;

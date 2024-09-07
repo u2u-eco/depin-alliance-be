@@ -18,4 +18,12 @@ public class EventMission extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id")
   public Event event;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "item_id")
+  public Item item;
+  public long number;
+
+  public static EventMission findByEventAndMission(long eventId, long missionId) {
+    return find("mission.id = ?1 and event.id = ?2 and event.isActive = true", missionId, eventId).firstResult();
+  }
 }
