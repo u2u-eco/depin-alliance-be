@@ -144,7 +144,7 @@ public class MissionService {
           }
           break;
         case BUY_ANY_DEVICE:
-          if (UserItemTradeHistory.countBuy(user.id) > 0) {
+          if (UserItemTradeHistory.countBuy(user.id) > 0 || user.totalDevice > 1) {
             isChecked = true;
           }
           break;

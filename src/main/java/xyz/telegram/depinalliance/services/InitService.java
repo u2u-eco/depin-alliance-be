@@ -195,6 +195,36 @@ public class InitService {
         mission.persist();
       }
 
+      List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L,
+        73L, 78L, 83L, 88L, 93L, 98L);
+      int orders = 3000;
+      Item item = Item.findByCode("CYBER_BOX");
+      for (Long id : rangeInviteEvent) {
+        Enums.MissionRequire require = Enums.MissionRequire.valueOf("EVENT_INVITE_" + id);
+        if (Mission.findByMissionRequire(require) == null) {
+          Mission mission = new Mission();
+          mission.groupMission = "Event 1";
+          mission.name = "Invite " + id + " friend";
+          mission.type = Enums.MissionType.ON_TIME_IN_APP;
+          mission.isFake = false;
+          mission.description = "Invite " + id + " friend";
+          mission.orders = orders++;
+          mission.missionRequire = require;
+          mission.point = new BigDecimal(0);
+          mission.xp = new BigDecimal(0);
+          mission.box = 1L;
+          mission.create();
+          mission.persist();
+          EventMission eventMissionInvite = new EventMission();
+          eventMissionInvite.event = new Event(1L);
+          eventMissionInvite.mission = mission;
+          eventMissionInvite.item = item;
+          eventMissionInvite.number = 1;
+          eventMissionInvite.create();
+          eventMissionInvite.persist();
+        }
+      }
+
       if (Event.findById(1L) == null) {
         //        Event event1 = new Event();
         //        event1.name = "Event 1";
@@ -203,7 +233,7 @@ public class InitService {
         //        event1.create();
         //        event1.persist();
 
-        Item item = Item.findByCode("CYBER_BOX");
+
         //        Mission mission1 = new Mission();
         //        mission1.groupMission = event1.name;
         //        mission1.name = "Follow AAAAAA";
@@ -313,34 +343,7 @@ public class InitService {
         //          eventBoxPoint.persistAndFlush();
         //        }
 
-        List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L,
-          73L, 78L, 83L, 88L, 93L, 98L);
-        int orders = 3000;
-        for (Long id : rangeInviteEvent) {
-          Enums.MissionRequire require = Enums.MissionRequire.valueOf("EVENT_INVITE_" + id);
-          if (Mission.findByMissionRequire(require) == null) {
-            Mission mission = new Mission();
-            mission.groupMission = "Event 1";
-            mission.name = "Invite " + id + " friend";
-            mission.type = Enums.MissionType.ON_TIME_IN_APP;
-            mission.isFake = false;
-            mission.description = "Invite " + id + " friend";
-            mission.orders = orders++;
-            mission.missionRequire = require;
-            mission.point = new BigDecimal(0);
-            mission.xp = new BigDecimal(0);
-            mission.box = 1L;
-            mission.create();
-            mission.persist();
-            EventMission eventMissionInvite = new EventMission();
-            eventMissionInvite.event = new Event(1L);
-            eventMissionInvite.mission = mission;
-            eventMissionInvite.item = item;
-            eventMissionInvite.number = 1;
-            eventMissionInvite.create();
-            eventMissionInvite.persist();
-          }
-        }
+
       }
 
      /* Partner partner = Partner.findByName("Clayton");
