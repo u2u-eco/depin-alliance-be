@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.common.models.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.utils.Utils;
 
@@ -25,10 +26,12 @@ public class UserMissionResponse {
   public Boolean isFake;
   @JsonIgnore
   public Enums.MissionRequire missionRequire;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Long box;
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
     Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,
-    Enums.MissionRequire missionRequire) {
+    Enums.MissionRequire missionRequire, Long box) {
     this.groupMission = groupMission;
     this.name = name;
     this.description = description;
@@ -41,5 +44,6 @@ public class UserMissionResponse {
     this.image = image;
     this.isFake = isFake;
     this.missionRequire = missionRequire;
+    this.box = box;
   }
 }

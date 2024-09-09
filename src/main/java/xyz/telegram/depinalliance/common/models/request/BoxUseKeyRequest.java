@@ -5,5 +5,5 @@ package xyz.telegram.depinalliance.common.models.request;
  */
 public class BoxUseKeyRequest {
   public String code;
-  public long amount;
+  public int amount;
 }

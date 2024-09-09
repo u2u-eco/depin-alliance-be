@@ -134,9 +134,20 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("detect-device-info")
-  public ResponseData detectDeviceInfo(@RestHeader("device-info") String device) throws Exception {
+  public ResponseData detectDeviceInfo(@RestHeader("device-info") String device,
+    @RestHeader("platform") String platform) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.detectDeviceInfo(getUser(), device);
+      Thread.sleep(1000);
+      return ResponseData.ok(res);
+    }
+  }
+
+  @POST
+  @Path("detect-device-info")
+  public ResponseData detectDeviceInfo1(Object request) throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      Object res = userService.detectDeviceInfo1(getUser(), request);
       Thread.sleep(1000);
       return ResponseData.ok(res);
     }
@@ -180,7 +191,7 @@ public class UserResource extends BaseResource {
     Map<String, Object> res = new HashMap<>();
     res.put("currentRank", User.findRankByUserId(getTelegramId()));
     res.put("ranking",
-      User.findAll(Sort.descending("miningPowerReal").and("createdAt", Sort.Direction.Ascending)).page(0, 30)
+      User.find("id != 1 ", Sort.descending("miningPowerReal").and("createdAt", Sort.Direction.Ascending)).page(0, 30)
         .project(RankingResponse.class).list());
     return ResponseData.ok(res);
   }

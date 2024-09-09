@@ -37,6 +37,8 @@ public class Mission extends BaseEntity {
   public BigDecimal point = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
   public BigDecimal xp = BigDecimal.ZERO;
+  @Column(name = "box")
+  public Long box = 0L;
   @Column(name = "is_active")
   public boolean isActive = true;
 
@@ -53,7 +55,7 @@ public class Mission extends BaseEntity {
 
   public static List<UserMissionResponse> findByUserId(long userId, boolean isPartner) {
     return find(
-      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.type != ?2 and m.isActive = true" + (
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire, m.box from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.type != ?2 and m.isActive = true" + (
         isPartner ?
           " and partner is not null" :
           " and partner is null"), Sort.ascending("m.orders"), userId, Enums.MissionType.ON_TIME_IN_APP).project(
@@ -62,14 +64,14 @@ public class Mission extends BaseEntity {
 
   public static List<UserMissionResponse> findTypeOnTimeInAppByUserId(long userId) {
     return find(
-      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.type = ?2 and m.isActive = true and (um.status is null or um.status != ?3) ",
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire, m.box from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.type = ?2 and m.isActive = true and (um.status is null or um.status != ?3) ",
       Sort.ascending("m.orders"), userId, Enums.MissionType.ON_TIME_IN_APP, Enums.MissionStatus.CLAIMED).project(
       UserMissionResponse.class).list();
   }
 
   public static UserMissionResponse findByUserIdAndMissionId(long userId, long missionId) {
     return find(
-      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2 and m.isActive = true",
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire, m.box from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2 and m.isActive = true",
       Sort.ascending("m.orders"), userId, missionId).project(UserMissionResponse.class).firstResult();
   }
 }

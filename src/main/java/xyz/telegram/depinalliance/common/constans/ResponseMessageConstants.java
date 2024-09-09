@@ -31,4 +31,5 @@ public interface ResponseMessageConstants {
   //ITEM
   String ITEM_SELL_NOT_ENOUGH = "MSG_ITEM_SELL_NOT_ENOUGH";
   String ITEM_CANNOT_SELL = "MSG_ITEM_CANNOT_SELL";
+  String ITEM_OPEN_NOT_ENOUGH = "MSG_ITEM_OPEN_NOT_ENOUGH";
 }

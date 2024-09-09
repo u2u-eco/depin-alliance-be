@@ -5,9 +5,11 @@ import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.event.Observes;
 import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
-import xyz.telegram.depinalliance.entities.Mission;
+import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author holden on 26-Aug-2024
@@ -146,6 +148,201 @@ public class InitService {
         mission.create();
         mission.persist();
       }
+
+      if (Mission.findByMissionRequire(Enums.MissionRequire.INVITE_1) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Invite 1 friend";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Invite 1 friend";
+        mission.orders = 1006;
+        mission.missionRequire = Enums.MissionRequire.INVITE_1;
+        mission.point = new BigDecimal(20000);
+        mission.xp = new BigDecimal(500);
+        mission.create();
+        mission.persist();
+      }
+
+      if (Mission.findByMissionRequire(Enums.MissionRequire.INVITE_5) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Invite 5 friend";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Invite 5 friend";
+        mission.orders = 1007;
+        mission.missionRequire = Enums.MissionRequire.INVITE_5;
+        mission.point = new BigDecimal(20000);
+        mission.xp = new BigDecimal(400);
+        mission.create();
+        mission.persist();
+      }
+      if (Mission.findByMissionRequire(Enums.MissionRequire.INVITE_10) == null) {
+        Mission mission = new Mission();
+        mission.groupMission = "Product";
+        mission.name = "Invite 10 friend";
+        mission.type = Enums.MissionType.ON_TIME_IN_APP;
+        mission.isFake = false;
+        mission.description = "Invite 10 friend";
+        mission.orders = 1008;
+        mission.missionRequire = Enums.MissionRequire.INVITE_10;
+        mission.point = new BigDecimal(20000);
+        mission.xp = new BigDecimal(400);
+        mission.create();
+        mission.persist();
+      }
+
+      if (Event.findById(1L) == null) {
+        Event event1 = new Event();
+        event1.name = "Event 1";
+        event1.code = "EVENT_1";
+        event1.isActive = true;
+        event1.create();
+        event1.persist();
+
+        Item item = Item.findByCode("CYBER_BOX");
+        Mission mission1 = new Mission();
+        mission1.groupMission = event1.name;
+        mission1.name = "Follow AAAAAA";
+        mission1.type = Enums.MissionType.TWITTER;
+        mission1.isFake = true;
+        mission1.description = "Follow AAAAAAAA";
+        mission1.orders = 2000;
+        mission1.url = "https://www.google.com";
+        mission1.point = new BigDecimal(0);
+        mission1.xp = new BigDecimal(0);
+        mission1.box = 1L;
+        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission1.create();
+        mission1.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = event1;
+        eventMission.mission = mission1;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission1 = new Mission();
+        mission1.groupMission = event1.name;
+        mission1.name = "Follow BBBBBBBBBBB";
+        mission1.type = Enums.MissionType.TELEGRAM;
+        mission1.isFake = true;
+        mission1.description = "Follow BBBBBBBBBBB";
+        mission1.orders = 1;
+        mission1.url = "https://www.google.com";
+        mission1.point = new BigDecimal(0);
+        mission1.xp = new BigDecimal(0);
+        mission1.box = 2L;
+        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission1.create();
+        mission1.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = event1;
+        eventMission.mission = mission1;
+        eventMission.item = item;
+        eventMission.number = 2;
+        eventMission.create();
+        eventMission.persist();
+
+        mission1 = new Mission();
+        mission1.groupMission = event1.name;
+        mission1.name = "Follow CCCCCC";
+        mission1.type = Enums.MissionType.TELEGRAM;
+        mission1.isFake = true;
+        mission1.description = "Follow CCCCCCC";
+        mission1.orders = 1;
+        mission1.url = "https://www.google.com";
+        mission1.point = new BigDecimal(0);
+        mission1.xp = new BigDecimal(0);
+        mission1.box = 3L;
+        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission1.create();
+        mission1.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = event1;
+        eventMission.mission = mission1;
+        eventMission.item = item;
+        eventMission.number = 3;
+        eventMission.create();
+        eventMission.persist();
+
+        mission1 = new Mission();
+        mission1.groupMission = event1.name;
+        mission1.name = "Follow DDDDDDDDD";
+        mission1.type = Enums.MissionType.TELEGRAM;
+        mission1.isFake = true;
+        mission1.description = "Follow DDDDDDDDDD";
+        mission1.orders = 1;
+        mission1.url = "https://www.google.com";
+        mission1.point = new BigDecimal(0);
+        mission1.xp = new BigDecimal(0);
+        mission1.box = 4L;
+        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission1.create();
+        mission1.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = event1;
+        eventMission.mission = mission1;
+        eventMission.item = item;
+        eventMission.number = 4;
+        eventMission.create();
+        eventMission.persist();
+
+//        for (int i = 1; i < 100; i++) {
+//          EventBoxPoint eventBoxPoint = new EventBoxPoint();
+//          eventBoxPoint.create();
+//          eventBoxPoint.event = event1;
+//          eventBoxPoint.item = item;
+//          eventBoxPoint.pointRequired = new BigDecimal(i);
+//          eventBoxPoint.indexBox = i;
+//          if (i == 1) {
+//            eventBoxPoint.rewardTable = "1";
+//          } else if (i > 1 && i <= 9) {
+//            eventBoxPoint.rewardTable = "2";
+//          } else {
+//            eventBoxPoint.rewardTable = "3";
+//          }
+//          eventBoxPoint.persistAndFlush();
+//        }
+
+        List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L,
+          73L, 78L, 83L, 88L, 93L, 98L);
+        int orders = 3000;
+        for (Long id : rangeInviteEvent) {
+          Enums.MissionRequire require = Enums.MissionRequire.valueOf("EVENT_INVITE_" + id);
+          if (Mission.findByMissionRequire(require) == null) {
+            Mission mission = new Mission();
+            mission.groupMission = event1.name;
+            mission.name = "Invite " + id + " friend";
+            mission.type = Enums.MissionType.ON_TIME_IN_APP;
+            mission.isFake = false;
+            mission.description = "Invite " + id + " friend";
+            mission.orders = orders++;
+            mission.missionRequire = require;
+            mission.point = new BigDecimal(0);
+            mission.xp = new BigDecimal(0);
+            mission.box = 1L;
+            mission.create();
+            mission.persist();
+            EventMission eventMissionInvite = new EventMission();
+            eventMissionInvite.event = event1;
+            eventMissionInvite.mission = mission;
+            eventMissionInvite.item = item;
+            eventMissionInvite.number = 1;
+            eventMissionInvite.create();
+            eventMissionInvite.persist();
+          }
+        }
+
+      }
+
+
      /* Partner partner = Partner.findByName("Clayton");
       if (partner == null) {
         partner = new Partner();
@@ -380,70 +577,7 @@ public class InitService {
 
 
 
-      if (Event.findById(1L) == null) {
-        Event event1 = new Event();
-        event1.name = "Event 1";
-        event1.code = "EVENT_1";
-        event1.isActive = true;
-        event1.create();
-        event1.persist();
 
-        Item item = Item.findByCode("CYBER_BOX");
-
-        Partner partnerEvent = new Partner();
-        partnerEvent.name = "Wizzwoods";
-        partnerEvent.description = "This is Wizzwoods";
-        partnerEvent.rewards = "Up to +3000 points";
-        partnerEvent.orders = 1;
-        partnerEvent.participants = 0;
-        partnerEvent.isActive = true;
-        partnerEvent.create();
-        partnerEvent.persist();
-
-        Mission mission1 = new Mission();
-        mission1.groupMission = partnerEvent.name;
-        mission1.name = "Follow AAAAAA";
-        mission1.type = Enums.MissionType.TWITTER;
-        mission1.isFake = true;
-        mission1.description = "Follow AAAAAAAA";
-        mission1.orders = 1;
-        mission1.url = "https://www.google.com";
-        mission1.point = new BigDecimal(1000);
-        mission1.xp = new BigDecimal(1000);
-        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission1.partner = partnerEvent;
-        mission1.create();
-        mission1.persist();
-
-        Mission mission2 = new Mission();
-        mission2.groupMission = partnerEvent.name;
-        mission2.name = "Follow BBBBBBBB";
-        mission2.type = Enums.MissionType.TELEGRAM;
-        mission2.isFake = true;
-        mission2.description = "Follow BBBBBB";
-        mission2.orders = 3;
-        mission2.url = "https://www.google.com";
-        mission2.point = new BigDecimal(3000);
-        mission2.xp = new BigDecimal(3000);
-        mission2.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission2.partner = partnerEvent;
-        mission2.create();
-        mission2.persist();
-
-        EventMission eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission1;
-        eventMission.item = item;
-        eventMission.number = 1;
-        eventMission.persist();
-
-        eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission2;
-        eventMission.item = item;
-        eventMission.number = 2;
-        eventMission.persist();
-      }
       *//*if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_35) == null) {
         Mission mission = new Mission();
         mission.groupMission = "Product";
