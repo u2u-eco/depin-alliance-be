@@ -17,4 +17,11 @@ public class Event extends BaseEntity {
   @Column(name = "is_active")
   public Boolean isActive;
   public String code;
+
+  public Event(Long id) {
+    this.id = id;
+  }
+
+  public Event() {
+  }
 }

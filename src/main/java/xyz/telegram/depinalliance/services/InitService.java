@@ -5,7 +5,10 @@ import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.event.Observes;
 import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
-import xyz.telegram.depinalliance.entities.*;
+import xyz.telegram.depinalliance.entities.Event;
+import xyz.telegram.depinalliance.entities.EventMission;
+import xyz.telegram.depinalliance.entities.Item;
+import xyz.telegram.depinalliance.entities.Mission;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -194,122 +197,122 @@ public class InitService {
       }
 
       if (Event.findById(1L) == null) {
-        Event event1 = new Event();
-        event1.name = "Event 1";
-        event1.code = "EVENT_1";
-        event1.isActive = true;
-        event1.create();
-        event1.persist();
+        //        Event event1 = new Event();
+        //        event1.name = "Event 1";
+        //        event1.code = "EVENT_1";
+        //        event1.isActive = true;
+        //        event1.create();
+        //        event1.persist();
 
         Item item = Item.findByCode("CYBER_BOX");
-        Mission mission1 = new Mission();
-        mission1.groupMission = event1.name;
-        mission1.name = "Follow AAAAAA";
-        mission1.type = Enums.MissionType.TWITTER;
-        mission1.isFake = true;
-        mission1.description = "Follow AAAAAAAA";
-        mission1.orders = 2000;
-        mission1.url = "https://www.google.com";
-        mission1.point = new BigDecimal(0);
-        mission1.xp = new BigDecimal(0);
-        mission1.box = 1L;
-        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission1.create();
-        mission1.persist();
+        //        Mission mission1 = new Mission();
+        //        mission1.groupMission = event1.name;
+        //        mission1.name = "Follow AAAAAA";
+        //        mission1.type = Enums.MissionType.TWITTER;
+        //        mission1.isFake = true;
+        //        mission1.description = "Follow AAAAAAAA";
+        //        mission1.orders = 2000;
+        //        mission1.url = "https://www.google.com";
+        //        mission1.point = new BigDecimal(0);
+        //        mission1.xp = new BigDecimal(0);
+        //        mission1.box = 1L;
+        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        //        mission1.create();
+        //        mission1.persist();
 
-        EventMission eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission1;
-        eventMission.item = item;
-        eventMission.number = 1;
-        eventMission.create();
-        eventMission.persist();
+        //        EventMission eventMission = new EventMission();
+        //        eventMission.event = event1;
+        //        eventMission.mission = mission1;
+        //        eventMission.item = item;
+        //        eventMission.number = 1;
+        //        eventMission.create();
+        //        eventMission.persist();
+        //
+        //        mission1 = new Mission();
+        //        mission1.groupMission = event1.name;
+        //        mission1.name = "Follow BBBBBBBBBBB";
+        //        mission1.type = Enums.MissionType.TELEGRAM;
+        //        mission1.isFake = true;
+        //        mission1.description = "Follow BBBBBBBBBBB";
+        //        mission1.orders = 1;
+        //        mission1.url = "https://www.google.com";
+        //        mission1.point = new BigDecimal(0);
+        //        mission1.xp = new BigDecimal(0);
+        //        mission1.box = 2L;
+        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        //        mission1.create();
+        //        mission1.persist();
+        //
+        //        eventMission = new EventMission();
+        //        eventMission.event = event1;
+        //        eventMission.mission = mission1;
+        //        eventMission.item = item;
+        //        eventMission.number = 2;
+        //        eventMission.create();
+        //        eventMission.persist();
+        //
+        //        mission1 = new Mission();
+        //        mission1.groupMission = event1.name;
+        //        mission1.name = "Follow CCCCCC";
+        //        mission1.type = Enums.MissionType.TELEGRAM;
+        //        mission1.isFake = true;
+        //        mission1.description = "Follow CCCCCCC";
+        //        mission1.orders = 1;
+        //        mission1.url = "https://www.google.com";
+        //        mission1.point = new BigDecimal(0);
+        //        mission1.xp = new BigDecimal(0);
+        //        mission1.box = 3L;
+        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        //        mission1.create();
+        //        mission1.persist();
+        //
+        //        eventMission = new EventMission();
+        //        eventMission.event = event1;
+        //        eventMission.mission = mission1;
+        //        eventMission.item = item;
+        //        eventMission.number = 3;
+        //        eventMission.create();
+        //        eventMission.persist();
+        //
+        //        mission1 = new Mission();
+        //        mission1.groupMission = event1.name;
+        //        mission1.name = "Follow DDDDDDDDD";
+        //        mission1.type = Enums.MissionType.TELEGRAM;
+        //        mission1.isFake = true;
+        //        mission1.description = "Follow DDDDDDDDDD";
+        //        mission1.orders = 1;
+        //        mission1.url = "https://www.google.com";
+        //        mission1.point = new BigDecimal(0);
+        //        mission1.xp = new BigDecimal(0);
+        //        mission1.box = 4L;
+        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+        //        mission1.create();
+        //        mission1.persist();
+        //
+        //        eventMission = new EventMission();
+        //        eventMission.event = event1;
+        //        eventMission.mission = mission1;
+        //        eventMission.item = item;
+        //        eventMission.number = 4;
+        //        eventMission.create();
+        //        eventMission.persist();
 
-        mission1 = new Mission();
-        mission1.groupMission = event1.name;
-        mission1.name = "Follow BBBBBBBBBBB";
-        mission1.type = Enums.MissionType.TELEGRAM;
-        mission1.isFake = true;
-        mission1.description = "Follow BBBBBBBBBBB";
-        mission1.orders = 1;
-        mission1.url = "https://www.google.com";
-        mission1.point = new BigDecimal(0);
-        mission1.xp = new BigDecimal(0);
-        mission1.box = 2L;
-        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission1.create();
-        mission1.persist();
-
-        eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission1;
-        eventMission.item = item;
-        eventMission.number = 2;
-        eventMission.create();
-        eventMission.persist();
-
-        mission1 = new Mission();
-        mission1.groupMission = event1.name;
-        mission1.name = "Follow CCCCCC";
-        mission1.type = Enums.MissionType.TELEGRAM;
-        mission1.isFake = true;
-        mission1.description = "Follow CCCCCCC";
-        mission1.orders = 1;
-        mission1.url = "https://www.google.com";
-        mission1.point = new BigDecimal(0);
-        mission1.xp = new BigDecimal(0);
-        mission1.box = 3L;
-        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission1.create();
-        mission1.persist();
-
-        eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission1;
-        eventMission.item = item;
-        eventMission.number = 3;
-        eventMission.create();
-        eventMission.persist();
-
-        mission1 = new Mission();
-        mission1.groupMission = event1.name;
-        mission1.name = "Follow DDDDDDDDD";
-        mission1.type = Enums.MissionType.TELEGRAM;
-        mission1.isFake = true;
-        mission1.description = "Follow DDDDDDDDDD";
-        mission1.orders = 1;
-        mission1.url = "https://www.google.com";
-        mission1.point = new BigDecimal(0);
-        mission1.xp = new BigDecimal(0);
-        mission1.box = 4L;
-        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission1.create();
-        mission1.persist();
-
-        eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission1;
-        eventMission.item = item;
-        eventMission.number = 4;
-        eventMission.create();
-        eventMission.persist();
-
-        for (int i = 1; i < 100; i++) {
-          EventBoxPoint eventBoxPoint = new EventBoxPoint();
-          eventBoxPoint.create();
-          eventBoxPoint.event = event1;
-          eventBoxPoint.item = item;
-          eventBoxPoint.pointRequired = new BigDecimal(i);
-          eventBoxPoint.indexBox = i;
-          if (i == 1) {
-            eventBoxPoint.rewardTable = "1";
-          } else if (i > 1 && i <= 9) {
-            eventBoxPoint.rewardTable = "2";
-          } else {
-            eventBoxPoint.rewardTable = "3";
-          }
-          eventBoxPoint.persistAndFlush();
-        }
+        //        for (int i = 1; i < 100; i++) {
+        //          EventBoxPoint eventBoxPoint = new EventBoxPoint();
+        //          eventBoxPoint.create();
+        //          eventBoxPoint.event = event1;
+        //          eventBoxPoint.item = item;
+        //          eventBoxPoint.pointRequired = new BigDecimal(i);
+        //          eventBoxPoint.indexBox = i;
+        //          if (i == 1) {
+        //            eventBoxPoint.rewardTable = "1";
+        //          } else if (i > 1 && i <= 9) {
+        //            eventBoxPoint.rewardTable = "2";
+        //          } else {
+        //            eventBoxPoint.rewardTable = "3";
+        //          }
+        //          eventBoxPoint.persistAndFlush();
+        //        }
 
         List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L,
           73L, 78L, 83L, 88L, 93L, 98L);
@@ -318,7 +321,7 @@ public class InitService {
           Enums.MissionRequire require = Enums.MissionRequire.valueOf("EVENT_INVITE_" + id);
           if (Mission.findByMissionRequire(require) == null) {
             Mission mission = new Mission();
-            mission.groupMission = event1.name;
+            mission.groupMission = "Event 1";
             mission.name = "Invite " + id + " friend";
             mission.type = Enums.MissionType.ON_TIME_IN_APP;
             mission.isFake = false;
@@ -331,7 +334,7 @@ public class InitService {
             mission.create();
             mission.persist();
             EventMission eventMissionInvite = new EventMission();
-            eventMissionInvite.event = event1;
+            eventMissionInvite.event = new Event(1L);
             eventMissionInvite.mission = mission;
             eventMissionInvite.item = item;
             eventMissionInvite.number = 1;
@@ -339,9 +342,7 @@ public class InitService {
             eventMissionInvite.persist();
           }
         }
-
       }
-
 
      /* Partner partner = Partner.findByName("Clayton");
       if (partner == null) {
