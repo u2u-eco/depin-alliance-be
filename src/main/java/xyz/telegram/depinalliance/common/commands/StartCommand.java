@@ -27,13 +27,8 @@ public class StartCommand extends BotCommand {
     this.userService = userService;
     this.url = url;
     this.botName = botName;
-    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton("\uD83D\uDD79\uFE0F Play");
-    WebAppInfo webAppInfo = new WebAppInfo(url);
-    inlineKeyboardButton.setWebApp(webAppInfo);
-    InlineKeyboardRow inlineKeyboardRow = new InlineKeyboardRow(inlineKeyboardButton);
-
     this.inlineKeyboardMarkup = new InlineKeyboardMarkup(
-      Arrays.asList(new InlineKeyboardRow(InlineKeyboardButton.builder().text("\uD83D\uDD79\uFE0F Play").webApp(new WebAppInfo(url)).build()),
+      Arrays.asList(new InlineKeyboardRow(InlineKeyboardButton.builder().text("\uD83D\uDD79️ Play").webApp(new WebAppInfo(url)).build()),
         new InlineKeyboardRow(InlineKeyboardButton.builder().text("Join Community").url("https://t.me/DePIN_App").build()),
         new InlineKeyboardRow(InlineKeyboardButton.builder().text("Follow X").url("https://x.com/DePINApp").build())));
   }
@@ -64,11 +59,11 @@ public class StartCommand extends BotCommand {
       messageBuilder.append(
         "The Odyssey of Decentralists for those who dare to challenge the current state and embrace the future of decentralized innovation.\n\n");
       messageBuilder.append("\uD83D\uDE80 <b>How to Get Started:</b>\n\n");
-      messageBuilder.append("1\uFE0F⃣ Access the telegram bot: https://t.me/").append(botName).append("\n");
-      messageBuilder.append("2\uFE0F⃣ Click \"Get Started\" to verify your device.\n");
-      messageBuilder.append("3\uFE0F⃣ Start mining to earn additional points.\n");
-      messageBuilder.append("4\uFE0F⃣ Explore more Challenges and Rewards.\n");
-      messageBuilder.append("5\uFE0F⃣ Invite friends to join this adventure together.\n\n");
+      messageBuilder.append("1️⃣ Access the telegram bot: https://t.me/").append(botName).append("\n");
+      messageBuilder.append("2️⃣ Click \"Get Started\" to verify your device.\n");
+      messageBuilder.append("3️⃣ Start mining to earn additional points.\n");
+      messageBuilder.append("4️⃣ Explore more Challenges and Rewards.\n");
+      messageBuilder.append("5️⃣ Invite friends to join this adventure together.\n\n");
       messageBuilder.append(
         "\uD83D\uDCCC The device verification process will not affect your device and all data is securely stored locally on your device.\n\n");
       messageBuilder.append("\uD83D\uDC49 Click the play and start your journey with DePIN Alliance today!");

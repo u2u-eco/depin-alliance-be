@@ -16,10 +16,10 @@ public class BaseEntity extends PanacheEntityBase implements Serializable {
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY, value = "createdAt")
   @Column(name = "created_at")
-  public long createdAt;
+  public Long createdAt;
   @JsonProperty(access = JsonProperty.Access.READ_ONLY, value = "updatedAt")
   @Column(name = "updated_at")
-  public long updatedAt;
+  public Long updatedAt;
 
   public BaseEntity create() {
     long time = Utils.getCalendar().getTimeInMillis();

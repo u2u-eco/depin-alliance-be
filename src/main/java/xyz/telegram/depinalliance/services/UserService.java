@@ -27,6 +27,8 @@ import java.util.*;
 public class UserService {
   @Inject
   Logger logger;
+  @Inject
+  LeagueService leagueService;
   private static final long RATE_BONUS_DEFAULT = Long.parseLong(
     SystemConfig.findByKey(Enums.Config.BONUS_REWARD_DEFAULT, "5"));
 
@@ -67,6 +69,13 @@ public class UserService {
       UserSkill.initUserSkill(user, Skill.findAll().list());
       logger.info("User " + user.username + " created with ref code " + refCode);
       return user;
+    }
+    if (StringUtils.isNotBlank(league) && StringUtils.isNotBlank(refCode) && user.league == null) {
+      User ref = User.findByCode(refCode);
+      if (ref != null && ref.league != null) {
+        logger.info("user " + user.id + " join league " + ref.league.code + " with ref code " + ref.id);
+        leagueService.joinLeague(user, ref.league.code);
+      }
     }
     boolean hasChange = false;
     Map<String, Object> params = new HashMap<>();
