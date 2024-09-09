@@ -106,7 +106,15 @@ public class DeviceResource extends BaseResource {
   @POST
   public ResponseData estimateUseKey(BoxUseKeyRequest request) {
     synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok();
+      return ResponseData.ok(deviceService.estimateUseKeyBox(getUser(), request));
+    }
+  }
+
+  @Path("use-key")
+  @POST
+  public ResponseData useKeyBox(BoxUseKeyRequest request) {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.useKeyBox(getUser(), request));
     }
   }
 }

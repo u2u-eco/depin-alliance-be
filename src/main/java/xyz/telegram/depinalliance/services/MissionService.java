@@ -8,15 +8,13 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.DailyCheckinResponse;
+import xyz.telegram.depinalliance.common.models.response.GroupMissionResponse;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -155,46 +153,25 @@ public class MissionService {
             isChecked = true;
           }
           break;
-        case INVITE_1_FRIEND:
-          if (User.countFriendByUser(user.id) >= 1) {
-            isChecked = true;
+        default:
+          if (check.missionRequire.name().startsWith("INVITE_")) {
+            long numberRequire = Long.parseLong(check.missionRequire.name().replace("INVITE_", ""));
+            if (User.countFriendByUser(user.id) >= numberRequire) {
+              isChecked = true;
+            }
+          } else if (check.missionRequire.name().startsWith("LEVEL_")) {
+            long numberRequire = Long.parseLong(check.missionRequire.name().replace("LEVEL_", ""));
+            if (user.level.id >= numberRequire) {
+              isChecked = true;
+            }
+          } else if (check.missionRequire.name().startsWith("EVENT_INVITE_")) {
+            long numberRequire = Long.parseLong(check.missionRequire.name().replace("EVENT_INVITE_", ""));
+            if (User.countFriendEventByUser(user.id) >= numberRequire) {
+              isChecked = true;
+            }
           }
           break;
-        case INVITE_5_FRIEND:
-          if (User.countFriendByUser(user.id) >= 5) {
-            isChecked = true;
-          }
-          break;
-        case INVITE_10_FRIEND:
-          if (User.countFriendByUser(user.id) >= 10) {
-            isChecked = true;
-          }
-          break;
-        case LEVEL_5:
-          if (user.level.id >= 5) {
-            isChecked = true;
-          }
-          break;
-        case LEVEL_10:
-          if (user.level.id >= 10) {
-            isChecked = true;
-          }
-          break;
-        case LEVEL_20:
-          if (user.level.id >= 20) {
-            isChecked = true;
-          }
-          break;
-        case LEVEL_35:
-          if (user.level.id >= 35) {
-            isChecked = true;
-          }
-          break;
-        case LEVEL_50:
-          if (user.level.id >= 50) {
-            isChecked = true;
-          }
-          break;
+
         }
       }
     }
@@ -204,19 +181,19 @@ public class MissionService {
       userMission.user = user;
       userMission.status = Enums.MissionStatus.VERIFIED;
       UserMission.create(userMission);
-      event1(user.id, check.id);
+      event1(user, check.id);
       return true;
     }
     return false;
   }
 
-  public void event1(long userId, long missionId) throws BusinessException {
+  public void event1(User user, long missionId) throws BusinessException {
     EventMission eventMission = EventMission.findByEventAndMission(1L, missionId);
     if (eventMission == null) {
       return;
     }
     for (int i = 0; i < eventMission.number; i++) {
-      UserItem.create(new UserItem(new User(userId), eventMission.item, null));
+      UserItem.create(new UserItem(user, eventMission.item, null));
     }
   }
 
@@ -241,5 +218,87 @@ public class MissionService {
       return true;
     }
     return false;
+  }
+
+  public List<GroupMissionResponse> getMissionReward(User user) {
+    List<UserMissionResponse> userMissions = Mission.findByUserId(user.id, false);
+    List<GroupMissionResponse> groupMissions = new ArrayList<>();
+    for (UserMissionResponse userMission : userMissions) {
+      GroupMissionResponse groupMission = groupMissions.stream()
+        .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
+      if (groupMission == null) {
+        groupMission = new GroupMissionResponse();
+        groupMission.group = userMission.groupMission;
+        groupMission.missions.add(userMission);
+        groupMissions.add(groupMission);
+      } else {
+        groupMission.missions.add(userMission);
+      }
+    }
+    long level = user.level.id;
+    long countFriend = -1;
+    long countFriendEvent = -1;
+    List<UserMissionResponse> userMissionProduct = Mission.findTypeOnTimeInAppByUserId(user.id);
+    boolean isHasMissionLevel = false;
+    boolean isHasMissionInvite = false;
+    boolean isHasMissionInviteEvent = false;
+    List<Long> rangeLevel = Arrays.asList(5L, 10L, 20L, 35L, 50L);
+    List<Long> rangeInviteLevel = Arrays.asList(1L, 5L, 10L);
+    List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L, 73L,
+      78L, 83L, 88L, 93L, 98L);
+    for (UserMissionResponse userMission : userMissionProduct) {
+      if (userMission.missionRequire.name().startsWith("LEVEL_")) {
+        if (isHasMissionLevel) {
+          continue;
+        }
+        long numberRequire = Long.parseLong(userMission.missionRequire.name().replace("LEVEL_", ""));
+        for (Long r : rangeLevel) {
+          if (level < r && numberRequire > r) {
+            break;
+          }
+        }
+        isHasMissionLevel = true;
+      } else if (userMission.missionRequire.name().startsWith("INVITE_")) {
+        if (isHasMissionInvite) {
+          continue;
+        }
+        if (countFriend == -1) {
+          countFriend = User.countFriendByUser(user.id);
+        }
+        long numberRequire = Long.parseLong(userMission.missionRequire.name().replace("INVITE_", ""));
+        for (Long r : rangeInviteLevel) {
+          if (countFriend < r && numberRequire > r) {
+            break;
+          }
+        }
+        isHasMissionInvite = true;
+      } else if (userMission.missionRequire.name().startsWith("EVENT_INVITE_")) {
+        if (isHasMissionInviteEvent) {
+          continue;
+        }
+        if (countFriendEvent == -1) {
+          countFriendEvent = User.countFriendEventByUser(user.id);
+        }
+        long numberRequire = Long.parseLong(userMission.missionRequire.name().replace("EVENT_INVITE_", ""));
+        for (Long r : rangeInviteEvent) {
+          if (countFriendEvent < r && numberRequire > r) {
+            break;
+          }
+        }
+        isHasMissionInviteEvent = true;
+      }
+      GroupMissionResponse groupMission = groupMissions.stream()
+        .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
+      if (groupMission == null) {
+        groupMission = new GroupMissionResponse();
+        groupMission.group = userMission.groupMission;
+        groupMission.missions.add(userMission);
+        groupMissions.add(groupMission);
+      } else {
+        groupMission.missions.add(userMission);
+      }
+    }
+    return groupMissions;
+
   }
 }

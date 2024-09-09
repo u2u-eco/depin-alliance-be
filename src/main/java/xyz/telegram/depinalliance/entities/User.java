@@ -83,6 +83,10 @@ public class User extends BaseEntity {
   public long totalFriend = 0;
   @Column(name = "detect_device")
   public String detectDevice;
+  @Column(name = "device_platform")
+  public String devicePlatform;
+  @Column(name = "device_model", columnDefinition = "text")
+  public String deviceModel;
   @Column(name = "is_premium")
   public Boolean isPremium;
 
@@ -159,7 +163,7 @@ public class User extends BaseEntity {
 
   public static long findRankByUserId(long userId) {
     return find(
-      "select position from ( select id as id, row_number() over(order by miningPowerReal desc, createdAt asc) as position from User) result where id =?1",
+      "select position from ( select id as id, row_number() over(order by miningPowerReal desc, createdAt asc) as position from User where id != 1) result where id =?1",
       userId).project(Long.class).firstResult();
   }
 
@@ -211,7 +215,7 @@ public class User extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
     update(
-      "update User set miningPowerReal = (select sum(ui.item.miningPower) from UserItem ui where ui.user.id = :userId and userDevice is not null ) * rateMining where id = :userId",
+      "update User set miningPowerReal = (select COALESCE(sum(ui.item.miningPower),0) from UserItem ui where ui.user.id = :userId and userDevice is not null ) * rateMining where id = :userId",
       params);
   }
 
@@ -223,6 +227,10 @@ public class User extends BaseEntity {
   }
 
   public static long countFriendByUser(long userId) {
+    return count("ref.id =?1", userId);
+  }
+
+  public static long countFriendEventByUser(long userId) {
     return count("ref.id =?1", userId);
   }
 }

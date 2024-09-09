@@ -20,7 +20,6 @@ import java.util.TimeZone;
  */
 public class Utils {
   private static final ModelMapper modelMapper;
-  public static int KOMBAT_INDEX = 26;
   private static ObjectMapper rawMapper;
 
   static {

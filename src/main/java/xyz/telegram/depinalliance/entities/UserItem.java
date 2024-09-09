@@ -83,11 +83,11 @@ public class UserItem extends BaseEntity {
       panacheQuery.count());
   }
 
-  public static List<Long> findItemForSell(long userId, String code, int number) {
-    String sql = "select ui.id from UserItem ui inner join Item i on item.id = i.id and i.code = :code where userDevice is null and user.id = :userId and isActive = true";
+  public static List<Long> findItemNotHasDevice(long userId, long itemId, int number) {
+    String sql = "select ui.id from UserItem ui where userDevice is null and user.id = :userId and isActive = true and item.id = :itemId";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
-    params.put("code", code);
+    params.put("itemId", itemId);
     return find(sql, params).page(0, number).project(Long.class).list();
   }
 

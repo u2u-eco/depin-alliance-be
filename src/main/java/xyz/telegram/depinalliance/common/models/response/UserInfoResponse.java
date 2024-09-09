@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.common.models.response;
 
+import jakarta.persistence.Column;
 import xyz.telegram.depinalliance.common.constans.Enums;
 
 import java.math.BigDecimal;
@@ -29,4 +30,6 @@ public class UserInfoResponse {
   public long lastCheckin;
   public BigDecimal pointBonus;
   public Boolean isPremium;
+  public String detectDevice;
+  public String devicePlatform;
 }

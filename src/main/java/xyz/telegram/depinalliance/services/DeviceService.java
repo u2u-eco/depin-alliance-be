@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.services;
 
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -11,13 +12,12 @@ import xyz.telegram.depinalliance.common.models.request.BoxUseKeyRequest;
 import xyz.telegram.depinalliance.common.models.request.BuyItemRequest;
 import xyz.telegram.depinalliance.common.models.request.ChangeNameDeviceRequest;
 import xyz.telegram.depinalliance.common.models.request.SellItemRequest;
+import xyz.telegram.depinalliance.common.models.response.ItemBoxOpenResponse;
+import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author holden on 26-Aug-2024
@@ -233,7 +233,7 @@ public class DeviceService {
     if (!item.isCanSell) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    List<Long> itemIds = UserItem.findItemForSell(user.id, request.code, request.number);
+    List<Long> itemIds = UserItem.findItemNotHasDevice(user.id, item.id, request.number);
     if (itemIds.isEmpty() || itemIds.size() < request.number) {
       throw new BusinessException(ResponseMessageConstants.ITEM_SELL_NOT_ENOUGH);
     }
@@ -300,6 +300,186 @@ public class DeviceService {
   }
 
   public BigDecimal estimateUseKeyBox(User user, BoxUseKeyRequest request) {
-    return BigDecimal.ZERO;
+
+    if (request == null || StringUtils.isBlank(request.code) || request.amount <= 0) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Item item = Item.findByCode(request.code);
+    if (item == null || !item.isCanOpen) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    long countInactive = UserItem.count("item.id = ?1 and user.id = ?2 and isActive = false", item.id, user.id);
+    return EventBoxPoint.find(
+      "select sum(pointRequired) from EventBoxPoint where item.id = ?1 and indexBox > ?2 and indexBox<= ?3", item.id,
+      countInactive, (countInactive + request.amount)).project(BigDecimal.class).firstResult();
+  }
+
+  @Transactional
+  public List<ItemBoxOpenResponse> useKeyBox(User user, BoxUseKeyRequest request) {
+    if (request == null || StringUtils.isBlank(request.code) || request.amount <= 0) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Item item = Item.findByCode(request.code);
+    if (item == null || !item.isCanOpen) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    List<Long> itemIds = UserItem.findItemNotHasDevice(user.id, item.id, request.amount);
+    if (itemIds.size() != request.amount) {
+      throw new BusinessException(ResponseMessageConstants.ITEM_OPEN_NOT_ENOUGH);
+    }
+    long countInactive = UserItem.count("item.id = ?1 and user.id = ?2 and isActive = false", item.id, user.id);
+    BigDecimal pointRequire = EventBoxPoint.find(
+      "select sum(pointRequired) from EventBoxPoint where item.id = ?1 and indexBox > ?2 and indexBox<= ?3", item.id,
+      countInactive, (countInactive + request.amount)).project(BigDecimal.class).firstResult();
+    if (pointRequire.compareTo(user.point) > 0) {
+      throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+    }
+    if (!User.updatePointUser(user.id, pointRequire.multiply(new BigDecimal("-1")))) {
+      throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
+    }
+    Map<String, Object> paramsUserItem = new HashMap<>();
+    paramsUserItem.put("ids", itemIds);
+    paramsUserItem.put("isActive", false);
+    if (UserItem.updateObject(" isActive = :isActive where id in (:ids) and isActive = true",
+      paramsUserItem) < request.amount) {
+      throw new BusinessException(ResponseMessageConstants.ITEM_OPEN_NOT_ENOUGH);
+    }
+    List<EventBoxPoint> eventBoxPoints = EventBoxPoint.list("item.id = ?1 and indexBox > ?2 and indexBox<= ?3 ",
+      Sort.ascending("indexBox"), item.id, countInactive, (countInactive + request.amount));
+    List<ItemBoxOpenResponse> rs = new ArrayList<>();
+    for (int i = 0; i < eventBoxPoints.size(); i++) {
+      UserItem userItem = new UserItem();
+      userItem.id = itemIds.get(i);
+      EventBoxPoint eventBoxPoint = eventBoxPoints.get(i);
+      EventItemHistory eventItemHistory = new EventItemHistory();
+      eventItemHistory.create();
+      eventItemHistory.eventBoxPoint = eventBoxPoint;
+      eventItemHistory.userItem = userItem;
+      ItemBoxOpenResponse response = null;
+      if (eventBoxPoint.rewardTable.contains("1")) {
+        response = eventTable1(user);
+      } else if (eventBoxPoint.rewardTable.contains("2")) {
+        response = eventTable2(user);
+      } else if (eventBoxPoint.rewardTable.contains("3")) {
+        response = eventTable3(user);
+      }
+
+      eventItemHistory.reward = response.toString();
+      eventItemHistory.persist();
+      rs.add(response);
+    }
+    return rs;
+  }
+
+  public ItemBoxOpenResponse eventTable1(User user) {
+    BigDecimal amount;
+    int a = new Random().nextInt(100);
+    if (a < 20) {
+      amount = new BigDecimal("7000");
+    } else if (a < 40) {
+      amount = new BigDecimal("8092");
+    } else if (a < 60) {
+      amount = new BigDecimal("9354");
+    } else if (a < 80) {
+      amount = new BigDecimal("10814");
+    } else {
+      amount = new BigDecimal("12501");
+    }
+    if (!User.updatePointUser(user.id, amount)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(amount).toString());
+  }
+
+  public ItemBoxOpenResponse eventTable2(User user) {
+    Item item;
+    int a = new Random().nextInt(1000);
+    ItemBoxOpenResponse itemBoxOpenResponse = null;
+    if (a < 300) {
+      item = Item.findByCode(Enums.ItemSpecial.USDT_0_001.name());
+      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.001");
+    } else if (a < 325) {
+      item = Item.findByCode(Enums.ItemSpecial.USDT_0_002.name());
+      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.002");
+    } else if (a < 525) {
+      item = Item.findByCode("SSD_128GB");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 725) {
+      item = Item.findByCode("RAM_16GB");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 875) {
+      item = Item.findByCode("CPU_DYSEN_5_8000_SERIES");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 925) {
+      item = Item.findByCode("CPU_DOCK_T5_15TH");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 975) {
+      item = Item.findByCode("DEFORCE_MX450");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else {
+      item = Item.findByCode("CPU_DOCK_T7_4TH");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    }
+    if (item != null) {
+      UserItem userItem = new UserItem(user, item, null);
+      UserItem.create(userItem);
+    }
+    return itemBoxOpenResponse;
+  }
+
+  public ItemBoxOpenResponse eventTable3(User user) {
+    Item item = null;
+    BigDecimal amount = BigDecimal.ZERO;
+    int a = new Random().nextInt(100);
+    ItemBoxOpenResponse itemBoxOpenResponse = null;
+    if (a < 8) {
+      item = Item.findByCode(Enums.ItemSpecial.USDT_0_001.name());
+      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.001");
+    } else if (a < 10) {
+      item = Item.findByCode(Enums.ItemSpecial.USDT_0_002.name());
+      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.002");
+    } else if (a < 12) {
+      item = Item.findByCode(Enums.ItemSpecial.USDT_0_1.name());
+      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.1");
+    } else if (a < 14) {
+      item = Item.findByCode(Enums.ItemSpecial.USDT_0_5.name());
+      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.5");
+    } else if (a < 16) {
+      item = Item.findByCode(Enums.ItemSpecial.USDT_1.name());
+      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "1");
+    } else if (a < 36) {
+      item = Item.findByCode("SSD_4TB");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 52) {
+      item = Item.findByCode("CPU_DYSEN_7_4000_SERIES");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 64) {
+      item = Item.findByCode("CPU_DOCK_T7_6TH");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 66) {
+      item = Item.findByCode("DEFORCE_RTX_2060_12GB");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 68) {
+      item = Item.findByCode("CPU_DYSEN_7_6000_SERIES");
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
+    } else if (a < 80) {
+      amount = new BigDecimal(35000);
+    } else if (a < 92) {
+      amount = new BigDecimal(75000);
+    } else if (a < 96) {
+      amount = new BigDecimal(125000);
+    } else {
+      amount = new BigDecimal(175000);
+    }
+    if (item != null) {
+      UserItem userItem = new UserItem(user, item, null);
+      UserItem.create(userItem);
+    } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
+      if (!User.updatePointUser(user.id, amount)) {
+        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+      }
+      return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(amount).toString());
+    }
+    return itemBoxOpenResponse;
   }
 }
