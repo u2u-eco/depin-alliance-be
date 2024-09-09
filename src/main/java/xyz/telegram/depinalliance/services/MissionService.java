@@ -181,19 +181,19 @@ public class MissionService {
       userMission.user = user;
       userMission.status = Enums.MissionStatus.VERIFIED;
       UserMission.create(userMission);
-      event1(user.id, check.id);
+      event1(user, check.id);
       return true;
     }
     return false;
   }
 
-  public void event1(long userId, long missionId) throws BusinessException {
+  public void event1(User user, long missionId) throws BusinessException {
     EventMission eventMission = EventMission.findByEventAndMission(1L, missionId);
     if (eventMission == null) {
       return;
     }
     for (int i = 0; i < eventMission.number; i++) {
-      UserItem.create(new UserItem(new User(userId), eventMission.item, null));
+      UserItem.create(new UserItem(user, eventMission.item, null));
     }
   }
 

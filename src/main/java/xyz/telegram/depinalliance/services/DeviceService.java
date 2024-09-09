@@ -346,14 +346,26 @@ public class DeviceService {
     List<EventBoxPoint> eventBoxPoints = EventBoxPoint.list("item.id = ?1 and indexBox > ?2 and indexBox<= ?3 ",
       Sort.ascending("indexBox"), item.id, countInactive, (countInactive + request.amount));
     List<ItemBoxOpenResponse> rs = new ArrayList<>();
-    for (EventBoxPoint eventBoxPoint : eventBoxPoints) {
+    for (int i = 0; i < eventBoxPoints.size(); i++) {
+      UserItem userItem = new UserItem();
+      userItem.id = itemIds.get(i);
+      EventBoxPoint eventBoxPoint = eventBoxPoints.get(i);
+      EventItemHistory eventItemHistory = new EventItemHistory();
+      eventItemHistory.create();
+      eventItemHistory.eventBoxPoint = eventBoxPoint;
+      eventItemHistory.userItem = userItem;
+      ItemBoxOpenResponse response = null;
       if (eventBoxPoint.rewardTable.contains("1")) {
-        rs.add(eventTable1(user));
+        response = eventTable1(user);
       } else if (eventBoxPoint.rewardTable.contains("2")) {
-        rs.add(eventTable2(user));
+        response = eventTable2(user);
       } else if (eventBoxPoint.rewardTable.contains("3")) {
-        rs.add(eventTable3(user));
+        response = eventTable3(user);
       }
+
+      eventItemHistory.reward = response.toString();
+      eventItemHistory.persist();
+      rs.add(response);
     }
     return rs;
   }
@@ -390,22 +402,22 @@ public class DeviceService {
       itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.002");
     } else if (a < 525) {
       item = Item.findByCode("SSD_128GB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 725) {
       item = Item.findByCode("RAM_16GB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 875) {
       item = Item.findByCode("CPU_DYSEN_5_8000_SERIES");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 925) {
       item = Item.findByCode("CPU_DOCK_T5_15TH");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 975) {
       item = Item.findByCode("DEFORCE_MX450");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else {
       item = Item.findByCode("CPU_DOCK_T7_4TH");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     }
     if (item != null) {
       UserItem userItem = new UserItem(user, item, null);
@@ -436,19 +448,19 @@ public class DeviceService {
       itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "1");
     } else if (a < 36) {
       item = Item.findByCode("SSD_4TB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 52) {
       item = Item.findByCode("CPU_DYSEN_7_4000_SERIES");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 64) {
       item = Item.findByCode("CPU_DOCK_T7_6TH");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 66) {
       item = Item.findByCode("DEFORCE_RTX_2060_12GB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 68) {
       item = Item.findByCode("CPU_DYSEN_7_6000_SERIES");
-      itemBoxOpenResponse = new ItemBoxOpenResponse("Device", item.name);
+      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
     } else if (a < 80) {
       amount = new BigDecimal(35000);
     } else if (a < 92) {

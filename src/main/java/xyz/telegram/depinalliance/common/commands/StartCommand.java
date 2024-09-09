@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import xyz.telegram.depinalliance.services.UserService;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 public class StartCommand extends BotCommand {
   private final String url;
@@ -27,12 +27,15 @@ public class StartCommand extends BotCommand {
     this.userService = userService;
     this.url = url;
     this.botName = botName;
-    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton("Play");
+    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton("\uD83D\uDD79\uFE0F Play");
     WebAppInfo webAppInfo = new WebAppInfo(url);
     inlineKeyboardButton.setWebApp(webAppInfo);
     InlineKeyboardRow inlineKeyboardRow = new InlineKeyboardRow(inlineKeyboardButton);
-    this.inlineKeyboardMarkup = new InlineKeyboardMarkup(Collections.singletonList(inlineKeyboardRow));
 
+    this.inlineKeyboardMarkup = new InlineKeyboardMarkup(
+      Arrays.asList(new InlineKeyboardRow(InlineKeyboardButton.builder().text("\uD83D\uDD79\uFE0F Play").webApp(new WebAppInfo(url)).build()),
+        new InlineKeyboardRow(InlineKeyboardButton.builder().text("Join Community").url("https://t.me/DePIN_App").build()),
+        new InlineKeyboardRow(InlineKeyboardButton.builder().text("Follow X").url("https://x.com/DePINApp").build())));
   }
 
   @Override

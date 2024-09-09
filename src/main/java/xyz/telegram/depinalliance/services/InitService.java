@@ -294,22 +294,22 @@ public class InitService {
         eventMission.create();
         eventMission.persist();
 
-//        for (int i = 1; i < 100; i++) {
-//          EventBoxPoint eventBoxPoint = new EventBoxPoint();
-//          eventBoxPoint.create();
-//          eventBoxPoint.event = event1;
-//          eventBoxPoint.item = item;
-//          eventBoxPoint.pointRequired = new BigDecimal(i);
-//          eventBoxPoint.indexBox = i;
-//          if (i == 1) {
-//            eventBoxPoint.rewardTable = "1";
-//          } else if (i > 1 && i <= 9) {
-//            eventBoxPoint.rewardTable = "2";
-//          } else {
-//            eventBoxPoint.rewardTable = "3";
-//          }
-//          eventBoxPoint.persistAndFlush();
-//        }
+        for (int i = 1; i < 100; i++) {
+          EventBoxPoint eventBoxPoint = new EventBoxPoint();
+          eventBoxPoint.create();
+          eventBoxPoint.event = event1;
+          eventBoxPoint.item = item;
+          eventBoxPoint.pointRequired = new BigDecimal(i);
+          eventBoxPoint.indexBox = i;
+          if (i == 1) {
+            eventBoxPoint.rewardTable = "1";
+          } else if (i > 1 && i <= 9) {
+            eventBoxPoint.rewardTable = "2";
+          } else {
+            eventBoxPoint.rewardTable = "3";
+          }
+          eventBoxPoint.persistAndFlush();
+        }
 
         List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L,
           73L, 78L, 83L, 88L, 93L, 98L);

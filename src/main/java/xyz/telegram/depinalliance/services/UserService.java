@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.services;
 
 import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -166,8 +167,19 @@ public class UserService {
         deviceInfo.platform)) {
         pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
       } else if (deviceInfo.platform.equalsIgnoreCase("IOS")) {
-        devicePoint = DevicePoint.find("platform = 'IOS' and lower(name) = ?1",
-          deviceInfo.detectedModel.toLowerCase().trim()).firstResult();
+        String model = deviceInfo.detectedModel.trim().toLowerCase();
+        //        if (model.contains(",")) {
+        List<String> models = Arrays.asList(model.split(","));
+        Set<String> modelsFinal = new HashSet<>();
+        for (String modelName : models) {
+          modelsFinal.add(modelName.trim().toLowerCase());
+        }
+        devicePoint = DevicePoint.find("platform = 'IOS' and lower(name) in (?1)", Sort.descending("point"),
+          modelsFinal).firstResult();
+        //        } else {
+        //          devicePoint = DevicePoint.find("platform = 'IOS' and lower(name) = ?1",
+        //            deviceInfo.detectedModel.toLowerCase().trim()).firstResult();
+        //        }
       } else if (deviceInfo.platform.equalsIgnoreCase(
         "Android") && deviceInfo.clientHints != null && StringUtils.isNotBlank(deviceInfo.clientHints.model)) {
         devicePoint = DevicePoint.find("platform = 'Android' and lower(name) like ?1",
@@ -179,11 +191,10 @@ public class UserService {
         deviceInfoFinal = devicePoint.name;
         pointUnClaimed = devicePoint.point;
       }
-      System.out.println(pointUnClaimed);
+//      System.out.println(pointUnClaimed);
       paramsUser.put("devicePlatform", deviceInfo.platform);
       paramsUser.put("deviceModel", deviceInfoStr);
     } catch (Exception e) {
-      e.printStackTrace();
       throw new Exception(ResponseMessageConstants.DATA_INVALID);
     }
 
@@ -284,7 +295,7 @@ public class UserService {
   public BigDecimal mining(User user) throws Exception {
     synchronized (user.id.toString().intern()) {
       BigDecimal res = mining(user, Utils.getCalendar().getTimeInMillis() / 1000);
-      Thread.sleep(200);
+//      Thread.sleep(200);
       return res;
     }
   }

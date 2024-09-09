@@ -117,6 +117,8 @@ public class UserResource extends BaseResource {
     userInfoResponse.rateBonusReward = new BigDecimal("5").add(rateBonus);
     userInfoResponse.pointBonus = Utils.stripDecimalZeros(user.pointBonus);
     userInfoResponse.isPremium = user.isPremium != null && user.isPremium;
+    userInfoResponse.detectDevice = user.detectDevice;
+    userInfoResponse.devicePlatform = user.devicePlatform;
     return ResponseData.ok(userInfoResponse);
   }
 
@@ -138,7 +140,7 @@ public class UserResource extends BaseResource {
     @RestHeader("platform") String platform) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.detectDeviceInfo(getUser(), device);
-      Thread.sleep(1000);
+//      Thread.sleep(1000);
       return ResponseData.ok(res);
     }
   }
@@ -148,7 +150,7 @@ public class UserResource extends BaseResource {
   public ResponseData detectDeviceInfo1(Object request) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.detectDeviceInfo1(getUser(), request);
-      Thread.sleep(1000);
+//      Thread.sleep(1000);
       return ResponseData.ok(res);
     }
   }
@@ -158,7 +160,7 @@ public class UserResource extends BaseResource {
   public ResponseData claimRewardNewUser() throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.claimRewardNewUser(getUser());
-      Thread.sleep(1000);
+//      Thread.sleep(1000);
       return ResponseData.ok(res);
     }
   }
@@ -168,7 +170,7 @@ public class UserResource extends BaseResource {
   public ResponseData startContributing() throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.startContributing(getUser());
-      Thread.sleep(1000);
+//      Thread.sleep(1000);
       return ResponseData.ok(res);
     }
   }
