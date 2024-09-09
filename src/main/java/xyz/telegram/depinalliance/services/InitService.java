@@ -203,7 +203,7 @@ public class InitService {
         Enums.MissionRequire require = Enums.MissionRequire.valueOf("EVENT_INVITE_" + id);
         if (Mission.findByMissionRequire(require) == null) {
           Mission mission = new Mission();
-          mission.groupMission = "Event 1";
+          mission.groupMission = "Summon DePIN Alliance";
           mission.name = "Invite " + id + " friend";
           mission.type = Enums.MissionType.ON_TIME_IN_APP;
           mission.isFake = false;
