@@ -487,9 +487,9 @@ public class UserService {
   }
 
   public long maxDeviceUserByLevel(long levelId) {
-    if (levelId <= 9) {
+    if (levelId < 5) {
       return 1;
-    } else if (levelId <= 19) {
+    } else if (levelId <= 15) {
       return 2;
     } else {
       return 3;
