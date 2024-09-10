@@ -128,7 +128,6 @@ public class UserService {
       "slotCpuUsed = slotCpuUsed + 1, slotRamUsed = slotRamUsed + 1, slotStorageUsed = slotStorageUsed + 1, totalMiningPower = :totalMiningPower where id = :id",
       params);
 
-    //TODO : get...
     BigDecimal pointUnClaimed = new BigDecimal(5000);
     if (StringUtils.isBlank(deviceInfo)) {
       deviceInfo = "Unknown Device";
@@ -163,7 +162,7 @@ public class UserService {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
 
-    BigDecimal pointUnClaimed;
+    BigDecimal pointUnClaimed = BigDecimal.ZERO;
     String deviceInfoFinal = "";
     Map<String, Object> paramsUser = new HashMap<>();
     try {
@@ -173,7 +172,7 @@ public class UserService {
       DevicePoint devicePoint = null;
       if (deviceInfo == null || StringUtils.isBlank(deviceInfo.detectedModel) || StringUtils.isBlank(
         deviceInfo.platform)) {
-        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
+//        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
       } else if (deviceInfo.platform.equalsIgnoreCase("IOS")) {
         String model = deviceInfo.detectedModel.trim().toLowerCase();
         //        if (model.contains(",")) {
@@ -194,7 +193,7 @@ public class UserService {
           "%" + deviceInfo.clientHints.model.toLowerCase().trim() + "%").firstResult();
       }
       if (devicePoint == null) {
-        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
+//        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
       } else {
         deviceInfoFinal = devicePoint.name;
         pointUnClaimed = devicePoint.point;
@@ -208,6 +207,9 @@ public class UserService {
 
     if (StringUtils.isBlank(deviceInfoFinal)) {
       deviceInfoFinal = "Unknown Device";
+    }
+    if (pointUnClaimed.compareTo(new BigDecimal(6000)) <= 0) {
+      pointUnClaimed = new BigDecimal(6000).add(new BigDecimal(Utils.getRandomNumber(0,2000)));
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
     String codeCpu = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
@@ -262,29 +264,6 @@ public class UserService {
     User.updateUser("status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower where id = :id",
       paramsUser);
     return Utils.stripDecimalZeros(user.pointUnClaimed);
-  }
-
-  @Transactional(Transactional.TxType.REQUIRES_NEW)
-  public void initMissionUser(long userId) {
-    try {
-      //      findMissionAndInsert(Enums.MissionRequire.CLAIM_FIRST_10000_POINT, userId);
-    } catch (Exception e) {
-    }
-  }
-
-  public void findMissionAndInsert(Enums.MissionRequire missionRequire, long userId) {
-    try {
-      Mission mission = Mission.findByMissionRequire(missionRequire);
-      if (mission != null) {
-        UserMission userMission = new UserMission();
-        userMission.user = new User(userId);
-        userMission.mission = mission;
-        userMission.status = Enums.MissionStatus.NOT_VERIFIED;
-        userMission.persistAndFlush();
-      }
-    } catch (Exception e) {
-      logger.error("Error inserting mission " + userId + " " + missionRequire.name(), e);
-    }
   }
 
   @Transactional
