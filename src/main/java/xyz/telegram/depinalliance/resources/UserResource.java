@@ -100,7 +100,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.miningPower = Utils.stripDecimalZeros(user.miningPowerReal);
     userInfoResponse.ratePurchase = Utils.stripDecimalZeros(user.ratePurchase);
     userInfoResponse.maximumPower = Utils.stripDecimalZeros(user.maximumPower.multiply(user.rateCapacity));
-    userInfoResponse.point = user.point.setScale(0, RoundingMode.DOWN);
+    userInfoResponse.point = Utils.stripDecimalZeros(user.point);
     userInfoResponse.pointUnClaimed = user.pointUnClaimed;
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
     userInfoResponse.xpLevelFrom = Utils.stripDecimalZeros(user.level.expFrom);
@@ -206,8 +206,8 @@ public class UserResource extends BaseResource {
     List<UserSkillResponse> userSkills = userService.getUserSkill(user.id);
     Map<String, Object> data = new HashMap<>();
     data.put("skill", userSkills);
-    data.put("pointSkill", user.pointSkill.setScale(2, RoundingMode.UP));
-    data.put("point", user.point.setScale(2, RoundingMode.UP));
+    data.put("pointSkill", Utils.stripDecimalZeros(user.pointSkill));
+    data.put("point", Utils.stripDecimalZeros(user.point));
     return ResponseData.ok(data);
   }
 
@@ -241,10 +241,10 @@ public class UserResource extends BaseResource {
       levelNextResponse.description = skillLevel.skill.description;
       levelNextResponse.levelCurrent = userSkill.level;
       levelNextResponse.levelUpgrade = userSkill.level + 1;
-      levelNextResponse.feeUpgrade = skillLevel.feeUpgrade.setScale(2, RoundingMode.UP);
-      levelNextResponse.feePointUpgrade = SkillPoint.getPointRequire(user.id).point.setScale(2, RoundingMode.UP);
-      levelNextResponse.effectCurrent = getUserRate(skillId.intValue(), user, null).setScale(2, RoundingMode.UP);
-      levelNextResponse.rateEffect = getUserRate(skillId.intValue(), null, skillLevel).setScale(2, RoundingMode.UP);
+      levelNextResponse.feeUpgrade = Utils.stripDecimalZeros(skillLevel.feeUpgrade);
+      levelNextResponse.feePointUpgrade = Utils.stripDecimalZeros(SkillPoint.getPointRequire(user.id).point);
+      levelNextResponse.effectCurrent = Utils.stripDecimalZeros(getUserRate(skillId.intValue(), user, null));
+      levelNextResponse.rateEffect = Utils.stripDecimalZeros(getUserRate(skillId.intValue(), null, skillLevel));
       return ResponseData.ok(levelNextResponse);
     }
     return ResponseData.ok(null);
