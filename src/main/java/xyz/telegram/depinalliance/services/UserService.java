@@ -220,7 +220,7 @@ public class UserService {
     }
     if (pointUnClaimed.compareTo(new BigDecimal(6000)) <= 0) {
       pointUnClaimed = new BigDecimal(6000).add(
-        new BigDecimal(Utils.getRandomNumber(0, 100)).multiply(new BigDecimal(10)));
+        new BigDecimal(Utils.getRandomNumber(0, 200)).multiply(new BigDecimal(10)));
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
     String codeCpu = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
