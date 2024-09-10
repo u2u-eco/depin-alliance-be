@@ -28,10 +28,12 @@ public class UserMissionResponse {
   public Enums.MissionRequire missionRequire;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public Long box;
+  @JsonIgnore
+  public String referId;
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
     Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,
-    Enums.MissionRequire missionRequire, Long box) {
+    Enums.MissionRequire missionRequire, Long box, String referId) {
     this.groupMission = groupMission;
     this.name = name;
     this.description = description;
@@ -45,5 +47,6 @@ public class UserMissionResponse {
     this.isFake = isFake;
     this.missionRequire = missionRequire;
     this.box = box;
+    this.referId = referId;
   }
 }

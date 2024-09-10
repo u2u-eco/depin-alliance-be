@@ -41,13 +41,14 @@ public class InitService {
         mission.groupMission = "Social mission";
         mission.name = "Join Our Telegram channel";
         mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
+        mission.isFake = false;
         mission.description = "Join Our Telegram channel";
         mission.orders = 2;
         mission.url = "https://t.me/DePIN_App";
         mission.point = new BigDecimal(7000);
         mission.xp = new BigDecimal(300);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.referId = "DePIN_App";
         mission.create();
         mission.persist();
 

@@ -27,6 +27,8 @@ public class MissionService {
   UserService userService;
   @Inject
   LeagueService leagueService;
+  @Inject
+  TelegramService telegramService;
 
   public List<DailyCheckinResponse> getListOfDailyCheckin(User user) {
     List<DailyCheckin> dailyCheckins = DailyCheckin.listAll(Sort.ascending("id"));
@@ -136,7 +138,9 @@ public class MissionService {
     if (check.isFake) {
       isChecked = true;
     } else {
-      if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+      if (check.type == Enums.MissionType.TELEGRAM) {
+        isChecked = telegramService.verifyJoinChannel("@" + check.referId, user.id.toString());
+      } else if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
         switch (check.missionRequire) {
         case CLAIM_FIRST_10000_POINT:
           if (user.pointClaimed.compareTo(new BigDecimal("10000")) >= 0) {

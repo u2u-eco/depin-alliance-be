@@ -5,6 +5,8 @@ import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import xyz.telegram.depinalliance.common.models.response.TelegramResponse;
 import xyz.telegram.depinalliance.common.models.response.UserTelegramResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 
@@ -25,6 +27,8 @@ public class TelegramService {
   boolean isValidate;
   @ConfigProperty(name = "login.time-out")
   long timeOut;
+  @RestClient
+  TelegramClient telegramClient;
 
   public UserTelegramResponse validateInitData(String initData) {
     Map<String, String> params = new TreeMap<>();
@@ -82,5 +86,14 @@ public class TelegramService {
     } catch (Exception e) {
       return null;
     }
+  }
+
+  public boolean verifyJoinChannel(String chatId, String userId) {
+    TelegramResponse response = telegramClient.getChatMember(botToken, chatId, userId);
+    if (response.ok && "member".equals(response.result.status) || "administrator".equals(
+      response.result.status) || "creator".equals(response.result.status)) {
+      return true;
+    }
+    return false;
   }
 }
