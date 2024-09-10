@@ -104,7 +104,7 @@ public class MissionService {
       if (day == countDays) {
         dailyCheckin = DailyCheckin.findById(1);
         paramsUser.put("startCheckIn", today);
-        sql += "startCheckIn = :startCheckIn";
+        sql += "startCheckIn = :startCheckIn,";
       } else {
         dailyCheckin = DailyCheckin.findById(day);
       }
