@@ -18,8 +18,8 @@ public class BotService extends CommandLongPollingTelegramBot {
   public BotService(String botToken, String botUsername, UserService userService, String url) {
     super(new OkHttpTelegramClient(botToken), true, () -> botUsername);
     register(new StartCommand(userService, botUsername, url));
-    HelpCommand helpCommand = new HelpCommand(this);
-    register(helpCommand);
+//    HelpCommand helpCommand = new HelpCommand(this);
+//    register(helpCommand);
     registerDefaultAction((telegramClient, message) -> {
       SendMessage commandUnknownMessage = new SendMessage(String.valueOf(message.getChatId()),
         "The command '" + message.getText() + "' is not known by this bot. Here comes some help " + Emoji.AMBULANCE);
@@ -27,22 +27,22 @@ public class BotService extends CommandLongPollingTelegramBot {
         telegramClient.execute(commandUnknownMessage);
       } catch (TelegramApiException e) {
       }
-      helpCommand.execute(telegramClient, message.getFrom(), message.getChat(), new String[] {});
+//      helpCommand.execute(telegramClient, message.getFrom(), message.getChat(), new String[] {});
     });
   }
 
   @Override
   public void processNonCommandUpdate(Update update) {
-    if (update.hasMessage()) {
-      Message message = update.getMessage();
-      if (message.hasText()) {
-        SendMessage echoMessage = new SendMessage(String.valueOf(message.getChatId()),
-          "Hey here's your message:\n" + message.getText());
-        try {
-          telegramClient.execute(echoMessage);
-        } catch (TelegramApiException e) {
-        }
-      }
-    }
+//    if (update.hasMessage()) {
+//      Message message = update.getMessage();
+//      if (message.hasText()) {
+//        SendMessage echoMessage = new SendMessage(String.valueOf(message.getChatId()),
+//          "Hey here's your message:\n" + message.getText());
+//        try {
+//          telegramClient.execute(echoMessage);
+//        } catch (TelegramApiException e) {
+//        }
+//      }
+//    }
   }
 }

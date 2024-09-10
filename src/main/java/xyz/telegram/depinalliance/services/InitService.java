@@ -29,7 +29,7 @@ public class InitService {
         mission.type = Enums.MissionType.TWITTER;
         mission.isFake = true;
         mission.description = "Follow Our X Account";
-        mission.orders = 1;
+        mission.orders = 4;
         mission.url = "https://x.com/DePINApp";
         mission.point = new BigDecimal(7000);
         mission.xp = new BigDecimal(300);
@@ -43,7 +43,7 @@ public class InitService {
         mission.type = Enums.MissionType.TELEGRAM;
         mission.isFake = false;
         mission.description = "Join Our Telegram channel";
-        mission.orders = 2;
+        mission.orders = 5;
         mission.url = "https://t.me/DePIN_App";
         mission.point = new BigDecimal(7000);
         mission.xp = new BigDecimal(300);
@@ -58,13 +58,61 @@ public class InitService {
         mission.type = Enums.MissionType.SHARE_STORY;
         mission.isFake = true;
         mission.description = "Share story";
-        mission.orders = 3;
+        mission.orders = 6;
         mission.url = "";
         mission.point = new BigDecimal(7000);
         mission.xp = new BigDecimal(300);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.create();
         mission.persist();
+
+        Item item = Item.findByCode("CYBER_BOX");
+        mission = new Mission();
+        mission.groupMission = "Summon DePIN Alliance";
+        mission.name = "Follow U2U Network X";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow U2U Network X";
+        mission.orders = 1;
+        mission.url = "https://x.com/uniultra_xyz";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(500);
+        mission.box = 1L;
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMissionInvite = new EventMission();
+        eventMissionInvite.event = new Event(1L);
+        eventMissionInvite.mission = mission;
+        eventMissionInvite.item = item;
+        eventMissionInvite.number = 1;
+        eventMissionInvite.create();
+        eventMissionInvite.persist();
+
+        mission = new Mission();
+        mission.groupMission = "Summon DePIN Alliance";
+        mission.name = "Join U2U Network Telegram";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join U2U Network Telegram";
+        mission.orders = 2;
+        mission.url = "https://t.me/UnicornUltraGlobal";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.referId = "UnicornUltraGlobal";
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMissionInvite = new EventMission();
+        eventMissionInvite.event = new Event(1L);
+        eventMissionInvite.mission = mission;
+        eventMissionInvite.item = item;
+        eventMissionInvite.number = 1;
+        eventMissionInvite.create();
+        eventMissionInvite.persist();
       }
 
       //Product
@@ -234,7 +282,6 @@ public class InitService {
         //        event1.create();
         //        event1.persist();
 
-
         //        Mission mission1 = new Mission();
         //        mission1.groupMission = event1.name;
         //        mission1.name = "Follow AAAAAA";
@@ -343,7 +390,6 @@ public class InitService {
         //          }
         //          eventBoxPoint.persistAndFlush();
         //        }
-
 
       }
 
