@@ -172,10 +172,9 @@ public class UserService {
       DevicePoint devicePoint = null;
       if (deviceInfo == null || StringUtils.isBlank(deviceInfo.detectedModel) || StringUtils.isBlank(
         deviceInfo.platform)) {
-//        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
+        //        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
       } else if (deviceInfo.platform.equalsIgnoreCase("IOS")) {
         String model = deviceInfo.detectedModel.trim().toLowerCase();
-        //        if (model.contains(",")) {
         List<String> models = Arrays.asList(model.split(","));
         Set<String> modelsFinal = new HashSet<>();
         for (String modelName : models) {
@@ -183,22 +182,33 @@ public class UserService {
         }
         devicePoint = DevicePoint.find("platform = 'IOS' and lower(name) in (?1)", Sort.descending("point"),
           modelsFinal).firstResult();
-        //        } else {
-        //          devicePoint = DevicePoint.find("platform = 'IOS' and lower(name) = ?1",
-        //            deviceInfo.detectedModel.toLowerCase().trim()).firstResult();
-        //        }
       } else if (deviceInfo.platform.equalsIgnoreCase(
         "Android") && deviceInfo.clientHints != null && StringUtils.isNotBlank(deviceInfo.clientHints.model)) {
-        devicePoint = DevicePoint.find("platform = 'Android' and lower(name) like ?1",
-          "%" + deviceInfo.clientHints.model.toLowerCase().trim() + "%").firstResult();
+        String model = deviceInfo.clientHints.model.toLowerCase().trim();
+        devicePoint = DevicePoint.find("platform = 'Android' and lower(name) like ?1", "%" + model + "%").firstResult();
+        if (devicePoint == null && model.contains("sm-")) {
+          model = model.replace("sm-", "");
+          devicePoint = DevicePoint.find("platform = 'Android' and lower(name) like ?1", "%" + model + "%")
+            .firstResult();
+          if (devicePoint == null) {
+            model = model.substring(0, model.length() - 1);
+            devicePoint = DevicePoint.find("platform = 'Android' and lower(name) like ?1", "%" + model + "%")
+              .firstResult();
+            if (devicePoint == null) {
+              model = model.substring(0, model.length() - 1);
+              devicePoint = DevicePoint.find("platform = 'Android' and lower(name) like ?1", "%" + model + "%")
+                .firstResult();
+            }
+          }
+        }
       }
       if (devicePoint == null) {
-//        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
+        //        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
       } else {
         deviceInfoFinal = devicePoint.name;
         pointUnClaimed = devicePoint.point;
       }
-//      System.out.println(pointUnClaimed);
+      //      System.out.println(pointUnClaimed);
       paramsUser.put("devicePlatform", deviceInfo.platform);
       paramsUser.put("deviceModel", deviceInfoStr);
     } catch (Exception e) {
@@ -209,7 +219,8 @@ public class UserService {
       deviceInfoFinal = "Unknown Device";
     }
     if (pointUnClaimed.compareTo(new BigDecimal(6000)) <= 0) {
-      pointUnClaimed = new BigDecimal(6000).add(new BigDecimal(Utils.getRandomNumber(0,100)).multiply(new BigDecimal(10)));
+      pointUnClaimed = new BigDecimal(6000).add(
+        new BigDecimal(Utils.getRandomNumber(0, 100)).multiply(new BigDecimal(10)));
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
     String codeCpu = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
@@ -282,7 +293,7 @@ public class UserService {
   public BigDecimal mining(User user) throws Exception {
     synchronized (user.id.toString().intern()) {
       BigDecimal res = mining(user, Utils.getCalendar().getTimeInMillis() / 1000);
-//      Thread.sleep(200);
+      //      Thread.sleep(200);
       return res;
     }
   }
