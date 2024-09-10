@@ -46,7 +46,7 @@ public class InitService {
         mission.orders = 5;
         mission.url = "https://t.me/DePIN_App";
         mission.point = new BigDecimal(7000);
-        mission.xp = new BigDecimal(300);
+        mission.xp = new BigDecimal(200);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.referId = "DePIN_App";
         mission.create();
@@ -61,7 +61,7 @@ public class InitService {
         mission.orders = 6;
         mission.url = "";
         mission.point = new BigDecimal(7000);
-        mission.xp = new BigDecimal(300);
+        mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.create();
         mission.persist();
@@ -76,7 +76,7 @@ public class InitService {
         mission.orders = 1;
         mission.url = "https://x.com/uniultra_xyz";
         mission.point = new BigDecimal(10000);
-        mission.xp = new BigDecimal(500);
+        mission.xp = new BigDecimal(200);
         mission.box = 1L;
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.create();
@@ -99,7 +99,7 @@ public class InitService {
         mission.orders = 2;
         mission.url = "https://t.me/UnicornUltraGlobal";
         mission.point = new BigDecimal(10000);
-        mission.xp = new BigDecimal(500);
+        mission.xp = new BigDecimal(200);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.referId = "UnicornUltraGlobal";
         mission.box = 1L;
@@ -126,7 +126,7 @@ public class InitService {
         mission.orders = 1000;
         mission.missionRequire = Enums.MissionRequire.CLAIM_FIRST_10000_POINT;
         mission.point = new BigDecimal(10000);
-        mission.xp = new BigDecimal(1000);
+        mission.xp = new BigDecimal(800);
         mission.create();
         mission.persist();
       }
@@ -140,7 +140,7 @@ public class InitService {
         mission.orders = 1001;
         mission.missionRequire = Enums.MissionRequire.BUY_ANY_DEVICE;
         mission.point = new BigDecimal(10000);
-        mission.xp = new BigDecimal(500);
+        mission.xp = new BigDecimal(200);
         mission.create();
         mission.persist();
       }
@@ -154,7 +154,7 @@ public class InitService {
         mission.orders = 1002;
         mission.missionRequire = Enums.MissionRequire.LEARN_ANY_SKILL;
         mission.point = new BigDecimal(7000);
-        mission.xp = new BigDecimal(500);
+        mission.xp = new BigDecimal(300);
         mission.create();
         mission.persist();
       }
@@ -168,7 +168,7 @@ public class InitService {
         mission.orders = 1003;
         mission.missionRequire = Enums.MissionRequire.LEVEL_5;
         mission.point = new BigDecimal(10000);
-        mission.xp = new BigDecimal(500);
+        mission.xp = new BigDecimal(300);
         mission.create();
         mission.persist();
       }
@@ -182,7 +182,7 @@ public class InitService {
         mission.orders = 1004;
         mission.missionRequire = Enums.MissionRequire.LEVEL_10;
         mission.point = new BigDecimal(100000);
-        mission.xp = new BigDecimal(500);
+        mission.xp = new BigDecimal(300);
         mission.create();
         mission.persist();
       }
@@ -196,7 +196,7 @@ public class InitService {
         mission.orders = 1005;
         mission.missionRequire = Enums.MissionRequire.LEVEL_20;
         mission.point = new BigDecimal(500000);
-        mission.xp = new BigDecimal(500);
+        mission.xp = new BigDecimal(300);
         mission.create();
         mission.persist();
       }
@@ -225,7 +225,7 @@ public class InitService {
         mission.orders = 1007;
         mission.missionRequire = Enums.MissionRequire.INVITE_5;
         mission.point = new BigDecimal(20000);
-        mission.xp = new BigDecimal(400);
+        mission.xp = new BigDecimal(300);
         mission.create();
         mission.persist();
       }
