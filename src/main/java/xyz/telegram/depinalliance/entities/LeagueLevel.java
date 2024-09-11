@@ -35,7 +35,10 @@ public class LeagueLevel extends PanacheEntityBase {
     return find("select max(id) from LeagueLevel").project(Long.class).firstResult();
   }
 
-  public static LeagueLevel getLevelBeExp(BigDecimal exp) {
-    return find(" expFrom <= :exp and :exp < expTo", Parameters.with("exp", exp)).firstResult();
+  public static LeagueLevel getLevelBeExp(long leagueId) {
+    return find(
+      " select * from LeagueLevel t2 where exists (  select * from League t1 where t1.xp between t2.expFrom and t2.expTo and t1.id = :leagueId)",
+      Parameters.with("leagueId", leagueId)).firstResult();
   }
+
 }

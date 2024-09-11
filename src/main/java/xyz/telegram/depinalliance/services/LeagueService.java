@@ -130,12 +130,13 @@ public class LeagueService {
     Map<String, Object> params = new HashMap<>();
     params.put("xp", xp);
     params.put("id", user.league.id);
-    League.updateObject("xp = xp + :xp where id = :id", params);
-    Long maxLevel = LeagueLevel.maxLevel();
-    LeagueLevel level = LeagueLevel.getLevelBeExp(xp);
-    if (null != level && level.id - user.level.id > 0 && level.id < maxLevel) {
-      League.updateLevel(user.league.id, level.id);
-    }
+    League.updateObject("xp = xp + :xp, level.id = (Select id from LeagueLevel where xp +:xp between expFrom and expTo) where id = :id", params);
+
+//    Long maxLevel = LeagueLevel.maxLevel();
+//    LeagueLevel level = LeagueLevel.getLevelBeExp(user.league.id);
+//    if (null != level && level.id - user.level.id > 0 && level.id < maxLevel) {
+//      League.updateLevel(user.league.id, level.id);
+//    }
   }
 
   public boolean validateName(LeagueRequest request) {
