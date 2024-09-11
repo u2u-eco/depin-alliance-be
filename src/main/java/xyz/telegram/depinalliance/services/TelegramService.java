@@ -23,6 +23,8 @@ public class TelegramService {
 
   @ConfigProperty(name = "telegram.token")
   String botToken;
+  @ConfigProperty(name = "telegram.token.verify")
+  String botTokenVerify;
   @ConfigProperty(name = "telegram.validate")
   boolean isValidate;
   @ConfigProperty(name = "login.time-out")
@@ -89,7 +91,7 @@ public class TelegramService {
   }
 
   public boolean verifyJoinChannel(String chatId, String userId) {
-    TelegramResponse response = telegramClient.getChatMember(botToken, chatId, userId);
+    TelegramResponse response = telegramClient.getChatMember(botTokenVerify, chatId, userId);
     if (response.ok && "member".equals(response.result.status) || "administrator".equals(
       response.result.status) || "creator".equals(response.result.status)) {
       return true;
