@@ -4,9 +4,7 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.extensions.bots.commandbot.CommandLongPollingTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import xyz.telegram.depinalliance.common.commands.HelpCommand;
 import xyz.telegram.depinalliance.common.commands.StartCommand;
 import xyz.telegram.depinalliance.common.constans.Emoji;
 

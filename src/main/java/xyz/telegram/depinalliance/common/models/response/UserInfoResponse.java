@@ -27,6 +27,7 @@ public class UserInfoResponse {
   public long level;
   public long lastLoginTime;
   public Long timeStartMining;
+  public Long currentTime;
   public long lastCheckin;
   public BigDecimal pointBonus;
   public Boolean isPremium;
