@@ -91,10 +91,13 @@ public class TelegramService {
   }
 
   public boolean verifyJoinChannel(String chatId, String userId) {
-    TelegramResponse response = telegramClient.getChatMember(botTokenVerify, chatId, userId);
-    if (response.ok && "member".equals(response.result.status) || "administrator".equals(
-      response.result.status) || "creator".equals(response.result.status)) {
-      return true;
+    try {
+      TelegramResponse response = telegramClient.getChatMember(botTokenVerify, chatId, userId);
+      if (response.ok && "member".equals(response.result.status) || "administrator".equals(
+        response.result.status) || "creator".equals(response.result.status)) {
+        return true;
+      }
+    } catch (Exception e) {
     }
     return false;
   }
