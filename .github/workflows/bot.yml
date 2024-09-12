@@ -1,7 +1,7 @@
 name: Telebot
 on:
   push:
-    branches: [ staging ]
+    branches: [ bot ]
 env:
   GLOBAL_ENV_VAR: 'Global Value'
   ARGOCD_APP_PRODUCTION: depin-alliance-bot
