@@ -52,6 +52,7 @@ public class UserService {
           user.pointRef = pointRef;
           if (StringUtils.isNotBlank(league)) {
             user.league = ref.league;
+            refCode += " joined league " + league;
           }
           Map<String, Object> params = new HashMap<>();
           params.put("id", ref.id);
@@ -73,7 +74,7 @@ public class UserService {
     if (StringUtils.isNotBlank(league) && StringUtils.isNotBlank(refCode) && user.league == null) {
       User ref = User.findByCode(refCode);
       if (ref != null && ref.league != null) {
-        logger.info("user " + user.id + " join league " + ref.league.code + " with ref code " + ref.id);
+        logger.info("user " + user.username + " join league " + ref.league.code + " with ref code " + ref.id);
         leagueService.joinLeague(user, ref.league.code);
       }
     }
@@ -272,7 +273,9 @@ public class UserService {
     paramsUser.put("status", Enums.UserStatus.CLAIMED);
     paramsUser.put("point", user.pointUnClaimed);
     paramsUser.put("maximumPower", user.level.maxMiningPower);
-    User.updateUser("status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower where id = :id",
+    paramsUser.put("firstLoginTime", Utils.getCalendar().getTimeInMillis());
+    User.updateUser(
+      "status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower, firstLoginTime = :firstLoginTime where id = :id",
       paramsUser);
     return Utils.stripDecimalZeros(user.pointUnClaimed);
   }

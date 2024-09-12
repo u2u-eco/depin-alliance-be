@@ -5,7 +5,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import xyz.telegram.depinalliance.services.BotService;
 import xyz.telegram.depinalliance.services.UserService;
 
@@ -28,8 +29,9 @@ public class MainApplication {
   void onStart(@Observes StartupEvent event) {
     if (botRun) {
       new Thread(() -> {
-        try (TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication()) {
-          botsApplication.registerBot(botToken, new BotService(botToken, botUsername, userService, botUrl));
+        try {
+          TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+          botsApi.registerBot(new BotService(botToken, botUrl, botUsername, userService));
           System.out.println("Bot successfully started!");
           Thread.currentThread().join();
         } catch (Exception e) {
