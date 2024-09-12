@@ -52,6 +52,7 @@ public class UserService {
           user.pointRef = pointRef;
           if (StringUtils.isNotBlank(league)) {
             user.league = ref.league;
+            refCode += " joined league " + league;
           }
           Map<String, Object> params = new HashMap<>();
           params.put("id", ref.id);
@@ -73,7 +74,7 @@ public class UserService {
     if (StringUtils.isNotBlank(league) && StringUtils.isNotBlank(refCode) && user.league == null) {
       User ref = User.findByCode(refCode);
       if (ref != null && ref.league != null) {
-        logger.info("user " + user.id + " join league " + ref.league.code + " with ref code " + ref.id);
+        logger.info("user " + user.username + " join league " + ref.league.code + " with ref code " + ref.id);
         leagueService.joinLeague(user, ref.league.code);
       }
     }
