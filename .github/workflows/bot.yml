@@ -1,0 +1,13 @@
+name: Telebot
+on:
+  push:
+    branches: [ staging ]
+env:
+  GLOBAL_ENV_VAR: 'Global Value'
+  ARGOCD_APP_PRODUCTION: depin-alliance-bot
+  KUSTOMIZE_PROJECT_PATH: u2u-timebird/depin-alliance-bot
+  U2U_SERVICE_NAME: depin-alliance-bot
+jobs:
+  u2u-workflow:
+    uses: u2u-eco/u2sec-ci-templates/.github/workflows/quarkus-template-prod.yaml@master
+    secrets: inherit
