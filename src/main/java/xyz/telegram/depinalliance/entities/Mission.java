@@ -25,6 +25,7 @@ public class Mission extends BaseEntity {
   public Partner partner;
   public String image;
   public String name;
+  @Column(columnDefinition = "text")
   public String description;
   public Enums.MissionType type;
   @Column(name = "mission_require")
