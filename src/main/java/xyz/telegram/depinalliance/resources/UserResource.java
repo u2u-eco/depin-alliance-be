@@ -290,4 +290,26 @@ public class UserResource extends BaseResource {
   public ResponseData friend(PagingParameters pagingParameters) {
     return ResponseData.ok(User.findFriendByUserAndPaging(pagingParameters, getTelegramId()));
   }
+
+  @GET
+  @Path("next-level")
+  public ResponseData nextLevel() {
+    User user = getUser();
+    List<Level> levels = Level.find("id > ?1", Sort.ascending("id"), user.level.id).page(0, 2).list();
+    BigDecimal maxMiningPower = BigDecimal.ZERO;
+    List<LevelResponse> levelResponses = new ArrayList<>();
+    for (int i = 0; i < levels.size(); i++) {
+      Level level = levels.get(i);
+      LevelResponse levelResponse = new LevelResponse();
+      levelResponse.level = level.id;
+      levelResponse.xpLevelFrom = Utils.stripDecimalZeros(level.expFrom);
+      levelResponse.xpLevelTo = Utils.stripDecimalZeros(level.expTo);
+      levelResponse.maxDevice = userService.maxDeviceUserByLevel(level.id);
+      maxMiningPower = maxMiningPower.add(level.maxMiningPower);
+      levelResponse.maximumPower = Utils.stripDecimalZeros(
+        user.maximumPower.add(maxMiningPower).multiply(user.rateCapacity));
+      levelResponses.add(levelResponse);
+    }
+    return ResponseData.ok(levelResponses);
+  }
 }

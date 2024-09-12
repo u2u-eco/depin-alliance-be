@@ -46,7 +46,8 @@ public class MissionService {
     }
 
     if (today - user.lastCheckIn == 86400) {
-      if ((today - user.startCheckIn) / 86400 == dailyCheckins.size()) {
+      long day = ((today - user.startCheckIn) / 86400);
+      if (day == dailyCheckins.size()) {
         calendar.setTimeInMillis(today * 1000);
       } else {
         calendar.setTimeInMillis(user.startCheckIn * 1000);
@@ -103,7 +104,7 @@ public class MissionService {
       String sql = "";
       DailyCheckin dailyCheckin;
       Map<String, Object> paramsUser = new HashMap<>();
-      if (day == countDays) {
+      if (day == (countDays + 1)) {
         dailyCheckin = DailyCheckin.findById(1);
         paramsUser.put("startCheckIn", today);
         sql += "startCheckIn = :startCheckIn,";
