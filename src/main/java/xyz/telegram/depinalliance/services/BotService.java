@@ -89,7 +89,7 @@ public class BotService extends TelegramLongPollingBot {
                 SendMessage answer = new SendMessage(message.getChat().getId().toString(), messageStr);
                 answer.setReplyMarkup(inlineKeyboardMarkup);
                 answer.enableHtml(true);
-                execute(answer);
+                executeAsync(answer);
               } catch (TelegramApiException e) {
                 Log.error("User " + user + "has error", e);
               }
