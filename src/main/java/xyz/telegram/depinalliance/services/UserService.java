@@ -272,7 +272,9 @@ public class UserService {
     paramsUser.put("status", Enums.UserStatus.CLAIMED);
     paramsUser.put("point", user.pointUnClaimed);
     paramsUser.put("maximumPower", user.level.maxMiningPower);
-    User.updateUser("status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower where id = :id",
+    paramsUser.put("firstLoginTime", Utils.getCalendar().getTimeInMillis());
+    User.updateUser(
+      "status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower, firstLoginTime = :firstLoginTime where id = :id",
       paramsUser);
     return Utils.stripDecimalZeros(user.pointUnClaimed);
   }
