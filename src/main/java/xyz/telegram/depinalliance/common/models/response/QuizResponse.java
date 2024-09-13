@@ -1,8 +1,5 @@
 package xyz.telegram.depinalliance.common.models.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +9,7 @@ import java.util.List;
 public class QuizResponse {
   public long index;
   public String question;
+  public Boolean isMultiple = false;
   public List<Answer> answers = new ArrayList<>();
 
   public static class Answer {
