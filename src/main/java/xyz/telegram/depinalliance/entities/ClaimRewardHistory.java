@@ -23,8 +23,11 @@ public class ClaimRewardHistory extends BaseEntity {
   public BigDecimal pointClaim = BigDecimal.ZERO;
   @Column(name = "point_claimed", scale = 18, precision = 29)
   public BigDecimal pointClaimed = BigDecimal.ZERO;
+  @Column(name = "point_bonus", scale = 18, precision = 29)
+  public BigDecimal pointBonus = BigDecimal.ZERO;
   @Column(name = "rate_reward")
   public BigDecimal rateReward = BigDecimal.ZERO;
   @Column(name = "percent_bonus")
   public BigDecimal percentBonus = BigDecimal.ZERO;
+
 }

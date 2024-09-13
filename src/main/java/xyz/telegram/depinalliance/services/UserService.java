@@ -334,6 +334,7 @@ public class UserService {
         claimRewardHistory.pointClaim = user.pointUnClaimed;
         claimRewardHistory.rateReward = rateBonus.add(new BigDecimal(RATE_BONUS_DEFAULT));
         claimRewardHistory.percentBonus = percentBonus;
+        claimRewardHistory.pointBonus = pointBonus;
         claimRewardHistory.create();
         claimRewardHistory.persist();
       }

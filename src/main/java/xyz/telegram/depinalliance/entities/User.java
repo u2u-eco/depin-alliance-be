@@ -32,7 +32,7 @@ public class User extends BaseEntity {
   public BigDecimal pointUnClaimed = BigDecimal.ZERO;
   @Column(name = "point_claimed", scale = 18, precision = 29)
   public BigDecimal pointClaimed = BigDecimal.ZERO;
-  @Column(name = "point_used", scale = 18, precision = 29)
+  @Column(name = "point_used", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
   public BigDecimal pointUsed = BigDecimal.ZERO;
   @Column(name = "claim_number", columnDefinition = "bigint DEFAULT 0")
   public long claimNumber = 0;
@@ -138,7 +138,11 @@ public class User extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("point", point);
-    return updateUser("point = point + :point where id = :id and point + :point >= 0", params);
+    String sql = "";
+    if (point.compareTo(BigDecimal.ZERO) < 0) {
+      sql = "pointUsed = pointUsed + :point * -1, ";
+    }
+    return updateUser(sql + "point = point + :point where id = :id and point + :point >= 0", params);
   }
 
   public static boolean updatePointSkill(long id, BigDecimal pointSkill) {
@@ -154,7 +158,7 @@ public class User extends BaseEntity {
     params.put("pointSkill", pointSkill);
     params.put("point", point);
     return updateUser(
-      "pointSkill = pointSkill + :pointSkill, point = point + :point " + "where id = :id and pointSkill + :pointSkill >=0 and point + :point >= 0 ",
+      "pointSkill = pointSkill + :pointSkill, point = point + :point, pointUsed = pointUsed + :point * -1 where id = :id and pointSkill + :pointSkill >=0 and point + :point >= 0 ",
       params);
   }
 
