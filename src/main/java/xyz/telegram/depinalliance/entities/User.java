@@ -32,6 +32,10 @@ public class User extends BaseEntity {
   public BigDecimal pointUnClaimed = BigDecimal.ZERO;
   @Column(name = "point_claimed", scale = 18, precision = 29)
   public BigDecimal pointClaimed = BigDecimal.ZERO;
+  @Column(name = "point_used", scale = 18, precision = 29)
+  public BigDecimal pointUsed = BigDecimal.ZERO;
+  @Column(name = "claim_number", columnDefinition = "bigint DEFAULT 0")
+  public long claimNumber = 0;
   @Column(name = "point_bonus", scale = 18, precision = 29)
   public BigDecimal pointBonus = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)

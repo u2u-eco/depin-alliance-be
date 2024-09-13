@@ -326,14 +326,25 @@ public class UserService {
       paramsUser.put("id", user.id);
       paramsUser.put("point", pointUnClaimed);
       paramsUser.put("pointRef", pointRef);
+      if (pointBonus.compareTo(BigDecimal.ZERO) > 0) {
+        ClaimRewardHistory claimRewardHistory = new ClaimRewardHistory();
+        claimRewardHistory.user = user;
+        claimRewardHistory.claimNumber = user.claimNumber + 1;
+        claimRewardHistory.pointClaimed = pointUnClaimed;
+        claimRewardHistory.pointClaim = user.pointUnClaimed;
+        claimRewardHistory.rateReward = rateBonus.add(new BigDecimal(RATE_BONUS_DEFAULT));
+        claimRewardHistory.percentBonus = percentBonus;
+        claimRewardHistory.create();
+        claimRewardHistory.persist();
+      }
       User.updateUser(
-        "point = point + :point, pointClaimed = pointClaimed + pointUnClaimed, pointUnClaimed = 0, pointRef = pointRef + :pointRef  where id = :id",
+        "point = point + :point, pointClaimed = pointClaimed + pointUnClaimed, pointUnClaimed = 0, pointRef = pointRef + :pointRef, claimNumber = claimNumber + 1  where id = :id",
         paramsUser);
-
       Map<String, Object> paramsUserRef = new HashMap<>();
       paramsUserRef.put("id", userRefId);
       paramsUserRef.put("point", pointRef);
       User.updateUser("point = point + :point where id = :id", paramsUserRef);
+
       return new ClaimResponse(pointUnClaimed, pointBonus);
     }
   }
