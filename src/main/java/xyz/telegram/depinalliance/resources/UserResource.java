@@ -10,6 +10,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestHeader;
 import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -45,6 +46,8 @@ public class UserResource extends BaseResource {
   boolean isValidate;
   @Inject
   AmazonS3Config amazonS3Config;
+  @Inject
+  Logger logger;
 
   @POST
   @Path("auth")
@@ -53,6 +56,7 @@ public class UserResource extends BaseResource {
   public ResponseData auth(TelegramInitDataRequest request) throws Exception {
     UserTelegramResponse userTelegramResponse = telegramService.validateInitData(request.initData);
     if (userTelegramResponse == null) {
+      logger.error("Auth fail init data " + request.initData);
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
     }
     User user = User.findById(userTelegramResponse.id);
