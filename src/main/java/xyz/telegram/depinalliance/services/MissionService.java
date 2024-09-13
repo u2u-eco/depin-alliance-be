@@ -218,6 +218,9 @@ public class MissionService {
       userMission.status = Enums.MissionStatus.VERIFIED;
       UserMission.create(userMission);
       event1(user, check.id);
+      if (check.partnerId != null) {
+        Partner.updateParticipants(check.partnerId);
+      }
       return true;
     }
     return false;

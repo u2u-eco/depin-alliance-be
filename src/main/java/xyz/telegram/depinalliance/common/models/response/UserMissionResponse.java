@@ -33,10 +33,12 @@ public class UserMissionResponse {
   public String referId;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public List<QuizResponse> quizArrays;
+  @JsonIgnore
+  public Long partnerId;
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
     Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,
-    Enums.MissionRequire missionRequire, Long box, String referId) {
+    Enums.MissionRequire missionRequire, Long box, String referId, Long partnerId) {
     this.groupMission = groupMission;
     this.name = name;
     this.description = description;
@@ -51,5 +53,6 @@ public class UserMissionResponse {
     this.missionRequire = missionRequire;
     this.box = box;
     this.referId = referId;
+    this.partnerId = partnerId;
   }
 }

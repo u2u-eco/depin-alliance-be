@@ -32,4 +32,8 @@ public class Partner extends BaseEntity {
   public static Partner findByName(String name) {
     return find("name=?1", name).firstResult();
   }
+
+  public static void updateParticipants(long partnerId) {
+    update("update Partner p set participants = participants + 1 where id = ?1 and participants < (select count(1) from User)", partnerId);
+  }
 }
