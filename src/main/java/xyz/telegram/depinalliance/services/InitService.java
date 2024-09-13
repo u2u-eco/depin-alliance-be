@@ -7,10 +7,7 @@ import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.response.QuizResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
-import xyz.telegram.depinalliance.entities.Event;
-import xyz.telegram.depinalliance.entities.EventMission;
-import xyz.telegram.depinalliance.entities.Item;
-import xyz.telegram.depinalliance.entities.Mission;
+import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -278,36 +275,123 @@ public class InitService {
         }
       }
 
-//      List<QuizResponse> listQuizResponses = new ArrayList<>();
-//      QuizResponse quizResponse = new QuizResponse();
-//      quizResponse.index = 1;
-//      quizResponse.question = "Ai la leader team";
-//      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
-//      quizResponse.answers.add(new QuizResponse.Answer(2, "Holden", true));
-//      quizResponse.answers.add(new QuizResponse.Answer(3, "ChinhTm", false));
-//      listQuizResponses.add(quizResponse);
-//      quizResponse = new QuizResponse();
-//      quizResponse.index = 2;
-//      quizResponse.question = "Ai cao nhat team";
-//      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
-//      quizResponse.answers.add(new QuizResponse.Answer(2, "Huong", false));
-//      quizResponse.answers.add(new QuizResponse.Answer(3, "Tuan", false));
-//      quizResponse.answers.add(new QuizResponse.Answer(4, "Hung cui bap", true));
-//      listQuizResponses.add(quizResponse);
-////
-//      Mission mission = new Mission();
-//      mission.groupMission = "Quiz mission";
-//      mission.name = "Complete IQ Quiz";
-//      mission.type = Enums.MissionType.QUIZ;
-//      mission.isFake = false;
-//      mission.description = Utils.convertObjectToString(listQuizResponses);
-//      mission.orders = 1;
-//      mission.url = "";
-//      mission.point = new BigDecimal(7000);
-//      mission.xp = new BigDecimal(300);
-//      mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
-//      mission.create();
-//      mission.persist();
+      Partner partner = Partner.findByName("U2DPN");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "U2DPN";
+        partner.description = "Embrace the revolution of the decentralized Internet and monetize your unused bandwidth";
+        partner.rewards = "Up to +3000 points";
+        partner.orders = 1;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow X Account";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow X Account";
+        mission.orders = 1;
+        mission.url = "https://x.com/u2_dpn";
+        mission.point = new BigDecimal(1000);
+        mission.xp = new BigDecimal(200);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Join Telegram channel";
+        mission.orders = 2;
+        mission.url = "https://t.me/UnicornUltraGlobal/120759";
+        mission.point = new BigDecimal(1000);
+        mission.xp = new BigDecimal(200);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Download App";
+        mission.type = Enums.MissionType.DOWNLOAD_APP;
+        mission.isFake = true;
+        mission.description = "Download App";
+        mission.orders = 3;
+        mission.url = "https://u2dpn.xyz/?utm_source=DepinApp&utm_campaign=default&utm_medium=ref";
+        mission.point = new BigDecimal(1000);
+        mission.xp = new BigDecimal(200);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+
+      List<QuizResponse> listQuizResponses = new ArrayList<>();
+      QuizResponse quizResponse = new QuizResponse();
+      quizResponse.index = 1;
+      quizResponse.isMultiple = true;
+      quizResponse.question = "Ai la leader team";
+      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
+      quizResponse.answers.add(new QuizResponse.Answer(2, "Holden", true));
+      quizResponse.answers.add(new QuizResponse.Answer(3, "ChinhTm", true));
+      listQuizResponses.add(quizResponse);
+      quizResponse = new QuizResponse();
+      quizResponse.index = 2;
+      quizResponse.question = "Ai cao nhat team";
+      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
+      quizResponse.answers.add(new QuizResponse.Answer(2, "Huong", false));
+      quizResponse.answers.add(new QuizResponse.Answer(3, "Tuan", false));
+      quizResponse.answers.add(new QuizResponse.Answer(4, "Hung cui bap", true));
+      listQuizResponses.add(quizResponse);
+      //
+      Mission mission = new Mission();
+      mission.groupMission = "Quiz mission";
+      mission.name = "Complete IQ Quiz";
+      mission.type = Enums.MissionType.QUIZ;
+      mission.isFake = false;
+      mission.description = Utils.convertObjectToString(listQuizResponses);
+      mission.orders = 1;
+      mission.url = "";
+      mission.point = new BigDecimal(7000);
+      mission.xp = new BigDecimal(300);
+      mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
+      mission.create();
+      mission.persist();
 
       //      if (Event.findById(1L) == null) {
       //        Event event1 = new Event();
