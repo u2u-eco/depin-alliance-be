@@ -5,12 +5,15 @@ import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.event.Observes;
 import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
+import xyz.telegram.depinalliance.common.models.response.QuizResponse;
+import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.Event;
 import xyz.telegram.depinalliance.entities.EventMission;
 import xyz.telegram.depinalliance.entities.Item;
 import xyz.telegram.depinalliance.entities.Mission;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -275,124 +278,155 @@ public class InitService {
         }
       }
 
-//      if (Event.findById(1L) == null) {
-        //        Event event1 = new Event();
-        //        event1.name = "Event 1";
-        //        event1.code = "EVENT_1";
-        //        event1.isActive = true;
-        //        event1.create();
-        //        event1.persist();
+//      List<QuizResponse> listQuizResponses = new ArrayList<>();
+//      QuizResponse quizResponse = new QuizResponse();
+//      quizResponse.index = 1;
+//      quizResponse.question = "Ai la leader team";
+//      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
+//      quizResponse.answers.add(new QuizResponse.Answer(2, "Holden", true));
+//      quizResponse.answers.add(new QuizResponse.Answer(3, "ChinhTm", false));
+//      listQuizResponses.add(quizResponse);
+//      quizResponse = new QuizResponse();
+//      quizResponse.index = 2;
+//      quizResponse.question = "Ai cao nhat team";
+//      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
+//      quizResponse.answers.add(new QuizResponse.Answer(2, "Huong", false));
+//      quizResponse.answers.add(new QuizResponse.Answer(3, "Tuan", false));
+//      quizResponse.answers.add(new QuizResponse.Answer(4, "Hung cui bap", true));
+//      listQuizResponses.add(quizResponse);
+////
+//      Mission mission = new Mission();
+//      mission.groupMission = "Quiz mission";
+//      mission.name = "Complete IQ Quiz";
+//      mission.type = Enums.MissionType.QUIZ;
+//      mission.isFake = false;
+//      mission.description = Utils.convertObjectToString(listQuizResponses);
+//      mission.orders = 1;
+//      mission.url = "";
+//      mission.point = new BigDecimal(7000);
+//      mission.xp = new BigDecimal(300);
+//      mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
+//      mission.create();
+//      mission.persist();
 
-        //        Mission mission1 = new Mission();
-        //        mission1.groupMission = event1.name;
-        //        mission1.name = "Follow AAAAAA";
-        //        mission1.type = Enums.MissionType.TWITTER;
-        //        mission1.isFake = true;
-        //        mission1.description = "Follow AAAAAAAA";
-        //        mission1.orders = 2000;
-        //        mission1.url = "https://www.google.com";
-        //        mission1.point = new BigDecimal(0);
-        //        mission1.xp = new BigDecimal(0);
-        //        mission1.box = 1L;
-        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        //        mission1.create();
-        //        mission1.persist();
+      //      if (Event.findById(1L) == null) {
+      //        Event event1 = new Event();
+      //        event1.name = "Event 1";
+      //        event1.code = "EVENT_1";
+      //        event1.isActive = true;
+      //        event1.create();
+      //        event1.persist();
 
-        //        EventMission eventMission = new EventMission();
-        //        eventMission.event = event1;
-        //        eventMission.mission = mission1;
-        //        eventMission.item = item;
-        //        eventMission.number = 1;
-        //        eventMission.create();
-        //        eventMission.persist();
-        //
-        //        mission1 = new Mission();
-        //        mission1.groupMission = event1.name;
-        //        mission1.name = "Follow BBBBBBBBBBB";
-        //        mission1.type = Enums.MissionType.TELEGRAM;
-        //        mission1.isFake = true;
-        //        mission1.description = "Follow BBBBBBBBBBB";
-        //        mission1.orders = 1;
-        //        mission1.url = "https://www.google.com";
-        //        mission1.point = new BigDecimal(0);
-        //        mission1.xp = new BigDecimal(0);
-        //        mission1.box = 2L;
-        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        //        mission1.create();
-        //        mission1.persist();
-        //
-        //        eventMission = new EventMission();
-        //        eventMission.event = event1;
-        //        eventMission.mission = mission1;
-        //        eventMission.item = item;
-        //        eventMission.number = 2;
-        //        eventMission.create();
-        //        eventMission.persist();
-        //
-        //        mission1 = new Mission();
-        //        mission1.groupMission = event1.name;
-        //        mission1.name = "Follow CCCCCC";
-        //        mission1.type = Enums.MissionType.TELEGRAM;
-        //        mission1.isFake = true;
-        //        mission1.description = "Follow CCCCCCC";
-        //        mission1.orders = 1;
-        //        mission1.url = "https://www.google.com";
-        //        mission1.point = new BigDecimal(0);
-        //        mission1.xp = new BigDecimal(0);
-        //        mission1.box = 3L;
-        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        //        mission1.create();
-        //        mission1.persist();
-        //
-        //        eventMission = new EventMission();
-        //        eventMission.event = event1;
-        //        eventMission.mission = mission1;
-        //        eventMission.item = item;
-        //        eventMission.number = 3;
-        //        eventMission.create();
-        //        eventMission.persist();
-        //
-        //        mission1 = new Mission();
-        //        mission1.groupMission = event1.name;
-        //        mission1.name = "Follow DDDDDDDDD";
-        //        mission1.type = Enums.MissionType.TELEGRAM;
-        //        mission1.isFake = true;
-        //        mission1.description = "Follow DDDDDDDDDD";
-        //        mission1.orders = 1;
-        //        mission1.url = "https://www.google.com";
-        //        mission1.point = new BigDecimal(0);
-        //        mission1.xp = new BigDecimal(0);
-        //        mission1.box = 4L;
-        //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        //        mission1.create();
-        //        mission1.persist();
-        //
-        //        eventMission = new EventMission();
-        //        eventMission.event = event1;
-        //        eventMission.mission = mission1;
-        //        eventMission.item = item;
-        //        eventMission.number = 4;
-        //        eventMission.create();
-        //        eventMission.persist();
+      //        Mission mission1 = new Mission();
+      //        mission1.groupMission = event1.name;
+      //        mission1.name = "Follow AAAAAA";
+      //        mission1.type = Enums.MissionType.TWITTER;
+      //        mission1.isFake = true;
+      //        mission1.description = "Follow AAAAAAAA";
+      //        mission1.orders = 2000;
+      //        mission1.url = "https://www.google.com";
+      //        mission1.point = new BigDecimal(0);
+      //        mission1.xp = new BigDecimal(0);
+      //        mission1.box = 1L;
+      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+      //        mission1.create();
+      //        mission1.persist();
 
-        //        for (int i = 1; i < 100; i++) {
-        //          EventBoxPoint eventBoxPoint = new EventBoxPoint();
-        //          eventBoxPoint.create();
-        //          eventBoxPoint.event = event1;
-        //          eventBoxPoint.item = item;
-        //          eventBoxPoint.pointRequired = new BigDecimal(i);
-        //          eventBoxPoint.indexBox = i;
-        //          if (i == 1) {
-        //            eventBoxPoint.rewardTable = "1";
-        //          } else if (i > 1 && i <= 9) {
-        //            eventBoxPoint.rewardTable = "2";
-        //          } else {
-        //            eventBoxPoint.rewardTable = "3";
-        //          }
-        //          eventBoxPoint.persistAndFlush();
-        //        }
+      //        EventMission eventMission = new EventMission();
+      //        eventMission.event = event1;
+      //        eventMission.mission = mission1;
+      //        eventMission.item = item;
+      //        eventMission.number = 1;
+      //        eventMission.create();
+      //        eventMission.persist();
+      //
+      //        mission1 = new Mission();
+      //        mission1.groupMission = event1.name;
+      //        mission1.name = "Follow BBBBBBBBBBB";
+      //        mission1.type = Enums.MissionType.TELEGRAM;
+      //        mission1.isFake = true;
+      //        mission1.description = "Follow BBBBBBBBBBB";
+      //        mission1.orders = 1;
+      //        mission1.url = "https://www.google.com";
+      //        mission1.point = new BigDecimal(0);
+      //        mission1.xp = new BigDecimal(0);
+      //        mission1.box = 2L;
+      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+      //        mission1.create();
+      //        mission1.persist();
+      //
+      //        eventMission = new EventMission();
+      //        eventMission.event = event1;
+      //        eventMission.mission = mission1;
+      //        eventMission.item = item;
+      //        eventMission.number = 2;
+      //        eventMission.create();
+      //        eventMission.persist();
+      //
+      //        mission1 = new Mission();
+      //        mission1.groupMission = event1.name;
+      //        mission1.name = "Follow CCCCCC";
+      //        mission1.type = Enums.MissionType.TELEGRAM;
+      //        mission1.isFake = true;
+      //        mission1.description = "Follow CCCCCCC";
+      //        mission1.orders = 1;
+      //        mission1.url = "https://www.google.com";
+      //        mission1.point = new BigDecimal(0);
+      //        mission1.xp = new BigDecimal(0);
+      //        mission1.box = 3L;
+      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+      //        mission1.create();
+      //        mission1.persist();
+      //
+      //        eventMission = new EventMission();
+      //        eventMission.event = event1;
+      //        eventMission.mission = mission1;
+      //        eventMission.item = item;
+      //        eventMission.number = 3;
+      //        eventMission.create();
+      //        eventMission.persist();
+      //
+      //        mission1 = new Mission();
+      //        mission1.groupMission = event1.name;
+      //        mission1.name = "Follow DDDDDDDDD";
+      //        mission1.type = Enums.MissionType.TELEGRAM;
+      //        mission1.isFake = true;
+      //        mission1.description = "Follow DDDDDDDDDD";
+      //        mission1.orders = 1;
+      //        mission1.url = "https://www.google.com";
+      //        mission1.point = new BigDecimal(0);
+      //        mission1.xp = new BigDecimal(0);
+      //        mission1.box = 4L;
+      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
+      //        mission1.create();
+      //        mission1.persist();
+      //
+      //        eventMission = new EventMission();
+      //        eventMission.event = event1;
+      //        eventMission.mission = mission1;
+      //        eventMission.item = item;
+      //        eventMission.number = 4;
+      //        eventMission.create();
+      //        eventMission.persist();
 
-//      }
+      //        for (int i = 1; i < 100; i++) {
+      //          EventBoxPoint eventBoxPoint = new EventBoxPoint();
+      //          eventBoxPoint.create();
+      //          eventBoxPoint.event = event1;
+      //          eventBoxPoint.item = item;
+      //          eventBoxPoint.pointRequired = new BigDecimal(i);
+      //          eventBoxPoint.indexBox = i;
+      //          if (i == 1) {
+      //            eventBoxPoint.rewardTable = "1";
+      //          } else if (i > 1 && i <= 9) {
+      //            eventBoxPoint.rewardTable = "2";
+      //          } else {
+      //            eventBoxPoint.rewardTable = "3";
+      //          }
+      //          eventBoxPoint.persistAndFlush();
+      //        }
+
+      //      }
 
      /* Partner partner = Partner.findByName("Clayton");
       if (partner == null) {

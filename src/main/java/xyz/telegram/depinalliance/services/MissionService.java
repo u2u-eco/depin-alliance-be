@@ -9,6 +9,7 @@ import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.DailyCheckinResponse;
 import xyz.telegram.depinalliance.common.models.response.GroupMissionResponse;
+import xyz.telegram.depinalliance.common.models.response.QuizResponse;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
@@ -128,7 +129,7 @@ public class MissionService {
   }
 
   @Transactional
-  public boolean verify(User user, long missionId) throws BusinessException {
+  public boolean verify(User user, long missionId, List<QuizResponse> answerArrays) throws Exception {
     UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
     if (check == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
@@ -139,9 +140,39 @@ public class MissionService {
     if (check.isFake) {
       isChecked = true;
     } else {
-      if (check.type == Enums.MissionType.TELEGRAM) {
+      switch (check.type) {
+      case QUIZ:
+        if (answerArrays == null || answerArrays.isEmpty()) {
+          throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+        }
+        List<QuizResponse> quizArrays = Utils.mapToList(check.description, QuizResponse.class);
+        isChecked = true;
+        try {
+          quizArrays.forEach(quiz -> {
+            QuizResponse quizRequest = answerArrays.stream().filter(quizAnswer -> quizAnswer.index == quiz.index)
+              .findFirst().orElse(null);
+            if (quizRequest == null) {
+              throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+            }
+            quiz.answers.forEach(answer -> {
+              QuizResponse.Answer answerRequest = quizRequest.answers.stream()
+                .filter(quizAnswer -> quizAnswer.index == answer.index).findFirst().orElse(null);
+              assert answerRequest != null;
+              System.out.println("Cau hoi " + quiz.question + " cau tra loi " + answer.text + " dap an " + answer.isCorrect() + " user tra loi " + answerRequest.isCorrect());
+              if (answerRequest.isCorrect() != answer.isCorrect()) {
+                throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+              }
+            });
+          });
+        } catch (Exception e) {
+          return false;
+        }
+
+        break;
+      case TELEGRAM:
         isChecked = telegramService.verifyJoinChannel("@" + check.referId, user.id.toString());
-      } else if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+        break;
+      case ON_TIME_IN_APP:
         switch (check.missionRequire) {
         case CLAIM_FIRST_10000_POINT:
           if (user.pointClaimed.compareTo(new BigDecimal("10000")) >= 0) {
@@ -176,8 +207,8 @@ public class MissionService {
             }
           }
           break;
-
         }
+        break;
       }
     }
     if (isChecked) {
@@ -225,12 +256,16 @@ public class MissionService {
     return false;
   }
 
-  public List<GroupMissionResponse> getMissionReward(User user) {
+  public List<GroupMissionResponse> getMissionReward(User user) throws Exception {
     List<UserMissionResponse> userMissions = Mission.findByUserId(user.id, false);
     List<GroupMissionResponse> groupMissions = new ArrayList<>();
     for (UserMissionResponse userMission : userMissions) {
       GroupMissionResponse groupMission = groupMissions.stream()
         .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
+      if (userMission.type == Enums.MissionType.QUIZ) {
+        userMission.quizArrays = Utils.mapToList(userMission.description, QuizResponse.class);
+        userMission.description = "";
+      }
       if (groupMission == null) {
         groupMission = new GroupMissionResponse();
         groupMission.group = userMission.groupMission;

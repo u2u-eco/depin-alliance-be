@@ -1,19 +1,19 @@
 package xyz.telegram.depinalliance.common.utils;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Random;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * @author holden on 25-Jul-2024
@@ -87,5 +87,15 @@ public class Utils {
       return null;
     BigDecimal striped = (value.scale() > 0) ? value.stripTrailingZeros() : value;
     return (striped.scale() < 0) ? striped.setScale(0) : striped;
+  }
+
+  public static <T> List<T> mapToList(String entitiesJson, Class<T> entityClass) throws Exception {
+    try {
+      CollectionType listType = rawMapper.getTypeFactory().constructCollectionType(ArrayList.class, entityClass);
+      List<T> entities = rawMapper.readValue(entitiesJson, listType);
+      return entities;
+    } catch (JsonParseException e) {
+      throw e;
+    }
   }
 }

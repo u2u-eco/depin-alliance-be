@@ -6,6 +6,7 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.utils.Utils;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author holden on 28-Aug-2024
@@ -30,6 +31,8 @@ public class UserMissionResponse {
   public Long box;
   @JsonIgnore
   public String referId;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public List<QuizResponse> quizArrays;
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
     Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,

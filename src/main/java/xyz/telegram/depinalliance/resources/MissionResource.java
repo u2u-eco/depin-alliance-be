@@ -6,6 +6,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
+import xyz.telegram.depinalliance.common.models.response.QuizResponse;
 import xyz.telegram.depinalliance.common.models.response.PartnerResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
@@ -41,7 +42,7 @@ public class MissionResource extends BaseResource {
 
   @GET
   @Path("")
-  public ResponseData getAllMissions() {
+  public ResponseData getAllMissions() throws Exception {
     return ResponseData.ok(missionService.getMissionReward(getUser()));
   }
 
@@ -57,9 +58,18 @@ public class MissionResource extends BaseResource {
 
   @GET
   @Path("verify-task/{id}")
-  public ResponseData verifyTask(@PathParam("id") Long missionId) throws BusinessException {
+  public ResponseData verifyTask(@PathParam("id") Long missionId) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(missionService.verify(getUser(), missionId));
+      return ResponseData.ok(missionService.verify(getUser(), missionId, null));
+    }
+  }
+
+  @POST
+  @Path("verify-task/{id}")
+  public ResponseData verifyTaskQuiz(@PathParam("id") Long missionId, List<QuizResponse> answerRequests)
+    throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(missionService.verify(getUser(), missionId, answerRequests));
     }
   }
 
