@@ -158,7 +158,6 @@ public class MissionService {
               QuizResponse.Answer answerRequest = quizRequest.answers.stream()
                 .filter(quizAnswer -> quizAnswer.index == answer.index).findFirst().orElse(null);
               assert answerRequest != null;
-              System.out.println("Cau hoi " + quiz.question + " cau tra loi " + answer.text + " dap an " + answer.isCorrect() + " user tra loi " + answerRequest.isCorrect());
               if (answerRequest.isCorrect() != answer.isCorrect()) {
                 throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
               }
@@ -218,6 +217,9 @@ public class MissionService {
       userMission.status = Enums.MissionStatus.VERIFIED;
       UserMission.create(userMission);
       event1(user, check.id);
+      if (check.partnerId != null) {
+        Partner.updateParticipants(check.partnerId);
+      }
       return true;
     }
     return false;
