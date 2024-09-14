@@ -281,7 +281,7 @@ public class InitService {
         partner = new Partner();
         partner.name = "U2DPN";
         partner.description = "Embrace the revolution of the decentralized Internet and monetize your unused bandwidth";
-        partner.rewards = "Up to +3000 points";
+        partner.rewards = "Up to +90000 points";
         partner.orders = 1;
         partner.participants = 0;
         partner.isActive = true;
@@ -296,11 +296,12 @@ public class InitService {
         mission.description = "Follow X Account";
         mission.orders = 1;
         mission.url = "https://x.com/u2_dpn";
-        mission.point = new BigDecimal(1000);
-        mission.xp = new BigDecimal(200);
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
         mission.box = 1L;
+        mission.isActive = true;
         mission.create();
         mission.persist();
 
@@ -320,11 +321,28 @@ public class InitService {
         mission.description = "Join Telegram channel";
         mission.orders = 2;
         mission.url = "https://t.me/UnicornUltraGlobal/120759";
-        mission.point = new BigDecimal(1000);
-        mission.xp = new BigDecimal(200);
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Download App";
+        mission.type = Enums.MissionType.DOWNLOAD_APP;
+        mission.isFake = true;
+        mission.description = "Download App";
+        mission.orders = 3;
+        mission.url = "https://u2dpn.xyz/?utm_source=DepinApp&utm_campaign=default&utm_medium=ref";
+        mission.point = new BigDecimal(20000);
+        mission.xp = new BigDecimal(200);
+        mission.image = "";
+        mission.partner = partner;
         mission.box = 1L;
+        mission.isActive = true;
         mission.create();
         mission.persist();
 
@@ -336,19 +354,49 @@ public class InitService {
         eventMission.create();
         eventMission.persist();
 
-        mission = new Mission();
+        List<QuizResponse> listQuizResponses = new ArrayList<>();
+        QuizResponse quizResponse = new QuizResponse();
+        quizResponse.index = 1;
+        quizResponse.isMultiple = false;
+        quizResponse.question = "What is the primary difference between U2DPN and traditional VPNs?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "U2DPN uses a centralized server.", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "U2DPN offers fewer privacy features.", true));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "U2DPN utilizes a decentralized network of nodes.", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "U2DPN is less secure than traditional VPNs.", false));
+
+        listQuizResponses.add(quizResponse);
+        quizResponse = new QuizResponse();
+        quizResponse.index = 2;
+        quizResponse.question = "Which of the following is NOT a benefit of using U2DPN?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Enhanced privacy", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "Increased security", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Limited global access", true));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Financial incentives for node operators", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 3;
+        quizResponse.question = "How does U2DPN operate?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Through a centralized server", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "On a peer-to-peer basis", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Exclusively through government-owned nodes", true));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Using a proprietary protocol inaccessible to users", false));
+        listQuizResponses.add(quizResponse);
+
+        //
+         mission = new Mission();
         mission.groupMission = partner.name;
-        mission.name = "Download App";
-        mission.type = Enums.MissionType.DOWNLOAD_APP;
-        mission.isFake = true;
-        mission.description = "Download App";
-        mission.orders = 3;
-        mission.url = "https://u2dpn.xyz/?utm_source=DepinApp&utm_campaign=default&utm_medium=ref";
-        mission.point = new BigDecimal(1000);
-        mission.xp = new BigDecimal(200);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
+        mission.name = "Quiz IQ";
+        mission.type = Enums.MissionType.QUIZ;
+        mission.isFake = false;
+        mission.description = Utils.convertObjectToString(listQuizResponses);
+        mission.orders = 4;
+        mission.url = "";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
         mission.box = 1L;
+        mission.partner = partner;
+        mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
         mission.create();
         mission.persist();
 
@@ -361,37 +409,7 @@ public class InitService {
         eventMission.persist();
       }
 
-      List<QuizResponse> listQuizResponses = new ArrayList<>();
-      QuizResponse quizResponse = new QuizResponse();
-      quizResponse.index = 1;
-      quizResponse.isMultiple = true;
-      quizResponse.question = "Ai la leader team";
-      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
-      quizResponse.answers.add(new QuizResponse.Answer(2, "Holden", true));
-      quizResponse.answers.add(new QuizResponse.Answer(3, "ChinhTm", true));
-      listQuizResponses.add(quizResponse);
-      quizResponse = new QuizResponse();
-      quizResponse.index = 2;
-      quizResponse.question = "Ai cao nhat team";
-      quizResponse.answers.add(new QuizResponse.Answer(1, "Frankie", false));
-      quizResponse.answers.add(new QuizResponse.Answer(2, "Huong", false));
-      quizResponse.answers.add(new QuizResponse.Answer(3, "Tuan", false));
-      quizResponse.answers.add(new QuizResponse.Answer(4, "Hung cui bap", true));
-      listQuizResponses.add(quizResponse);
-      //
-      Mission mission = new Mission();
-      mission.groupMission = "Quiz mission";
-      mission.name = "Complete IQ Quiz";
-      mission.type = Enums.MissionType.QUIZ;
-      mission.isFake = false;
-      mission.description = Utils.convertObjectToString(listQuizResponses);
-      mission.orders = 1;
-      mission.url = "";
-      mission.point = new BigDecimal(7000);
-      mission.xp = new BigDecimal(300);
-      mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
-      mission.create();
-      mission.persist();
+
 
       //      if (Event.findById(1L) == null) {
       //        Event event1 = new Event();
