@@ -281,7 +281,7 @@ public class InitService {
         partner = new Partner();
         partner.name = "U2DPN";
         partner.description = "Embrace the revolution of the decentralized Internet and monetize your unused bandwidth";
-        partner.rewards = "Up to +90000 points";
+        partner.rewards = "Up to +90,000 points";
         partner.orders = 1;
         partner.participants = 0;
         partner.isActive = true;
@@ -380,11 +380,12 @@ public class InitService {
         quizResponse.answers.add(new QuizResponse.Answer(1, "Through a centralized server", false));
         quizResponse.answers.add(new QuizResponse.Answer(2, "On a peer-to-peer basis", false));
         quizResponse.answers.add(new QuizResponse.Answer(3, "Exclusively through government-owned nodes", true));
-        quizResponse.answers.add(new QuizResponse.Answer(4, "Using a proprietary protocol inaccessible to users", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(4, "Using a proprietary protocol inaccessible to users", false));
         listQuizResponses.add(quizResponse);
 
         //
-         mission = new Mission();
+        mission = new Mission();
         mission.groupMission = partner.name;
         mission.name = "Quiz IQ";
         mission.type = Enums.MissionType.QUIZ;
@@ -409,7 +410,191 @@ public class InitService {
         eventMission.persist();
       }
 
+      partner = Partner.findByName("Mizzle");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "Mizzle";
+        partner.description = "A DePIN platform empowering developers with No-Code DevOps, limitless cloud compute & storage resources, and unparalleled security through TEEs, eBPF, FHE, and ZK. \n" + "We're Quantum-Ready!";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 5;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.create();
+        partner.persist();
 
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Mizzle on Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Mizzle on Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/Mizzle_io";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Join Mizzle's Telegram group";
+        mission.orders = 5;
+        mission.url = "https://t.me/mizzleio";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "RT the following tweet";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "RT the following tweet";
+        mission.orders = 6;
+        mission.url = "https://x.com/Mizzle_io/status/1833029639930810591?t=SQzXTPEbML0OMLOX8oC55Q&s=19";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+      }
+
+      partner = Partner.findByName("Hermes Alpha Zone");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "Hermes Alpha Zone";
+        partner.description = "A go to space for all native crypto alpha, news, airdrops, potential 100x gems and educational contents on DeFi.";
+        partner.rewards = "Up to +80,000 points";
+        partner.orders = 6;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow our X account";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow our X account";
+        mission.orders = 10;
+        mission.url = "https://x.com/Vanieofweb3?t=yl2yPFIvXo5gR4ChkL1G7g&s=09";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join the Telegram Channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Join the Telegram Channel";
+        mission.orders = 5;
+        mission.url = "https://t.me/Gemjungle";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join the Telegram Channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Join the Telegram Channel";
+        mission.orders = 6;
+        mission.url = "https://t.me/HermesCryptohub";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow our medium page";
+        mission.type = Enums.MissionType.DOWNLOAD_APP;
+        mission.isFake = true;
+        mission.description = "Follow our medium page";
+        mission.orders = 6;
+        mission.url = "https://medium.com/@Hermesalpha";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+      }
 
       //      if (Event.findById(1L) == null) {
       //        Event event1 = new Event();
