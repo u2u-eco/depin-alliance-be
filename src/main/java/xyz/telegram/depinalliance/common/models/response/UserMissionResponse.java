@@ -54,5 +54,14 @@ public class UserMissionResponse {
     this.box = box;
     this.referId = referId;
     this.partnerId = partnerId;
+
+    if (type == Enums.MissionType.QUIZ) {
+      try {
+        this.quizArrays = Utils.mapToList(description, QuizResponse.class);
+      } catch (Exception e) {
+
+      }
+      this.description = "";
+    }
   }
 }

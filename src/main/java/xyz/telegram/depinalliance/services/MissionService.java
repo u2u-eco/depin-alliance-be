@@ -145,10 +145,10 @@ public class MissionService {
         if (answerArrays == null || answerArrays.isEmpty()) {
           throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
         }
-        List<QuizResponse> quizArrays = Utils.mapToList(check.description, QuizResponse.class);
+//        List<QuizResponse> quizArrays = Utils.mapToList(check.description, QuizResponse.class);
         isChecked = true;
         try {
-          quizArrays.forEach(quiz -> {
+          check.quizArrays.forEach(quiz -> {
             QuizResponse quizRequest = answerArrays.stream().filter(quizAnswer -> quizAnswer.index == quiz.index)
               .findFirst().orElse(null);
             if (quizRequest == null) {
@@ -166,7 +166,6 @@ public class MissionService {
         } catch (Exception e) {
           return false;
         }
-
         break;
       case TELEGRAM:
         isChecked = telegramService.verifyJoinChannel("@" + check.referId, user.id.toString());
@@ -264,10 +263,6 @@ public class MissionService {
     for (UserMissionResponse userMission : userMissions) {
       GroupMissionResponse groupMission = groupMissions.stream()
         .filter(item -> item.group.equalsIgnoreCase(userMission.groupMission)).findFirst().orElse(null);
-      if (userMission.type == Enums.MissionType.QUIZ) {
-        userMission.quizArrays = Utils.mapToList(userMission.description, QuizResponse.class);
-        userMission.description = "";
-      }
       if (groupMission == null) {
         groupMission = new GroupMissionResponse();
         groupMission.group = userMission.groupMission;
