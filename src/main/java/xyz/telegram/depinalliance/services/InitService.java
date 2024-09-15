@@ -285,6 +285,7 @@ public class InitService {
         partner.orders = 1;
         partner.participants = 0;
         partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/u2dpn.jpg";
         partner.create();
         partner.persist();
 
@@ -317,7 +318,7 @@ public class InitService {
         mission.groupMission = partner.name;
         mission.name = "Join Telegram channel";
         mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
+        mission.isFake = false;
         mission.description = "Join Telegram channel";
         mission.orders = 2;
         mission.url = "https://t.me/UnicornUltraGlobal/120759";
@@ -359,10 +360,10 @@ public class InitService {
         quizResponse.index = 1;
         quizResponse.isMultiple = false;
         quizResponse.question = "What is the primary difference between U2DPN and traditional VPNs?";
-        quizResponse.answers.add(new QuizResponse.Answer(1, "U2DPN uses a centralized server.", false));
-        quizResponse.answers.add(new QuizResponse.Answer(2, "U2DPN offers fewer privacy features.", true));
-        quizResponse.answers.add(new QuizResponse.Answer(3, "U2DPN utilizes a decentralized network of nodes.", false));
-        quizResponse.answers.add(new QuizResponse.Answer(4, "U2DPN is less secure than traditional VPNs.", false));
+        quizResponse.answers.add(new QuizResponse.Answer(1, "U2DPN uses a centralized server", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "U2DPN offers fewer privacy features", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "U2DPN utilizes a decentralized network of nodes", true));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "U2DPN is less secure than traditional VPNs", false));
 
         listQuizResponses.add(quizResponse);
         quizResponse = new QuizResponse();
@@ -378,8 +379,8 @@ public class InitService {
         quizResponse.index = 3;
         quizResponse.question = "How does U2DPN operate?";
         quizResponse.answers.add(new QuizResponse.Answer(1, "Through a centralized server", false));
-        quizResponse.answers.add(new QuizResponse.Answer(2, "On a peer-to-peer basis", false));
-        quizResponse.answers.add(new QuizResponse.Answer(3, "Exclusively through government-owned nodes", true));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "On a peer-to-peer basis", true));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Exclusively through government-owned nodes", false));
         quizResponse.answers.add(
           new QuizResponse.Answer(4, "Using a proprietary protocol inaccessible to users", false));
         listQuizResponses.add(quizResponse);
@@ -417,9 +418,10 @@ public class InitService {
         partner.name = "Mizzle";
         partner.description = "A DePIN platform empowering developers with No-Code DevOps, limitless cloud compute & storage resources, and unparalleled security through TEEs, eBPF, FHE, and ZK. \n" + "We're Quantum-Ready!";
         partner.rewards = "Up to +50,000 points";
-        partner.orders = 5;
+        partner.orders = 2;
         partner.participants = 0;
         partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/mizzle.jpg";
         partner.create();
         partner.persist();
 
@@ -450,12 +452,13 @@ public class InitService {
 
         mission = new Mission();
         mission.groupMission = partner.name;
-        mission.name = "Join Telegram channel";
+        mission.name = "Join Mizzle's Telegram group";
         mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
+        mission.isFake = false;
         mission.description = "Join Mizzle's Telegram group";
-        mission.orders = 5;
+        mission.orders = 2;
         mission.url = "https://t.me/mizzleio";
+        mission.referId = "mizzleio";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -479,8 +482,198 @@ public class InitService {
         mission.type = Enums.MissionType.TWITTER;
         mission.isFake = true;
         mission.description = "RT the following tweet";
-        mission.orders = 6;
+        mission.orders = 3;
         mission.url = "https://x.com/Mizzle_io/status/1833029639930810591?t=SQzXTPEbML0OMLOX8oC55Q&s=19";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+      }
+
+      partner = Partner.findByName("Pindora");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "Pindora";
+        partner.description = "We're building a DePIN Aggregator Platform";
+        partner.rewards = "Up to +60,000 points";
+        partner.orders = 3;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/pindora.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join the Telegram announcement channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join the Telegram announcement channel";
+        mission.orders = 1;
+        mission.url = "https://t.me/depindora";
+        mission.referId = "depindora";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Twitter";
+        mission.orders = 2;
+        mission.url = "https://x.com/depindora";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Visit the website";
+        mission.type = Enums.MissionType.DOWNLOAD_APP;
+        mission.isFake = true;
+        mission.description = "Visit the website";
+        mission.orders = 3;
+        mission.url = "https://www.pindora.io";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Sign up for the waitlist";
+        mission.type = Enums.MissionType.DOWNLOAD_APP;
+        mission.isFake = true;
+        mission.description = "Sign up for the waitlist";
+        mission.orders = 4;
+        mission.url = "https://forms.gle/aouZNAnAVWsEy3UP9";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+
+      partner = Partner.findByName("ZkAGI");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "ZkAGI";
+        partner.description = "ZkAGI is the first privacy AI DePIN, integrating advanced technologies like artificial intelligence (AI) and blockchain";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 4;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/zkagi.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow ZkAGI on Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow ZkAGI on Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/zk_agi";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.box = 1L;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join ZkAGI's Telegram group";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join ZkAGI's Telegram group";
+        mission.orders = 2;
+        mission.referId = "ZkAGI_AI";
+        mission.url = "https://t.me/ZkAGI_AI";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Retweet";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Retweet";
+        mission.orders = 3;
+        mission.url = "https://x.com/zk_agi/status/1834909536420847633?s=46";
         mission.point = new BigDecimal(10000);
         mission.xp = new BigDecimal(100);
         mission.image = "";
@@ -496,11 +689,12 @@ public class InitService {
         Item item = Item.findByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "Hermes Alpha Zone";
-        partner.description = "A go to space for all native crypto alpha, news, airdrops, potential 100x gems and educational contents on DeFi.";
+        partner.description = "A go to space for all native crypto alpha, news, airdrops, potential 100x gems and educational contents on DeFi";
         partner.rewards = "Up to +80,000 points";
-        partner.orders = 6;
+        partner.orders = 5;
         partner.participants = 0;
         partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/hermes-alpha-zone.jpg";
         partner.create();
         partner.persist();
 
@@ -510,7 +704,7 @@ public class InitService {
         mission.type = Enums.MissionType.TWITTER;
         mission.isFake = true;
         mission.description = "Follow our X account";
-        mission.orders = 10;
+        mission.orders = 1;
         mission.url = "https://x.com/Vanieofweb3?t=yl2yPFIvXo5gR4ChkL1G7g&s=09";
         mission.point = new BigDecimal(10000);
         mission.xp = new BigDecimal(100);
@@ -533,9 +727,10 @@ public class InitService {
         mission.groupMission = partner.name;
         mission.name = "Join the Telegram Channel";
         mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
+        mission.isFake = false;
         mission.description = "Join the Telegram Channel";
-        mission.orders = 5;
+        mission.orders = 2;
+        mission.referId = "Gemjungle";
         mission.url = "https://t.me/Gemjungle";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -558,16 +753,17 @@ public class InitService {
         mission.groupMission = partner.name;
         mission.name = "Join the Telegram Channel";
         mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
+        mission.isFake = false;
         mission.description = "Join the Telegram Channel";
-        mission.orders = 6;
+        mission.orders = 3;
+        mission.referId = "HermesCryptohub";
         mission.url = "https://t.me/HermesCryptohub";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
-        mission.box = 1L;
         mission.isActive = true;
+        mission.box = 1L;
         mission.create();
         mission.persist();
 
@@ -585,16 +781,122 @@ public class InitService {
         mission.type = Enums.MissionType.DOWNLOAD_APP;
         mission.isFake = true;
         mission.description = "Follow our medium page";
-        mission.orders = 6;
+        mission.orders = 4;
         mission.url = "https://medium.com/@Hermesalpha";
         mission.point = new BigDecimal(10000);
         mission.xp = new BigDecimal(100);
+        mission.image = "";
         mission.partner = partner;
         mission.isActive = true;
         mission.create();
         mission.persist();
 
       }
+
+      //      partner = Partner.findByName("Hermes Alpha Zone");
+      //      if (partner == null) {
+      //        Item item = Item.findByCode("CYBER_BOX");
+      //        partner = new Partner();
+      //        partner.name = "Hermes Alpha Zone";
+      //        partner.description = "A go to space for all native crypto alpha, news, airdrops, potential 100x gems and educational contents on DeFi.";
+      //        partner.rewards = "Up to +80,000 points";
+      //        partner.orders = 6;
+      //        partner.participants = 0;
+      //        partner.isActive = true;
+      //        partner.create();
+      //        partner.persist();
+      //
+      //        Mission mission = new Mission();
+      //        mission.groupMission = partner.name;
+      //        mission.name = "Follow our X account";
+      //        mission.type = Enums.MissionType.TWITTER;
+      //        mission.isFake = true;
+      //        mission.description = "Follow our X account";
+      //        mission.orders = 4;
+      //        mission.url = "https://x.com/Vanieofweb3?t=yl2yPFIvXo5gR4ChkL1G7g&s=09";
+      //        mission.point = new BigDecimal(10000);
+      //        mission.xp = new BigDecimal(100);
+      //        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+      //        mission.partner = partner;
+      //        mission.box = 1L;
+      //        mission.isActive = true;
+      //        mission.create();
+      //        mission.persist();
+      //
+      //        EventMission eventMission = new EventMission();
+      //        eventMission.event = new Event(1L);
+      //        eventMission.mission = mission;
+      //        eventMission.item = item;
+      //        eventMission.number = 1;
+      //        eventMission.create();
+      //        eventMission.persist();
+      //
+      //        mission = new Mission();
+      //        mission.groupMission = partner.name;
+      //        mission.name = "Join the Telegram Channel";
+      //        mission.type = Enums.MissionType.TELEGRAM;
+      //        mission.isFake = true;
+      //        mission.description = "Join the Telegram Channel";
+      //        mission.orders = 5;
+      //        mission.url = "https://t.me/Gemjungle";
+      //        mission.point = new BigDecimal(30000);
+      //        mission.xp = new BigDecimal(500);
+      //        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+      //        mission.partner = partner;
+      //        mission.isActive = true;
+      //        mission.box = 1L;
+      //        mission.create();
+      //        mission.persist();
+      //
+      //        eventMission = new EventMission();
+      //        eventMission.event = new Event(1L);
+      //        eventMission.mission = mission;
+      //        eventMission.item = item;
+      //        eventMission.number = 1;
+      //        eventMission.create();
+      //        eventMission.persist();
+      //
+      //        mission = new Mission();
+      //        mission.groupMission = partner.name;
+      //        mission.name = "Join the Telegram Channel";
+      //        mission.type = Enums.MissionType.TELEGRAM;
+      //        mission.isFake = true;
+      //        mission.description = "Join the Telegram Channel";
+      //        mission.orders = 6;
+      //        mission.url = "https://t.me/HermesCryptohub";
+      //        mission.point = new BigDecimal(30000);
+      //        mission.xp = new BigDecimal(500);
+      //        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+      //        mission.partner = partner;
+      //        mission.box = 1L;
+      //        mission.isActive = true;
+      //        mission.create();
+      //        mission.persist();
+      //
+      //        eventMission = new EventMission();
+      //        eventMission.event = new Event(1L);
+      //        eventMission.mission = mission;
+      //        eventMission.item = item;
+      //        eventMission.number = 1;
+      //        eventMission.create();
+      //        eventMission.persist();
+      //
+      //        mission = new Mission();
+      //        mission.groupMission = partner.name;
+      //        mission.name = "Follow our medium page";
+      //        mission.type = Enums.MissionType.DOWNLOAD_APP;
+      //        mission.isFake = true;
+      //        mission.description = "Follow our medium page";
+      //        mission.orders = 7;
+      //        mission.url = "https://medium.com/@Hermesalpha";
+      //        mission.point = new BigDecimal(10000);
+      //        mission.xp = new BigDecimal(100);
+      //        mission.partner = partner;
+      //        mission.isActive = true;
+      //        mission.create();
+      //        mission.persist();
+      //
+      //      }
 
       //      if (Event.findById(1L) == null) {
       //        Event event1 = new Event();
