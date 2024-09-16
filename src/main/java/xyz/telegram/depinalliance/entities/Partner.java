@@ -17,6 +17,7 @@ public class Partner extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "partnerSequence")
   public Long id;
   public String name;
+  @Column(columnDefinition = "text")
   public String description;
   public long participants;
   public String image;
