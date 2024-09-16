@@ -790,559 +790,98 @@ public class InitService {
         mission.isActive = true;
         mission.create();
         mission.persist();
-
       }
 
-      //      partner = Partner.findByName("Hermes Alpha Zone");
-      //      if (partner == null) {
-      //        Item item = Item.findByCode("CYBER_BOX");
-      //        partner = new Partner();
-      //        partner.name = "Hermes Alpha Zone";
-      //        partner.description = "A go to space for all native crypto alpha, news, airdrops, potential 100x gems and educational contents on DeFi.";
-      //        partner.rewards = "Up to +80,000 points";
-      //        partner.orders = 6;
-      //        partner.participants = 0;
-      //        partner.isActive = true;
-      //        partner.create();
-      //        partner.persist();
-      //
-      //        Mission mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Follow our X account";
-      //        mission.type = Enums.MissionType.TWITTER;
-      //        mission.isFake = true;
-      //        mission.description = "Follow our X account";
-      //        mission.orders = 4;
-      //        mission.url = "https://x.com/Vanieofweb3?t=yl2yPFIvXo5gR4ChkL1G7g&s=09";
-      //        mission.point = new BigDecimal(10000);
-      //        mission.xp = new BigDecimal(100);
-      //        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.box = 1L;
-      //        mission.isActive = true;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        EventMission eventMission = new EventMission();
-      //        eventMission.event = new Event(1L);
-      //        eventMission.mission = mission;
-      //        eventMission.item = item;
-      //        eventMission.number = 1;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Join the Telegram Channel";
-      //        mission.type = Enums.MissionType.TELEGRAM;
-      //        mission.isFake = true;
-      //        mission.description = "Join the Telegram Channel";
-      //        mission.orders = 5;
-      //        mission.url = "https://t.me/Gemjungle";
-      //        mission.point = new BigDecimal(30000);
-      //        mission.xp = new BigDecimal(500);
-      //        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.isActive = true;
-      //        mission.box = 1L;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        eventMission = new EventMission();
-      //        eventMission.event = new Event(1L);
-      //        eventMission.mission = mission;
-      //        eventMission.item = item;
-      //        eventMission.number = 1;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Join the Telegram Channel";
-      //        mission.type = Enums.MissionType.TELEGRAM;
-      //        mission.isFake = true;
-      //        mission.description = "Join the Telegram Channel";
-      //        mission.orders = 6;
-      //        mission.url = "https://t.me/HermesCryptohub";
-      //        mission.point = new BigDecimal(30000);
-      //        mission.xp = new BigDecimal(500);
-      //        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.box = 1L;
-      //        mission.isActive = true;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        eventMission = new EventMission();
-      //        eventMission.event = new Event(1L);
-      //        eventMission.mission = mission;
-      //        eventMission.item = item;
-      //        eventMission.number = 1;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Follow our medium page";
-      //        mission.type = Enums.MissionType.DOWNLOAD_APP;
-      //        mission.isFake = true;
-      //        mission.description = "Follow our medium page";
-      //        mission.orders = 7;
-      //        mission.url = "https://medium.com/@Hermesalpha";
-      //        mission.point = new BigDecimal(10000);
-      //        mission.xp = new BigDecimal(100);
-      //        mission.partner = partner;
-      //        mission.isActive = true;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //      }
-
-      //      if (Event.findById(1L) == null) {
-      //        Event event1 = new Event();
-      //        event1.name = "Event 1";
-      //        event1.code = "EVENT_1";
-      //        event1.isActive = true;
-      //        event1.create();
-      //        event1.persist();
-
-      //        Mission mission1 = new Mission();
-      //        mission1.groupMission = event1.name;
-      //        mission1.name = "Follow AAAAAA";
-      //        mission1.type = Enums.MissionType.TWITTER;
-      //        mission1.isFake = true;
-      //        mission1.description = "Follow AAAAAAAA";
-      //        mission1.orders = 2000;
-      //        mission1.url = "https://www.google.com";
-      //        mission1.point = new BigDecimal(0);
-      //        mission1.xp = new BigDecimal(0);
-      //        mission1.box = 1L;
-      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-      //        mission1.create();
-      //        mission1.persist();
-
-      //        EventMission eventMission = new EventMission();
-      //        eventMission.event = event1;
-      //        eventMission.mission = mission1;
-      //        eventMission.item = item;
-      //        eventMission.number = 1;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission1 = new Mission();
-      //        mission1.groupMission = event1.name;
-      //        mission1.name = "Follow BBBBBBBBBBB";
-      //        mission1.type = Enums.MissionType.TELEGRAM;
-      //        mission1.isFake = true;
-      //        mission1.description = "Follow BBBBBBBBBBB";
-      //        mission1.orders = 1;
-      //        mission1.url = "https://www.google.com";
-      //        mission1.point = new BigDecimal(0);
-      //        mission1.xp = new BigDecimal(0);
-      //        mission1.box = 2L;
-      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-      //        mission1.create();
-      //        mission1.persist();
-      //
-      //        eventMission = new EventMission();
-      //        eventMission.event = event1;
-      //        eventMission.mission = mission1;
-      //        eventMission.item = item;
-      //        eventMission.number = 2;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission1 = new Mission();
-      //        mission1.groupMission = event1.name;
-      //        mission1.name = "Follow CCCCCC";
-      //        mission1.type = Enums.MissionType.TELEGRAM;
-      //        mission1.isFake = true;
-      //        mission1.description = "Follow CCCCCCC";
-      //        mission1.orders = 1;
-      //        mission1.url = "https://www.google.com";
-      //        mission1.point = new BigDecimal(0);
-      //        mission1.xp = new BigDecimal(0);
-      //        mission1.box = 3L;
-      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-      //        mission1.create();
-      //        mission1.persist();
-      //
-      //        eventMission = new EventMission();
-      //        eventMission.event = event1;
-      //        eventMission.mission = mission1;
-      //        eventMission.item = item;
-      //        eventMission.number = 3;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission1 = new Mission();
-      //        mission1.groupMission = event1.name;
-      //        mission1.name = "Follow DDDDDDDDD";
-      //        mission1.type = Enums.MissionType.TELEGRAM;
-      //        mission1.isFake = true;
-      //        mission1.description = "Follow DDDDDDDDDD";
-      //        mission1.orders = 1;
-      //        mission1.url = "https://www.google.com";
-      //        mission1.point = new BigDecimal(0);
-      //        mission1.xp = new BigDecimal(0);
-      //        mission1.box = 4L;
-      //        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-      //        mission1.create();
-      //        mission1.persist();
-      //
-      //        eventMission = new EventMission();
-      //        eventMission.event = event1;
-      //        eventMission.mission = mission1;
-      //        eventMission.item = item;
-      //        eventMission.number = 4;
-      //        eventMission.create();
-      //        eventMission.persist();
-
-      //        for (int i = 1; i < 100; i++) {
-      //          EventBoxPoint eventBoxPoint = new EventBoxPoint();
-      //          eventBoxPoint.create();
-      //          eventBoxPoint.event = event1;
-      //          eventBoxPoint.item = item;
-      //          eventBoxPoint.pointRequired = new BigDecimal(i);
-      //          eventBoxPoint.indexBox = i;
-      //          if (i == 1) {
-      //            eventBoxPoint.rewardTable = "1";
-      //          } else if (i > 1 && i <= 9) {
-      //            eventBoxPoint.rewardTable = "2";
-      //          } else {
-      //            eventBoxPoint.rewardTable = "3";
-      //          }
-      //          eventBoxPoint.persistAndFlush();
-      //        }
-
-      //      }
-
-     /* Partner partner = Partner.findByName("Clayton");
+      partner = Partner.findByName("MiniTon");
       if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
         partner = new Partner();
-        partner.name = "Clayton";
-        partner.description = "This is clayton";
-        partner.rewards = "Up to +3000 points";
-        partner.orders = 1;
+        partner.name = "MiniTon";
+        partner.description = "MiniTon is a crypto social esports platform backed by the TON Foundation.\n" + "\n" + "Highlights:\n" + "1\uFE0F⃣ An innovative open platform: Combining the strengths of Crypto, Online Competitive, and Telegram.\n" + "2\uFE0F⃣ A game-changer: Revolutionizing the $30Bn web2 competitive gaming industry.\n" + "3\uFE0F⃣ Experienced team: Creators of a globally top-ranked cloud gaming platform and promoters of 40+ Web3 projects over the past five years";
+        partner.rewards = "Up to +80,000 points";
+        partner.orders = 6;
         partner.participants = 0;
         partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/mini-ton.png";
         partner.create();
         partner.persist();
 
         Mission mission = new Mission();
         mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 1;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(1000);
-        mission.xp = new BigDecimal(1000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our Telegram channel";
+        mission.name = "Join the Telegram Channel";
         mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
-        mission.description = "Follow Our Telegram channel";
-        mission.orders = 2;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(2000);
-        mission.xp = new BigDecimal(2000);
+        mission.isFake = false;
+        mission.description = "Join the Telegram Channel";
+        mission.orders = 1;
+        mission.referId = "MiniTon_Official";
+        mission.url = " https://t.me/MiniTon_Official";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
         mission.create();
         mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 3;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(3000);
-        mission.xp = new BigDecimal(3000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-      }
-
-      partner = Partner.findByName("Wizzwoods");
-      if (partner == null) {
-        partner = new Partner();
-        partner.name = "Wizzwoods";
-        partner.description = "This is Wizzwoods";
-        partner.rewards = "Up to +3000 points";
-        partner.orders = 1;
-        partner.participants = 0;
-        partner.isActive = true;
-        partner.create();
-        partner.persist();
-
-        Mission mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 1;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(1000);
-        mission.xp = new BigDecimal(1000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our Telegram channel";
-        mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
-        mission.description = "Follow Our Telegram channel";
-        mission.orders = 2;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(2000);
-        mission.xp = new BigDecimal(2000);
-        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 3;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(3000);
-        mission.xp = new BigDecimal(3000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-      }
-
-      partner = Partner.findByName("Simple Coin");
-      if (partner == null) {
-        partner = new Partner();
-        partner.name = "Simple Coin";
-        partner.description = "This is Simple Coin";
-        partner.rewards = "Up to +3000 points";
-        partner.orders = 1;
-        partner.participants = 0;
-        partner.isActive = true;
-        partner.create();
-        partner.persist();
-
-        Mission mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 1;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(1000);
-        mission.xp = new BigDecimal(1000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our Telegram channel";
-        mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
-        mission.description = "Follow Our Telegram channel";
-        mission.orders = 2;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(2000);
-        mission.xp = new BigDecimal(2000);
-        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 3;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(3000);
-        mission.xp = new BigDecimal(3000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-      }
-
-      partner = Partner.findByName("OkX wallets");
-      if (partner == null) {
-        partner = new Partner();
-        partner.name = "OkX wallets";
-        partner.description = "This is OkX wallets";
-        partner.rewards = "Up to +3000 points";
-        partner.orders = 1;
-        partner.participants = 0;
-        partner.isActive = true;
-        partner.create();
-        partner.persist();
-
-        Mission mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 1;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(1000);
-        mission.xp = new BigDecimal(1000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our Telegram channel";
-        mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
-        mission.description = "Follow Our Telegram channel";
-        mission.orders = 2;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(2000);
-        mission.xp = new BigDecimal(2000);
-        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Follow Our X Account";
-        mission.type = Enums.MissionType.TWITTER;
-        mission.isFake = true;
-        mission.description = "Follow Our X Account";
-        mission.orders = 3;
-        mission.url = "https://www.google.com";
-        mission.point = new BigDecimal(3000);
-        mission.xp = new BigDecimal(3000);
-        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission.partner = partner;
-        mission.create();
-        mission.persist();
-      }
-
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/staging
-
-
-
-<<<<<<< HEAD
-        Partner partnerEvent = new Partner();
-        partnerEvent.name = "Wizzwoods";
-        partnerEvent.description = "This is Wizzwoods";
-        partnerEvent.rewards = "Up to +3000 points";
-        partnerEvent.orders = 1;
-        partnerEvent.participants = 0;
-        partnerEvent.isActive = true;
-        partnerEvent.create();
-        partnerEvent.persist();
-
-        Mission mission1 = new Mission();
-        mission1.groupMission = partnerEvent.name;
-        mission1.name = "Follow AAAAAA";
-        mission1.type = Enums.MissionType.TWITTER;
-        mission1.isFake = true;
-        mission1.description = "Follow AAAAAAAA";
-        mission1.orders = 1;
-        mission1.url = "https://www.google.com";
-        mission1.point = new BigDecimal(1000);
-        mission1.xp = new BigDecimal(1000);
-        mission1.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission1.partner = partnerEvent;
-        mission1.create();
-        mission1.persist();
-
-        Mission mission2 = new Mission();
-        mission2.groupMission = partnerEvent.name;
-        mission2.name = "Follow BBBBBBBB";
-        mission2.type = Enums.MissionType.TELEGRAM;
-        mission2.isFake = true;
-        mission2.description = "Follow BBBBBB";
-        mission2.orders = 3;
-        mission2.url = "https://www.google.com";
-        mission2.point = new BigDecimal(3000);
-        mission2.xp = new BigDecimal(3000);
-        mission2.image = "/assets/images/icons/icon-x-gradient.svg";
-        mission2.partner = partnerEvent;
-        mission2.create();
-        mission2.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission1;
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
+        eventMission.create();
         eventMission.persist();
 
-        eventMission = new EventMission();
-        eventMission.event = event1;
-        eventMission.mission = mission2;
-        eventMission.item = item;
-        eventMission.number = 2;
-        eventMission.persist();
-      }
-=======
->>>>>>> origin/staging
-      *//*if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_35) == null) {
-        Mission mission = new Mission();
-        mission.groupMission = "Product";
-        mission.name = "Achieve Level 35";
-        mission.type = Enums.MissionType.ON_TIME_IN_APP;
-        mission.isFake = false;
-        mission.description = "Achieve Level 35";
-        mission.orders = 1006;
-        mission.missionRequire = Enums.MissionRequire.LEVEL_35;
-        mission.point = new BigDecimal(2000000);
-        mission.xp = new BigDecimal(500);
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Twitter";
+        mission.orders = 2;
+        mission.url = "https://x.com/RealMiniTon";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
         mission.create();
         mission.persist();
-      }
 
-      if (Mission.findByMissionRequire(Enums.MissionRequire.LEVEL_50) == null) {
-        Mission mission = new Mission();
-        mission.groupMission = "Product";
-        mission.name = "Achieve Level 50";
-        mission.type = Enums.MissionType.ON_TIME_IN_APP;
-        mission.isFake = false;
-        mission.description = "Achieve Level 50";
-        mission.orders = 1007;
-        mission.missionRequire = Enums.MissionRequire.LEVEL_50;
-        mission.point = new BigDecimal(5000000);
-        mission.xp = new BigDecimal(500);
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Visit the website";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = "Visit the website";
+        mission.orders = 3;
+        mission.url = "https://miniton.mvp.games/";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "";
+        mission.partner = partner;
+        mission.isActive = true;
         mission.create();
         mission.persist();
-      }*//**/
 
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Play game to get 5000 FREE USDT CHIPS";
+        mission.type = Enums.MissionType.PLAY_MINI_TON;
+        mission.isFake = false;
+        mission.description = "Play game to get 5000 FREE USDT CHIPS";
+        mission.orders = 4;
+        mission.url = " https://t.me/MiniTonBot/MiniTonGame?startapp=from_U2U";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+      }
     }
   }
 }
