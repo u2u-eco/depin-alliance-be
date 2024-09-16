@@ -797,11 +797,11 @@ public class InitService {
         Item item = Item.findByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "MiniTon";
-        partner.description = "MiniTon is a crypto social esports platform backed by the TON Foundation.\n" + "\n" + "Highlights:\n" + "1\uFE0F⃣ An innovative open platform: Combining the strengths of Crypto, Online Competitive, and Telegram.\n" + "2\uFE0F⃣ A game-changer: Revolutionizing the $30Bn web2 competitive gaming industry.\n" + "3\uFE0F⃣ Experienced team: Creators of a globally top-ranked cloud gaming platform and promoters of 40+ Web3 projects over the past five years";
+        partner.description = "MiniTon is a crypto social esports platform backed by the TON Foundation.";
         partner.rewards = "Up to +80,000 points";
         partner.orders = 6;
         partner.participants = 0;
-        partner.isActive = true;
+        partner.isActive = false;
         partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/mini-ton.png";
         partner.create();
         partner.persist();
@@ -819,7 +819,7 @@ public class InitService {
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
-        mission.isActive = true;
+        mission.isActive = false;
         mission.box = 1L;
         mission.create();
         mission.persist();
@@ -844,10 +844,9 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
-        mission.isActive = true;
+        mission.isActive = false;
         mission.create();
         mission.persist();
-
 
         mission = new Mission();
         mission.groupMission = partner.name;
@@ -861,7 +860,7 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "";
         mission.partner = partner;
-        mission.isActive = true;
+        mission.isActive = false;
         mission.create();
         mission.persist();
 
@@ -875,6 +874,154 @@ public class InitService {
         mission.url = " https://t.me/MiniTonBot/MiniTonGame?startapp=from_U2U";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = false;
+        mission.create();
+        mission.persist();
+
+      }
+
+      partner = Partner.findByName("Dextr");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "Dextr";
+        partner.description = "The world’s first Actively Validated Market Maker (AVMM) featuring built-in MEV Insurance";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 6;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/dextr.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Dextr on Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Dextr on Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/Dextr_Exchange";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Dextr's Telegram group";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join Dextr's Telegram group";
+        mission.orders = 2;
+        mission.referId = "DextrExchange";
+        mission.url = "https://t.me/DextrExchange";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "RT a tweet";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Retweet";
+        mission.orders = 3;
+        mission.url = "https://x.com/madhurprabhakar/status/1835228950441742528)";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+      }
+
+      partner = Partner.findByName("aZen Protocol");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "aZen Protocol";
+        partner.description = "Empowers DePIN for Universal Computing Tasks.";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 7;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/azen.png";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow aZen Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow aZen Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/azen_protocol";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join aZen Community";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join aZen Community";
+        mission.orders = 2;
+        mission.referId = "azenprotocol";
+        mission.url = "https://t.me/azenprotocol";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Start aZen bot";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Start aZen bot";
+        mission.orders = 3;
+        mission.url = "https://t.me/aZennetwork1_bot/aZEn?startapp=BIAM89";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
