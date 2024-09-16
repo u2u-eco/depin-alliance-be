@@ -27,13 +27,13 @@ public class SystemConfig extends PanacheEntityBase {
   public SystemConfig() {
   }
 
-  public static String findByKey(Enums.Config config) {
-    SystemConfig systemConfig = findById(config.getType());
-    return systemConfig != null ? systemConfig.value : null;
-  }
-
-  public static String findByKey(Enums.Config config, String defaultValue) {
-    String value = findByKey(config);
-    return StringUtils.isNotBlank(value) ? value : defaultValue;
-  }
+//  public static String findByKey(Enums.Config config) {
+//    SystemConfig systemConfig = findById(config.getType());
+//    return systemConfig != null ? systemConfig.value : null;
+//  }
+//
+//  public static String findByKey(Enums.Config config, String defaultValue) {
+//    String value = findByKey(config);
+//    return StringUtils.isNotBlank(value) ? value : defaultValue;
+//  }
 }

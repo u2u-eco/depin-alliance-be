@@ -278,7 +278,7 @@ public class DeviceService {
     if (numberDeviceUser >= maxDevice) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    BigDecimal pointBuy = new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_BUY_DEVICE)));
+    BigDecimal pointBuy = new BigDecimal(Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.POINT_BUY_DEVICE)));
     if (pointBuy.compareTo(BigDecimal.ZERO) > 0) {
       if (user.point.compareTo(pointBuy) < 0) {
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
