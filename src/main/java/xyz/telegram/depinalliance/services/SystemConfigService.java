@@ -37,13 +37,13 @@ public class SystemConfigService {
 //        logger.info("Get from cache " + config.name());
         return value.get();
       }
-//      logger.info("Get from db and set cache " + config.name());
+      logger.info("Get from db and set cache " + config.name());
       SystemConfig systemConfig = SystemConfig.findById(config.getType());
       String valueStr = systemConfig != null ? systemConfig.value : null;
       value.setAsync(valueStr, timeOut, TimeUnit.SECONDS);
       return valueStr;
     } catch (Exception e) {
-      logger.errorv(e, "Error while finding system config");
+      logger.errorv(e, "Error while finding system config " + config.name());
     }
     SystemConfig systemConfig = SystemConfig.findById(config.getType());
     String valueStr = systemConfig != null ? systemConfig.value : null;
