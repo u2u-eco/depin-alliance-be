@@ -34,10 +34,10 @@ public class SystemConfigService {
     try {
       RBucket<String> value = redissonClient.getBucket(config.name());
       if (value.isExists()) {
-        logger.info("Get from cache " + config.name());
+//        logger.info("Get from cache " + config.name());
         return value.get();
       }
-      logger.info("Get from db and set cache " + config.name());
+//      logger.info("Get from db and set cache " + config.name());
       SystemConfig systemConfig = SystemConfig.findById(config.getType());
       String valueStr = systemConfig != null ? systemConfig.value : null;
       value.setAsync(valueStr, timeOut, TimeUnit.SECONDS);
