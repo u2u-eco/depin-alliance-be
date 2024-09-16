@@ -4,6 +4,7 @@ import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
@@ -30,6 +31,8 @@ public class MissionService {
   LeagueService leagueService;
   @Inject
   TelegramService telegramService;
+  @RestClient
+  MiniTonClient miniTonClient;
 
   public List<DailyCheckinResponse> getListOfDailyCheckin(User user) {
     List<DailyCheckin> dailyCheckins = DailyCheckin.listAll(Sort.ascending("id"));
@@ -145,7 +148,6 @@ public class MissionService {
         if (answerArrays == null || answerArrays.isEmpty()) {
           throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
         }
-//        List<QuizResponse> quizArrays = Utils.mapToList(check.description, QuizResponse.class);
         isChecked = true;
         try {
           check.quizArrays.forEach(quiz -> {
@@ -169,6 +171,12 @@ public class MissionService {
         break;
       case TELEGRAM:
         isChecked = telegramService.verifyJoinChannel("@" + check.referId, user.id.toString());
+        break;
+      case PLAY_MINI_TON:
+        try {
+          isChecked = miniTonClient.verify(user.id);
+        } catch (Exception e) {
+        }
         break;
       case ON_TIME_IN_APP:
         switch (check.missionRequire) {
@@ -215,7 +223,6 @@ public class MissionService {
       userMission.user = user;
       userMission.status = Enums.MissionStatus.VERIFIED;
       UserMission.create(userMission);
-      event1(user, check.id);
       if (check.partnerId != null) {
         Partner.updateParticipants(check.partnerId);
       }
@@ -252,6 +259,7 @@ public class MissionService {
         userService.updateLevelByExp(user.id);
         leagueService.updateXp(user, check.xp);
       }
+      event1(user, check.id);
       return true;
     }
     return false;
