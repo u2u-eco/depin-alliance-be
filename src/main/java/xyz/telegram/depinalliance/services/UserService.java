@@ -29,8 +29,10 @@ public class UserService {
   Logger logger;
   @Inject
   LeagueService leagueService;
-  private static final long RATE_BONUS_DEFAULT = Long.parseLong(
-    SystemConfig.findByKey(Enums.Config.BONUS_REWARD_DEFAULT, "5"));
+  @Inject
+  SystemConfigService systemConfigService;
+//  private static final long RATE_BONUS_DEFAULT = Long.parseLong(
+//    SystemConfig.findByKey(Enums.Config.BONUS_REWARD_DEFAULT, "5"));
 
   @Transactional
   public User checkStartUser(Long id, String username, String refCode, String league, Boolean isPremium) {
@@ -42,13 +44,13 @@ public class UserService {
       user.username = username;
       user.level = new Level(1L);
       user.status = Enums.UserStatus.STARTED;
-      user.avatar = SystemConfig.findByKey(Enums.Config.AVATAR_DEFAULT);
+      user.avatar = systemConfigService.findByKey(Enums.Config.AVATAR_DEFAULT);
       user.isPremium = isPremium;
       User ref = null;
       if (StringUtils.isNotBlank(refCode)) {
         ref = User.findByCode(refCode);
         if (ref != null) {
-          BigDecimal pointRef = new BigDecimal(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.POINT_REF)));
+          BigDecimal pointRef = new BigDecimal(Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.POINT_REF)));
           user.pointRef = pointRef;
           if (StringUtils.isNotBlank(league)) {
             user.league = ref.league;
@@ -106,18 +108,18 @@ public class UserService {
       return BigDecimal.ZERO;
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
-    String codeCpu = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
+    String codeCpu = systemConfigService.findByKey(Enums.Config.CPU_DEFAULT);
     Item itemCpu = Item.find("code", codeCpu).firstResult();
     UserItem.create(new UserItem(user, itemCpu, userDevice));
-    //    String codeGpu = SystemConfig.findByKey(Enums.Config.GPU_DEFAULT);
+    //    String codeGpu = systemConfigService.findByKey(Enums.Config.GPU_DEFAULT);
     //    Item itemGpu = Item.find("code", codeGpu).firstResult();
     //    UserItem.create(new UserItem(user, itemGpu, userDevice));
 
-    String codeRam = SystemConfig.findByKey(Enums.Config.RAM_DEFAULT);
+    String codeRam = systemConfigService.findByKey(Enums.Config.RAM_DEFAULT);
     Item itemRam = Item.find("code", codeRam).firstResult();
     UserItem.create(new UserItem(user, itemRam, userDevice));
 
-    String codeStorage = SystemConfig.findByKey(Enums.Config.STORAGE_DEFAULT);
+    String codeStorage = systemConfigService.findByKey(Enums.Config.STORAGE_DEFAULT);
     Item itemStorage = Item.find("code", codeStorage).firstResult();
     UserItem.create(new UserItem(user, itemStorage, userDevice));
 
@@ -224,15 +226,15 @@ public class UserService {
         new BigDecimal(Utils.getRandomNumber(0, 200)).multiply(new BigDecimal(10)));
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
-    String codeCpu = SystemConfig.findByKey(Enums.Config.CPU_DEFAULT);
+    String codeCpu = systemConfigService.findByKey(Enums.Config.CPU_DEFAULT);
     Item itemCpu = Item.find("code", codeCpu).firstResult();
     UserItem.create(new UserItem(user, itemCpu, userDevice));
 
-    String codeRam = SystemConfig.findByKey(Enums.Config.RAM_DEFAULT);
+    String codeRam = systemConfigService.findByKey(Enums.Config.RAM_DEFAULT);
     Item itemRam = Item.find("code", codeRam).firstResult();
     UserItem.create(new UserItem(user, itemRam, userDevice));
 
-    String codeStorage = SystemConfig.findByKey(Enums.Config.STORAGE_DEFAULT);
+    String codeStorage = systemConfigService.findByKey(Enums.Config.STORAGE_DEFAULT);
     Item itemStorage = Item.find("code", codeStorage).firstResult();
     UserItem.create(new UserItem(user, itemStorage, userDevice));
 
@@ -313,10 +315,10 @@ public class UserService {
       if (user.ref != null) {
         userRefId = user.ref.id;
       } else {
-        userRefId = Long.valueOf(Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.ROOT_POINT_CLAIM)));
+        userRefId = Long.valueOf(Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.ROOT_POINT_CLAIM)));
       }
       BigDecimal refPointClaim = new BigDecimal(
-        Objects.requireNonNull(SystemConfig.findByKey(Enums.Config.REF_POINT_CLAIM)));
+        Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.REF_POINT_CLAIM)));
       BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
       BigDecimal percentBonus = bonusClaim(rateBonus.intValue());
       BigDecimal pointBonus = user.pointUnClaimed.multiply(percentBonus);
@@ -332,7 +334,7 @@ public class UserService {
         claimRewardHistory.claimNumber = user.claimNumber + 1;
         claimRewardHistory.pointClaimed = pointUnClaimed;
         claimRewardHistory.pointClaim = user.pointUnClaimed;
-        claimRewardHistory.rateReward = rateBonus.add(new BigDecimal(RATE_BONUS_DEFAULT));
+        claimRewardHistory.rateReward = rateBonus.add(new BigDecimal(systemConfigService.findByKey(Enums.Config.BONUS_REWARD_DEFAULT)));
         claimRewardHistory.percentBonus = percentBonus;
         claimRewardHistory.pointBonus = pointBonus;
         claimRewardHistory.create();
@@ -352,7 +354,7 @@ public class UserService {
 
   public BigDecimal bonusClaim(int rate) {
     int a = new Random().nextInt(100);
-    if (a < (RATE_BONUS_DEFAULT + rate)) {
+    if (a < (systemConfigService.getSystemConfigInt(Enums.Config.BONUS_REWARD_DEFAULT) + rate)) {
       // 5% chance
       a = new Random().nextInt(100);
       if (a < 65) {

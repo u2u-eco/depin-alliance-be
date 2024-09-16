@@ -35,11 +35,21 @@ public class MissionService {
   MiniTonClient miniTonClient;
 
   public List<DailyCheckinResponse> getListOfDailyCheckin(User user) {
-    List<DailyCheckin> dailyCheckins = DailyCheckin.listAll(Sort.ascending("id"));
+    List<DailyCheckin> dailyCheckins;
     Calendar calendar = Utils.getNewDay();
     long today = calendar.getTimeInMillis() / 1000;
+    long dayCheckin = user.startCheckIn == 0 ? 1 : ((today - user.startCheckIn) / 86400);
+    if (user.startCheckIn == 0 || today - user.lastCheckIn > 86400 || dayCheckin <= 3) {
+      dailyCheckins = DailyCheckin.findAll(Sort.ascending("id")).page(0, 8).list();
+    } else {
+      dailyCheckins = DailyCheckin.list("id >= ?1 and id <= ?2", Sort.ascending("id"), dayCheckin - 3, dayCheckin + 4);
+    }
     if (user.lastCheckIn == today) {
-      calendar.setTimeInMillis(user.startCheckIn * 1000);
+      if (dayCheckin >= 4) {
+        calendar.add(Calendar.DATE, -3);
+      } else {
+        calendar.setTimeInMillis(user.startCheckIn * 1000);
+      }
       return dailyCheckins.stream().map(dailyCheckin -> {
         long time = calendar.getTimeInMillis() / 1000;
         DailyCheckinResponse dailyCheckinResponse = new DailyCheckinResponse(dailyCheckin.name, time,
@@ -50,9 +60,14 @@ public class MissionService {
     }
 
     if (today - user.lastCheckIn == 86400) {
-      long day = ((today - user.startCheckIn) / 86400);
-      if (day == dailyCheckins.size()) {
-        calendar.setTimeInMillis(today * 1000);
+      //      long day = ((today - user.startCheckIn) / 86400);
+      //      if (day == dailyCheckins.size()) {
+      //        calendar.setTimeInMillis(today * 1000);
+      //      } else {
+      //        calendar.setTimeInMillis(user.startCheckIn * 1000);
+      //      }
+      if (dayCheckin >= 4) {
+        calendar.add(Calendar.DATE, -3);
       } else {
         calendar.setTimeInMillis(user.startCheckIn * 1000);
       }
