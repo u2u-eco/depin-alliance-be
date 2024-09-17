@@ -963,79 +963,79 @@ public class InitService {
 
       }
 
-//      partner = Partner.findByName("aZen Protocol");
-//      if (partner == null) {
-//        Item item = Item.findByCode("CYBER_BOX");
-//        partner = new Partner();
-//        partner.name = "aZen Protocol";
-//        partner.description = "Empowers DePIN for Universal Computing Tasks.";
-//        partner.rewards = "Up to +50,000 points";
-//        partner.orders = 7;
-//        partner.participants = 0;
-//        partner.isActive = true;
-//        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/azen.png";
-//        partner.create();
-//        partner.persist();
-//
-//        Mission mission = new Mission();
-//        mission.groupMission = partner.name;
-//        mission.name = "Follow aZen Twitter";
-//        mission.type = Enums.MissionType.TWITTER;
-//        mission.isFake = true;
-//        mission.description = "Follow aZen Twitter";
-//        mission.orders = 1;
-//        mission.url = "https://x.com/azen_protocol";
-//        mission.point = new BigDecimal(10000);
-//        mission.xp = new BigDecimal(100);
-//        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-//        mission.partner = partner;
-//        mission.isActive = true;
-//        mission.create();
-//        mission.persist();
-//
-//        mission = new Mission();
-//        mission.groupMission = partner.name;
-//        mission.name = "Join aZen Community";
-//        mission.type = Enums.MissionType.TELEGRAM;
-//        mission.isFake = false;
-//        mission.description = "Join aZen Community";
-//        mission.orders = 2;
-//        mission.referId = "azenprotocol";
-//        mission.url = "https://t.me/azenprotocol";
-//        mission.point = new BigDecimal(30000);
-//        mission.xp = new BigDecimal(500);
-//        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-//        mission.partner = partner;
-//        mission.isActive = true;
-//        mission.box = 1L;
-//        mission.create();
-//        mission.persist();
-//
-//        EventMission eventMission = new EventMission();
-//        eventMission.event = new Event(1L);
-//        eventMission.mission = mission;
-//        eventMission.item = item;
-//        eventMission.number = 1;
-//        eventMission.create();
-//        eventMission.persist();
-//
-//        mission = new Mission();
-//        mission.groupMission = partner.name;
-//        mission.name = "Start aZen bot";
-//        mission.type = Enums.MissionType.TELEGRAM;
-//        mission.isFake = true;
-//        mission.description = "Start aZen bot";
-//        mission.orders = 3;
-//        mission.url = "https://t.me/aZennetwork1_bot/aZEn?startapp=BIAM89";
-//        mission.point = new BigDecimal(10000);
-//        mission.xp = new BigDecimal(100);
-//        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-//        mission.partner = partner;
-//        mission.isActive = true;
-//        mission.create();
-//        mission.persist();
-//
-//      }
+      partner = Partner.findByName("aZen Protocol");
+      if (partner == null) {
+        Item item = Item.findByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "aZen Protocol";
+        partner.description = "Empowers DePIN for Universal Computing Tasks.";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 7;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/azen.png";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow aZen Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow aZen Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/azen_protocol";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join aZen Community";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join aZen Community";
+        mission.orders = 2;
+        mission.referId = "azenprotocol";
+        mission.url = "https://t.me/azenprotocol";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Start aZen bot";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Start aZen bot";
+        mission.orders = 3;
+        mission.url = "https://t.me/aZennetwork1_bot/aZEn?startapp=BIAM89";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+      }
     }
   }
 }
