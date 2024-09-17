@@ -24,7 +24,7 @@ import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 import xyz.telegram.depinalliance.services.JwtService;
-import xyz.telegram.depinalliance.services.SystemConfigService;
+import xyz.telegram.depinalliance.services.RedisService;
 import xyz.telegram.depinalliance.services.TelegramService;
 import xyz.telegram.depinalliance.services.UserService;
 
@@ -44,7 +44,7 @@ public class UserResource extends BaseResource {
   @Inject
   UserService userService;
   @Inject
-  SystemConfigService systemConfigService;
+  RedisService redisService;
   @ConfigProperty(name = "telegram.validate")
   boolean isValidate;
   @Inject
@@ -136,7 +136,7 @@ public class UserResource extends BaseResource {
     SystemConfigResponse systemConfigResponse = new SystemConfigResponse();
     systemConfigResponse.maxDevice = userService.maxDeviceUserByLevel(user.level.id);
     systemConfigResponse.pointBuyDevice = new BigDecimal(
-      Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.POINT_BUY_DEVICE)));
+      Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_BUY_DEVICE)));
     systemConfigResponse.urlImage = amazonS3Config.awsUrl();
     return ResponseData.ok(systemConfigResponse);
   }
@@ -269,7 +269,7 @@ public class UserResource extends BaseResource {
   @GET
   @Path("avatar")
   public ResponseData listAvatar() {
-    String avatarLst = systemConfigService.findByKey(Enums.Config.AVATAR_LIST);
+    String avatarLst = redisService.findConfigByKey(Enums.Config.AVATAR_LIST);
     return ResponseData.ok(avatarLst.split(";"));
   }
 
@@ -280,7 +280,7 @@ public class UserResource extends BaseResource {
     if (request == null || StringUtils.isBlank(request.avatar)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    String avatarLst = systemConfigService.findByKey(Enums.Config.AVATAR_LIST);
+    String avatarLst = redisService.findConfigByKey(Enums.Config.AVATAR_LIST);
     List<String> lstAvatar = Arrays.asList(avatarLst.split(";"));
     if (!lstAvatar.contains(request.avatar)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);

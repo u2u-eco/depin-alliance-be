@@ -3,6 +3,7 @@ package xyz.telegram.depinalliance.services;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.response.QuizResponse;
@@ -21,6 +22,8 @@ import java.util.List;
  * @author holden on 26-Aug-2024
  */
 public class InitService {
+  @Inject
+  RedisService redisService;
 
   @Transactional
   void onStart(@Observes StartupEvent event) {
@@ -70,7 +73,7 @@ public class InitService {
           mission.create();
           mission.persist();
 
-          Item item = Item.findByCode("CYBER_BOX");
+          Item item = redisService.findItemByCode("CYBER_BOX");
           mission = new Mission();
           mission.groupMission = "Summon DePIN Alliance";
           mission.name = "Follow U2U Network X";
@@ -250,7 +253,7 @@ public class InitService {
         List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L,
           73L, 78L, 83L, 88L, 93L, 98L);
         int orders = 3000;
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         for (Long id : rangeInviteEvent) {
           Enums.MissionRequire require = Enums.MissionRequire.valueOf("EVENT_INVITE_" + id);
           if (Mission.findByMissionRequire(require) == null) {

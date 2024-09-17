@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @Table(name = "user_item_trade_histories")
 public class UserItemTradeHistory extends BaseEntity {
   @Id
-  @SequenceGenerator(name = "itemSequence", sequenceName = "item_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemSequence")
+  @SequenceGenerator(name = "userItemTradeHistorySequence", sequenceName = "user_item_trade_history_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userItemTradeHistorySequence")
   public Long id;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")

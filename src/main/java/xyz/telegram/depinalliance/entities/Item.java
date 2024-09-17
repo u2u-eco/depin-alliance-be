@@ -41,13 +41,6 @@ public class Item extends BaseEntity {
   public boolean isCanOpen = false;
   @Column(name = "is_can_claim", columnDefinition = "boolean default false")
   public boolean isCanClaim = false;
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "event_id")
-  public Event event;
-
-  public static Item findByCode(String code) {
-    return find("code", code.toUpperCase()).firstResult();
-  }
 
   public static ResponsePage<ItemResponse> findByTypeAndPaging(PagingParameters pageable, String type) {
     PanacheQuery<PanacheEntityBase> panacheQuery;

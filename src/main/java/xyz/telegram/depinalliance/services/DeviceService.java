@@ -26,7 +26,7 @@ import java.util.*;
 public class DeviceService {
 
   @Inject
-  SystemConfigService systemConfigService;
+  RedisService redisService;
   @Inject
   UserService userService;
 
@@ -35,7 +35,7 @@ public class DeviceService {
     if (request == null || StringUtils.isBlank(request.code) || request.number < 1) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    Item item = Item.findByCode(request.code);
+    Item item = redisService.findItemByCode(request.code);
     if (item == null) {
       throw new BusinessException(ResponseMessageConstants.DEVICE_ITEM_NOT_FOUND);
     }
@@ -56,22 +56,22 @@ public class DeviceService {
       String query = "";
       switch (item.type) {
       case CPU:
-        maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.CPU_SLOT);
+        maxSlot = redisService.getSystemConfigInt(Enums.Config.CPU_SLOT);
         slotUsed = userDevice.slotCpuUsed;
         query = "slotCpuUsed = slotCpuUsed + :item";
         break;
       case GPU:
-        maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.GPU_SLOT);
+        maxSlot = redisService.getSystemConfigInt(Enums.Config.GPU_SLOT);
         slotUsed = userDevice.slotGpuUsed;
         query = "slotGpuUsed = slotGpuUsed + :item";
         break;
       case RAM:
-        maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.RAM_SLOT);
+        maxSlot = redisService.getSystemConfigInt(Enums.Config.RAM_SLOT);
         slotUsed = userDevice.slotRamUsed;
         query = "slotRamUsed = slotRamUsed + :item";
         break;
       case STORAGE:
-        maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.STORAGE_SLOT);
+        maxSlot = redisService.getSystemConfigInt(Enums.Config.STORAGE_SLOT);
         slotUsed = userDevice.slotStorageUsed;
         query = "slotStorageUsed = slotStorageUsed + :item";
         break;
@@ -121,22 +121,22 @@ public class DeviceService {
     String query = "{field} = {field} + 1, totalMiningPower = totalMiningPower + :miningPower where id =:id and {field} + 1 <= :maxSlot";
     switch (userItem.item.type) {
     case CPU:
-      maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.CPU_SLOT);
+      maxSlot = redisService.getSystemConfigInt(Enums.Config.CPU_SLOT);
       slotUsed = userDevice.slotCpuUsed;
       query = query.replace("{field}", "slotCpuUsed");
       break;
     case GPU:
-      maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.GPU_SLOT);
+      maxSlot = redisService.getSystemConfigInt(Enums.Config.GPU_SLOT);
       slotUsed = userDevice.slotGpuUsed;
       query = query.replace("{field}", "slotGpuUsed");
       break;
     case RAM:
-      maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.RAM_SLOT);
+      maxSlot = redisService.getSystemConfigInt(Enums.Config.RAM_SLOT);
       slotUsed = userDevice.slotRamUsed;
       query = query.replace("{field}", "slotRamUsed");
       break;
     case STORAGE:
-      maxSlot = systemConfigService.getSystemConfigInt(Enums.Config.STORAGE_SLOT);
+      maxSlot = redisService.getSystemConfigInt(Enums.Config.STORAGE_SLOT);
       slotUsed = userDevice.slotStorageUsed;
       query = query.replace("{field}", "slotStorageUsed");
       break;
@@ -226,7 +226,7 @@ public class DeviceService {
     if (request == null || StringUtils.isBlank(request.code) || request.number <= 0) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    Item item = Item.findByCode(request.code);
+    Item item = redisService.findItemByCode(request.code);
     if (item == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
     }
@@ -279,7 +279,7 @@ public class DeviceService {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     BigDecimal pointBuy = new BigDecimal(
-      Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.POINT_BUY_DEVICE)));
+      Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_BUY_DEVICE)));
     if (pointBuy.compareTo(BigDecimal.ZERO) > 0) {
       if (user.point.compareTo(pointBuy) < 0) {
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
@@ -301,11 +301,10 @@ public class DeviceService {
   }
 
   public BigDecimal estimateUseKeyBox(User user, BoxUseKeyRequest request) {
-
     if (request == null || StringUtils.isBlank(request.code) || request.amount <= 0) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    Item item = Item.findByCode(request.code);
+    Item item = redisService.findItemByCode(request.code);
     if (item == null || !item.isCanOpen) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
     }
@@ -320,7 +319,7 @@ public class DeviceService {
     if (request == null || StringUtils.isBlank(request.code) || request.amount <= 0) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    Item item = Item.findByCode(request.code);
+    Item item = redisService.findItemByCode(request.code);
     if (item == null || !item.isCanOpen) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
     }
@@ -365,65 +364,6 @@ public class DeviceService {
     return rs;
   }
 
-  public ItemBoxOpenResponse eventTable1(User user) {
-    BigDecimal amount;
-    int a = new Random().nextInt(100);
-    if (a < 20) {
-      amount = new BigDecimal("7000");
-    } else if (a < 40) {
-      amount = new BigDecimal("8092");
-    } else if (a < 60) {
-      amount = new BigDecimal("9354");
-    } else if (a < 80) {
-      amount = new BigDecimal("10814");
-    } else {
-      amount = new BigDecimal("12501");
-    }
-    if (!User.updatePointUser(user.id, amount)) {
-      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-    }
-    return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(amount).toString());
-  }
-
-  public ItemBoxOpenResponse eventTable2(User user) {
-    Item item;
-    int a = new Random().nextInt(1000);
-    ItemBoxOpenResponse itemBoxOpenResponse = null;
-    if (a < 300) {
-      item = Item.findByCode(Enums.ItemSpecial.USDT_0_001.name());
-      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.001");
-      //      if (Event.updateTotalUsdt(new BigDecimal("0.001"), 1)) {
-      //
-      //      }
-    } else if (a < 325) {
-      item = Item.findByCode(Enums.ItemSpecial.USDT_0_002.name());
-      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.002");
-    } else if (a < 525) {
-      item = Item.findByCode("SSD_128GB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 725) {
-      item = Item.findByCode("RAM_16GB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 875) {
-      item = Item.findByCode("CPU_DYSEN_5_8000_SERIES");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 925) {
-      item = Item.findByCode("CPU_DOCK_T5_15TH");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 975) {
-      item = Item.findByCode("DEFORCE_MX450");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else {
-      item = Item.findByCode("CPU_DOCK_T7_4TH");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    }
-    if (item != null) {
-      UserItem userItem = new UserItem(user, item, null);
-      UserItem.create(userItem);
-    }
-    return itemBoxOpenResponse;
-  }
-
   public ItemBoxOpenResponse eventTable(User user, String rewardTable) {
     int a = new Random().nextInt(1000);
     EventTableReward eventTableReward = EventTableReward.find("rewardTable = ?1 and fromRate <= ?2 and toRate > ?3",
@@ -434,77 +374,26 @@ public class DeviceService {
         if (!User.updatePointUser(user.id, eventTableReward.amount)) {
           throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
         }
-        return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(eventTableReward.amount).toString());
+        return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(eventTableReward.amount).toString(),
+          Utils.stripDecimalZeros(eventTableReward.amount));
       case DEVICE:
         UserItem.create(new UserItem(user, eventTableReward.item, null));
-        return new ItemBoxOpenResponse(eventTableReward.item.type.name(), eventTableReward.item.name);
+        return new ItemBoxOpenResponse(eventTableReward.item.type.name(), eventTableReward.item.name,
+          Utils.stripDecimalZeros(eventTableReward.item.price));
       case USDT:
         if (Event.updateTotalUsdt(eventTableReward.amount, 1L)) {
           UserItem.create(new UserItem(user, eventTableReward.item, null));
-          return new ItemBoxOpenResponse("USDT", Utils.stripDecimalZeros(eventTableReward.amount).toString());
+          return new ItemBoxOpenResponse("USDT", Utils.stripDecimalZeros(eventTableReward.amount).toString(),
+            Utils.stripDecimalZeros(eventTableReward.amount));
         } else {
           if (!User.updatePointUser(user.id, eventTableReward.amountPoint)) {
             throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
           }
-          return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(eventTableReward.amountPoint).toString());
+          return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(eventTableReward.amountPoint).toString(),
+            Utils.stripDecimalZeros(eventTableReward.amountPoint));
         }
       }
     }
     return null;
   }
-  /*public ItemBoxOpenResponse eventTable3(User user) {
-    Item item = null;
-    BigDecimal amount = BigDecimal.ZERO;
-    int a = new Random().nextInt(100);
-    ItemBoxOpenResponse itemBoxOpenResponse = null;
-    if (a < 8) {
-      item = Item.findByCode(Enums.ItemSpecial.USDT_0_001.name());
-      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.001");
-    } else if (a < 10) {
-      item = Item.findByCode(Enums.ItemSpecial.USDT_0_002.name());
-      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.002");
-    } else if (a < 12) {
-      item = Item.findByCode(Enums.ItemSpecial.USDT_0_1.name());
-      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.1");
-    } else if (a < 14) {
-      item = Item.findByCode(Enums.ItemSpecial.USDT_0_5.name());
-      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.5");
-    } else if (a < 16) {
-      item = Item.findByCode(Enums.ItemSpecial.USDT_1.name());
-      itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "1");
-    } else if (a < 36) {
-      item = Item.findByCode("SSD_4TB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 52) {
-      item = Item.findByCode("CPU_DYSEN_7_4000_SERIES");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 64) {
-      item = Item.findByCode("CPU_DOCK_T7_6TH");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 66) {
-      item = Item.findByCode("DEFORCE_RTX_2060_12GB");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 68) {
-      item = Item.findByCode("CPU_DYSEN_7_6000_SERIES");
-      itemBoxOpenResponse = new ItemBoxOpenResponse(item.type.name(), item.name);
-    } else if (a < 80) {
-      amount = new BigDecimal(35000);
-    } else if (a < 92) {
-      amount = new BigDecimal(75000);
-    } else if (a < 96) {
-      amount = new BigDecimal(125000);
-    } else {
-      amount = new BigDecimal(175000);
-    }
-    if (item != null) {
-      UserItem userItem = new UserItem(user, item, null);
-      UserItem.create(userItem);
-    } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
-      if (!User.updatePointUser(user.id, amount)) {
-        throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-      }
-      return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(amount).toString());
-    }
-    return itemBoxOpenResponse;
-  }*/
 }
