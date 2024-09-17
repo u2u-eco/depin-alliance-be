@@ -952,7 +952,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = "Retweet";
         mission.orders = 3;
-        mission.url = "https://x.com/madhurprabhakar/status/1835228950441742528)";
+        mission.url = "https://x.com/madhurprabhakar/status/1835228950441742528";
         mission.point = new BigDecimal(10000);
         mission.xp = new BigDecimal(100);
         mission.image = "";
