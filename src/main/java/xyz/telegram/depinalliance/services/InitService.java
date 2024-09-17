@@ -280,7 +280,7 @@ public class InitService {
 
       Partner partner = Partner.findByName("U2DPN");
       if (partner == null) {
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "U2DPN";
         partner.description = "Embrace the revolution of the decentralized Internet and monetize your unused bandwidth";
@@ -416,7 +416,7 @@ public class InitService {
 
       partner = Partner.findByName("Mizzle");
       if (partner == null) {
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "Mizzle";
         partner.description = "A DePIN platform empowering developers with No-Code DevOps, limitless cloud compute & storage resources, and unparalleled security through TEEs, eBPF, FHE, and ZK. \n" + "We're Quantum-Ready!";
@@ -499,7 +499,7 @@ public class InitService {
 
       partner = Partner.findByName("Pindora");
       if (partner == null) {
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "Pindora";
         partner.description = "We're building a DePIN Aggregator Platform";
@@ -606,7 +606,7 @@ public class InitService {
 
       partner = Partner.findByName("ZkAGI");
       if (partner == null) {
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "ZkAGI";
         partner.description = "ZkAGI is the first privacy AI DePIN, integrating advanced technologies like artificial intelligence (AI) and blockchain";
@@ -689,7 +689,7 @@ public class InitService {
 
       partner = Partner.findByName("Hermes Alpha Zone");
       if (partner == null) {
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "Hermes Alpha Zone";
         partner.description = "A go to space for all native crypto alpha, news, airdrops, potential 100x gems and educational contents on DeFi";
@@ -797,7 +797,7 @@ public class InitService {
 
 //      partner = Partner.findByName("MiniTon");
 //      if (partner == null) {
-//        Item item = Item.findByCode("CYBER_BOX");
+//        Item item = redisService.findItemByCode("CYBER_BOX");
 //        partner = new Partner();
 //        partner.name = "MiniTon";
 //        partner.description = "MiniTon is a crypto social esports platform backed by the TON Foundation.";
@@ -894,7 +894,7 @@ public class InitService {
 
       partner = Partner.findByName("Dextr");
       if (partner == null) {
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "Dextr";
         partner.description = "The world’s first Actively Validated Market Maker (AVMM) featuring built-in MEV Insurance";
@@ -968,7 +968,7 @@ public class InitService {
 
       partner = Partner.findByName("aZen Protocol");
       if (partner == null) {
-        Item item = Item.findByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode("CYBER_BOX");
         partner = new Partner();
         partner.name = "aZen Protocol";
         partner.description = "Empowers DePIN for Universal Computing Tasks.";
