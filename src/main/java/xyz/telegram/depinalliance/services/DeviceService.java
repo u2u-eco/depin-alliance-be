@@ -278,7 +278,8 @@ public class DeviceService {
     if (numberDeviceUser >= maxDevice) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    BigDecimal pointBuy = new BigDecimal(Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.POINT_BUY_DEVICE)));
+    BigDecimal pointBuy = new BigDecimal(
+      Objects.requireNonNull(systemConfigService.findByKey(Enums.Config.POINT_BUY_DEVICE)));
     if (pointBuy.compareTo(BigDecimal.ZERO) > 0) {
       if (user.point.compareTo(pointBuy) < 0) {
         throw new BusinessException(ResponseMessageConstants.USER_POINT_NOT_ENOUGH);
@@ -355,16 +356,9 @@ public class DeviceService {
       eventItemHistory.create();
       eventItemHistory.eventBoxPoint = eventBoxPoint;
       eventItemHistory.userItem = userItem;
-      ItemBoxOpenResponse response = null;
-      if (eventBoxPoint.rewardTable.contains("1")) {
-        response = eventTable1(user);
-      } else if (eventBoxPoint.rewardTable.contains("2")) {
-        response = eventTable2(user);
-      } else if (eventBoxPoint.rewardTable.contains("3")) {
-        response = eventTable3(user);
-      }
-
+      ItemBoxOpenResponse response = eventTable(user, eventBoxPoint.rewardTable);
       eventItemHistory.reward = response.toString();
+      eventItemHistory.event = new Event(1L);
       eventItemHistory.persist();
       rs.add(response);
     }
@@ -398,6 +392,9 @@ public class DeviceService {
     if (a < 300) {
       item = Item.findByCode(Enums.ItemSpecial.USDT_0_001.name());
       itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.001");
+      //      if (Event.updateTotalUsdt(new BigDecimal("0.001"), 1)) {
+      //
+      //      }
     } else if (a < 325) {
       item = Item.findByCode(Enums.ItemSpecial.USDT_0_002.name());
       itemBoxOpenResponse = new ItemBoxOpenResponse("USDT", "0.002");
@@ -427,7 +424,35 @@ public class DeviceService {
     return itemBoxOpenResponse;
   }
 
-  public ItemBoxOpenResponse eventTable3(User user) {
+  public ItemBoxOpenResponse eventTable(User user, String rewardTable) {
+    int a = new Random().nextInt(1000);
+    EventTableReward eventTableReward = EventTableReward.find("rewardTable = ?1 and fromRate <= ?2 and toRate > ?3",
+      rewardTable, a, a).firstResult();
+    if (eventTableReward != null) {
+      switch (eventTableReward.rewardType) {
+      case POINT:
+        if (!User.updatePointUser(user.id, eventTableReward.amount)) {
+          throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+        }
+        return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(eventTableReward.amount).toString());
+      case DEVICE:
+        UserItem.create(new UserItem(user, eventTableReward.item, null));
+        return new ItemBoxOpenResponse(eventTableReward.item.type.name(), eventTableReward.item.name);
+      case USDT:
+        if (Event.updateTotalUsdt(eventTableReward.amount, 1L)) {
+          UserItem.create(new UserItem(user, eventTableReward.item, null));
+          return new ItemBoxOpenResponse("USDT", Utils.stripDecimalZeros(eventTableReward.amount).toString());
+        } else {
+          if (!User.updatePointUser(user.id, eventTableReward.amountPoint)) {
+            throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+          }
+          return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(eventTableReward.amountPoint).toString());
+        }
+      }
+    }
+    return null;
+  }
+  /*public ItemBoxOpenResponse eventTable3(User user) {
     Item item = null;
     BigDecimal amount = BigDecimal.ZERO;
     int a = new Random().nextInt(100);
@@ -481,5 +506,5 @@ public class DeviceService {
       return new ItemBoxOpenResponse("Point", Utils.stripDecimalZeros(amount).toString());
     }
     return itemBoxOpenResponse;
-  }
+  }*/
 }
