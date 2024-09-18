@@ -39,10 +39,10 @@ public class MissionService {
     Calendar calendar = Utils.getNewDay();
     long today = calendar.getTimeInMillis() / 1000;
     long dayCheckin = user.startCheckIn == 0 ? 1 : ((today - user.startCheckIn) / 86400);
-    if (user.startCheckIn == 0 || today - user.lastCheckIn > 86400 || dayCheckin <= 3) {
+    if (user.startCheckIn == 0 || today - user.lastCheckIn > 86400 || dayCheckin < 4) {
       dailyCheckins = DailyCheckin.findAll(Sort.ascending("id")).page(0, 8).list();
     } else {
-      dailyCheckins = DailyCheckin.list("id >= ?1 and id <= ?2", Sort.ascending("id"), dayCheckin - 3, dayCheckin + 4);
+      dailyCheckins = DailyCheckin.list("id >= ?1 and id <= ?2", Sort.ascending("id"), dayCheckin - 2, dayCheckin + 5);
     }
     if (user.lastCheckIn == today) {
       if (dayCheckin >= 4) {

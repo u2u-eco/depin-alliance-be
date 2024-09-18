@@ -58,7 +58,7 @@ public class Enums {
     }
   }
 
-  public enum EventHistoryType {
-    MISSION, REF
+  public enum EventTableType {
+    POINT,USDT,DEVICE
   }
 }
