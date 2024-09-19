@@ -41,7 +41,7 @@ public class LeagueResponse {
     this.avatar = league.avatar;
     this.inviteLink = userCode + "_" + league.code;
     this.xp = Utils.stripDecimalZeros(league.xp);
-    this.level = league.level.id;
+//    this.level = league.level.id;
   }
 
   public LeagueResponse(League league, User user) {
@@ -53,7 +53,7 @@ public class LeagueResponse {
     this.inviteLink = user.code + "_" + league.code;
     this.isOwner = league.user.id == user.id;
     this.xp = Utils.stripDecimalZeros(league.xp);
-    this.level = league.level.id;
+//    this.level = league.level.id;
   }
 
   public LeagueResponse(League league, boolean isPendingRequest) {
@@ -63,7 +63,7 @@ public class LeagueResponse {
     this.totalMining = Utils.stripDecimalZeros(league.totalMining);
     this.avatar = league.avatar;
     this.xp = Utils.stripDecimalZeros(league.xp);
-    this.level = league.level.id;
+//    this.level = league.level.id;
     this.isPendingRequest = isPendingRequest;
   }
 }

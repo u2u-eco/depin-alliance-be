@@ -80,16 +80,6 @@ public class LeagueService {
     request.hash = user.id + "_" + request.status;
     request.create();
     request.persist();
-    //    Map<String, Object> params = new HashMap<>();
-    //    params.put("league", league.id);
-    //    params.put("id", user.id);
-    //    User.updateUser("league.id = :league where id = :id", params);
-    //    Map<String, Object> leagueParams = new HashMap<>();
-    //    leagueParams.put("id", league.id);
-    //    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
-    //    League.updateObject(
-    //      "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
-    //      leagueParams);
     return new LeagueResponse(league, user.code);
   }
 
