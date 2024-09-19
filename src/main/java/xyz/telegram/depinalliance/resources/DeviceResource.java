@@ -78,6 +78,15 @@ public class DeviceResource extends BaseResource {
     }
   }
 
+  @Path("swap-item/{itemRemoveId}/{itemAddId}")
+  @GET
+  public ResponseData swapItem(@PathParam("itemRemoveId") long itemRemoveId, @PathParam("itemAddId") long itemAddId)
+    throws Exception {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(deviceService.swapItem(getUser(), itemRemoveId, itemAddId));
+    }
+  }
+
   @Path("sell-item/{itemId}")
   @GET
   public ResponseData sellItem(@PathParam("itemId") long itemId) throws Exception {

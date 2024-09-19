@@ -48,16 +48,19 @@ public class UserService {
       if (StringUtils.isNotBlank(refCode)) {
         ref = User.findByCode(refCode);
         if (ref != null) {
-          BigDecimal pointRef = new BigDecimal(Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_REF)));
+          BigDecimal pointRef = new BigDecimal(
+            Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_REF)));
           user.pointRef = pointRef;
           if (StringUtils.isNotBlank(league)) {
-            user.league = ref.league;
-            refCode += " joined league " + league;
+//            user.league = ref.league;
+            refCode += " request league " + league;
           }
           Map<String, Object> params = new HashMap<>();
           params.put("id", ref.id);
           params.put("point", pointRef);
-          User.updateUser("point = point + :point, totalFriend = totalFriend + 1 where id = :id", params);
+          User.updateUser(
+            "point = point + :point, pointEarned = pointEarned + :point , totalFriend = totalFriend + 1 where id = :id",
+            params);
         }
       }
       user.ref = ref;
@@ -74,7 +77,7 @@ public class UserService {
     if (StringUtils.isNotBlank(league) && StringUtils.isNotBlank(refCode) && user.league == null) {
       User ref = User.findByCode(refCode);
       if (ref != null && ref.league != null) {
-        logger.info("user " + user.username + " join league " + ref.league.code + " with ref code " + ref.id);
+        logger.info("user " + user.username + " request league " + ref.league.code + " with ref code " + ref.id);
         leagueService.joinLeague(user, ref.league.code);
       }
     }
@@ -225,15 +228,15 @@ public class UserService {
     }
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
     String codeCpu = redisService.findConfigByKey(Enums.Config.CPU_DEFAULT);
-    Item itemCpu = Item.find("code", codeCpu).firstResult();
+    Item itemCpu = redisService.findItemByCode(codeCpu);
     UserItem.create(new UserItem(user, itemCpu, userDevice));
 
     String codeRam = redisService.findConfigByKey(Enums.Config.RAM_DEFAULT);
-    Item itemRam = Item.find("code", codeRam).firstResult();
+    Item itemRam = redisService.findItemByCode(codeRam);
     UserItem.create(new UserItem(user, itemRam, userDevice));
 
     String codeStorage = redisService.findConfigByKey(Enums.Config.STORAGE_DEFAULT);
-    Item itemStorage = Item.find("code", codeStorage).firstResult();
+    Item itemStorage = redisService.findItemByCode(codeStorage);
     UserItem.create(new UserItem(user, itemStorage, userDevice));
 
     BigDecimal miningPower = itemCpu.miningPower.add(itemRam.miningPower).add(itemStorage.miningPower);
@@ -268,6 +271,7 @@ public class UserService {
     if (user.status != Enums.UserStatus.DETECTED_DEVICE_INFO) {
       return BigDecimal.ZERO;
     }
+    user.level = redisService.findLevelById(user.level.id);
     Map<String, Object> paramsUser = new HashMap<>();
     paramsUser.put("id", user.id);
     paramsUser.put("status", Enums.UserStatus.CLAIMED);
@@ -275,7 +279,7 @@ public class UserService {
     paramsUser.put("maximumPower", user.level.maxMiningPower);
     paramsUser.put("firstLoginTime", Utils.getCalendar().getTimeInMillis());
     User.updateUser(
-      "status = :status, point = :point, pointUnClaimed = 0, maximumPower = :maximumPower, firstLoginTime = :firstLoginTime where id = :id",
+      "status = :status, point = :point, pointEarned = :point, pointUnClaimed = 0, maximumPower = :maximumPower, firstLoginTime = :firstLoginTime where id = :id",
       paramsUser);
     return Utils.stripDecimalZeros(user.pointUnClaimed);
   }
@@ -296,7 +300,6 @@ public class UserService {
   public BigDecimal mining(User user) throws Exception {
     synchronized (user.id.toString().intern()) {
       BigDecimal res = mining(user, Utils.getCalendar().getTimeInMillis() / 1000);
-      //      Thread.sleep(200);
       return res;
     }
   }
@@ -332,19 +335,20 @@ public class UserService {
         claimRewardHistory.claimNumber = user.claimNumber + 1;
         claimRewardHistory.pointClaimed = pointUnClaimed;
         claimRewardHistory.pointClaim = user.pointUnClaimed;
-        claimRewardHistory.rateReward = rateBonus.add(new BigDecimal(redisService.findConfigByKey(Enums.Config.BONUS_REWARD_DEFAULT)));
+        claimRewardHistory.rateReward = rateBonus.add(
+          new BigDecimal(redisService.findConfigByKey(Enums.Config.BONUS_REWARD_DEFAULT)));
         claimRewardHistory.percentBonus = percentBonus;
         claimRewardHistory.pointBonus = pointBonus;
         claimRewardHistory.create();
         claimRewardHistory.persist();
       }
       User.updateUser(
-        "point = point + :point, pointClaimed = pointClaimed + pointUnClaimed, pointUnClaimed = 0, pointRef = pointRef + :pointRef, claimNumber = claimNumber + 1  where id = :id",
+        "point = point + :point, pointClaimed = pointClaimed + pointUnClaimed, pointEarned = pointEarned + :point, pointUnClaimed = 0, pointRef = pointRef + :pointRef, claimNumber = claimNumber + 1  where id = :id",
         paramsUser);
       Map<String, Object> paramsUserRef = new HashMap<>();
       paramsUserRef.put("id", userRefId);
       paramsUserRef.put("point", pointRef);
-      User.updateUser("point = point + :point where id = :id", paramsUserRef);
+      User.updateUser("point = point + :point, pointEarned = pointEarned + :point  where id = :id", paramsUserRef);
 
       return new ClaimResponse(pointUnClaimed, pointBonus);
     }
@@ -390,6 +394,28 @@ public class UserService {
         paramsLeague.put("id", user.league.id);
         paramsLeague.put("miningPower", miningPower.multiply(user.rateMining));
         League.updateObject("totalMining = totalMining + :miningPower where id = :id", paramsLeague);
+      }
+    }
+  }
+
+  @Transactional
+  public void changeMiningPower(User user, BigDecimal miningPowerOld, BigDecimal miningPowerNew) throws Exception {
+    synchronized (user.id.toString().intern()) {
+      mining(user);
+      Map<String, Object> paramsUser = new HashMap<>();
+      paramsUser.put("id", user.id);
+      paramsUser.put("miningPowerOld", miningPowerOld);
+      paramsUser.put("miningPowerNew", miningPowerNew);
+      User.updateUser(
+        "miningPower = miningPower - :miningPowerOld + :miningPowerNew, miningPowerReal = (select COALESCE(sum(ui.item.miningPower),0) from UserItem ui where ui.user.id = :id and userDevice is not null ) * rateMining where id = :id",
+        paramsUser);
+      if (user.league != null) {
+        Map<String, Object> paramsLeague = new HashMap<>();
+        paramsLeague.put("id", user.league.id);
+        paramsLeague.put("miningPowerOld", miningPowerOld.multiply(user.rateMining));
+        paramsLeague.put("miningPowerNew", miningPowerNew.multiply(user.rateMining));
+        League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
+          paramsLeague);
       }
     }
   }
@@ -493,7 +519,7 @@ public class UserService {
 
   public void updateLevelByExp(long userId) {
     User user = User.findById(userId);
-    Long maxLevel = Level.maxLevel();
+    Long maxLevel = redisService.findMaxLevel();
     Level level = Level.getLevelBeExp(user.xp);
     if (null != level && level.id - user.level.id > 0 && level.id < maxLevel) {
       User.updateLevelAndPointSkill(userId, level.id, new BigDecimal(level.id - user.level.id));

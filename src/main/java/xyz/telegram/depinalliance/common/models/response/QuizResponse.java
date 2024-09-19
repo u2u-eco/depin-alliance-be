@@ -17,10 +17,6 @@ public class QuizResponse {
     public String text;
     public Boolean correct;
 
-    public boolean isCorrect() {
-      return correct != null && correct;
-    }
-
     public Answer(long index, String text, boolean correct) {
       this.index = index;
       this.text = text;
@@ -28,6 +24,10 @@ public class QuizResponse {
     }
 
     public Answer() {
+    }
+
+    public boolean isCorrect() {
+      return correct != null && correct;
     }
   }
 }

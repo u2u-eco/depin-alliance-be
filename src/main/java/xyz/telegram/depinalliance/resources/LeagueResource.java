@@ -4,6 +4,9 @@ import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import org.apache.commons.lang3.StringUtils;
+import xyz.telegram.depinalliance.common.constans.Enums;
+import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.LeagueRequest;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
@@ -11,11 +14,14 @@ import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.RankingResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.entities.League;
+import xyz.telegram.depinalliance.entities.LeagueJoinRequest;
 import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.services.LeagueService;
+import xyz.telegram.depinalliance.services.RedisService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author holden on 29-Aug-2024
@@ -25,6 +31,8 @@ public class LeagueResource extends BaseResource {
 
   @Inject
   LeagueService leagueService;
+  @Inject
+  RedisService redisService;
 
   @GET
   @Path("")
@@ -57,6 +65,30 @@ public class LeagueResource extends BaseResource {
   }
 
   @GET
+  @Path("reject/{id}")
+  public ResponseData reject(@PathParam("id") Long id) throws BusinessException {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(leagueService.reject(getUser(), id));
+    }
+  }
+
+  @GET
+  @Path("approve/{id}")
+  public ResponseData approve(@PathParam("id") Long id) throws BusinessException {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(leagueService.approve(getUser(), id));
+    }
+  }
+
+  @GET
+  @Path("cancel")
+  public ResponseData cancel() throws BusinessException {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(leagueService.cancel(getUser()));
+    }
+  }
+
+  @GET
   @Path("leave")
   public ResponseData leaveLeague() throws BusinessException {
     synchronized (getTelegramId().toString().intern()) {
@@ -77,13 +109,19 @@ public class LeagueResource extends BaseResource {
   public ResponseData getUserLeague() throws BusinessException {
     User user = getUser();
     League userLeague = user.league;
+    if (userLeague == null) {
+      LeagueJoinRequest requestCheck = LeagueJoinRequest.findPendingByUser(user.id);
+      if (requestCheck != null) {
+        return ResponseData.ok(new LeagueResponse(requestCheck.league, true));
+      }
+    }
     return ResponseData.ok(userLeague == null ? "" : new LeagueResponse(userLeague, user));
   }
 
   @GET
   @Path("member")
-  public ResponseData getMember(PagingParameters pagingParameters, @QueryParam("is-ranking") boolean isRanking)
-    throws BusinessException {
+  public ResponseData getMember(PagingParameters pagingParameters, @QueryParam("username") String username,
+    @QueryParam("is-ranking") boolean isRanking) throws BusinessException {
     User user = getUser();
     if (user.league == null) {
       return ResponseData.ok();
@@ -99,6 +137,45 @@ public class LeagueResource extends BaseResource {
         .project(RankingResponse.class).list());
       return ResponseData.ok(res);
     }
-    return ResponseData.ok();
+    if (StringUtils.isBlank(pagingParameters.sortBy)) {
+      pagingParameters.sortBy = "createdAt";
+      pagingParameters.sortAscending = true;
+    }
+    return ResponseData.ok(User.findMemberLeagueByUserAndPaging(pagingParameters, leagueId, username));
+  }
+
+  @GET
+  @Path("join-request")
+  public ResponseData getJoinRequest(PagingParameters pagingParameters, @QueryParam("username") String username)
+    throws BusinessException {
+    User user = getUser();
+    if (user.league == null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    League userLeague = redisService.findLeagueById(user.league.id);
+    if (!Objects.equals(userLeague.user.id, user.id)) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    if (StringUtils.isBlank(pagingParameters.sortBy)) {
+      pagingParameters.sortBy = "createdAt";
+    }
+    return ResponseData.ok(LeagueJoinRequest.findPendingByPagingAndLeagueId(pagingParameters, userLeague.id, username));
+  }
+
+  @GET
+  @Path("total-join-request")
+  public ResponseData getTotalJoinRequest() throws BusinessException {
+    User user = getUser();
+    if (user.league == null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    League userLeague = redisService.findLeagueById(user.league.id);
+    if (!Objects.equals(userLeague.user.id, user.id)) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("leagueId", userLeague.id);
+    params.put("status", Enums.LeagueJoinRequestStatus.PENDING);
+    return ResponseData.ok(LeagueJoinRequest.count("league.id = :leagueId and status = :status", params));
   }
 }

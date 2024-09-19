@@ -24,8 +24,8 @@ public class ScheduleUpgradeSkill {
       skillsUpgrade.forEach(up -> {
         try {
           userService.updateSkillLevelForUser(up);
-          logger.infov("Upgrade skill {0} for user {1} from lv {2} to {3} success", up.skillId, String.valueOf(up.userId),
-            up.levelCurrent, up.levelUpgrade);
+          logger.infov("Upgrade skill {0} for user {1} from lv {2} to {3} success", up.skillId,
+            String.valueOf(up.userId), up.levelCurrent, up.levelUpgrade);
         } catch (Exception e) {
           logger.errorv("ID [{0}]: Update level {1} skill {2} for user {3} error ", up.id, up.levelUpgrade, up.skillId,
             String.valueOf(up.userId));

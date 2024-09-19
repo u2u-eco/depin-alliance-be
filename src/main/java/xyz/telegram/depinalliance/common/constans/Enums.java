@@ -59,6 +59,10 @@ public class Enums {
   }
 
   public enum EventTableType {
-    POINT,USDT,DEVICE
+    POINT, USDT, DEVICE
+  }
+
+  public enum LeagueJoinRequestStatus {
+    PENDING, APPROVED, REJECTED, CANCELLED
   }
 }

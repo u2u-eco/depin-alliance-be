@@ -5,9 +5,11 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.FriendResponse;
+import xyz.telegram.depinalliance.common.models.response.MemberLeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 
 import java.math.BigDecimal;
@@ -34,6 +36,8 @@ public class User extends BaseEntity {
   public BigDecimal pointClaimed = BigDecimal.ZERO;
   @Column(name = "point_used", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
   public BigDecimal pointUsed = BigDecimal.ZERO;
+  @Column(name = "point_earned", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
+  public BigDecimal pointEarned = BigDecimal.ZERO;
   @Column(name = "claim_number", columnDefinition = "bigint DEFAULT 0")
   public long claimNumber = 0;
   @Column(name = "point_bonus", scale = 18, precision = 29)
@@ -83,6 +87,8 @@ public class User extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "league_id")
   public League league;
+  @Column(name = "joined_league_at")
+  public Long joinedLeagueAt;
   @Column(name = "total_device")
   public Integer totalDevice = 0;
   @Column(name = "total_friend")
@@ -138,18 +144,13 @@ public class User extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
     params.put("point", point);
-    String sql = "";
+    String sql;
     if (point.compareTo(BigDecimal.ZERO) < 0) {
       sql = "pointUsed = pointUsed + :point * -1, ";
+    } else {
+      sql = "pointEarned = pointEarned + :point, ";
     }
     return updateUser(sql + "point = point + :point where id = :id and point + :point >= 0", params);
-  }
-
-  public static boolean updatePointSkill(long id, BigDecimal pointSkill) {
-    Map<String, Object> params = new HashMap<>();
-    params.put("id", id);
-    params.put("pointSkill", pointSkill);
-    return updateUser("pointSkill = pointSkill + :pointSkill where id = :id and pointSkill + :pointSkill >=0", params);
   }
 
   public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
@@ -167,8 +168,12 @@ public class User extends BaseEntity {
     params.put("id", id);
     params.put("point", point);
     params.put("xp", xp);
-    return updateUser("point = point + :point, xp = xp + :xp where id = :id and point + :point >=0 and xp + :xp >= 0",
-      params);
+    String sql = "";
+    if (point.compareTo(BigDecimal.ZERO) > 0) {
+      sql = "pointEarned = pointEarned + :point, ";
+    }
+    return updateUser(
+      sql + "point = point + :point, xp = xp + :xp where id = :id and point + :point >=0 and xp + :xp >= 0", params);
   }
 
   public static long findRankByUserId(long userId) {
@@ -177,20 +182,10 @@ public class User extends BaseEntity {
       userId).project(Long.class).firstResult();
   }
 
-  public static boolean updateLevel(long id, long nextLevel, long maxLevel, BigDecimal pointUse, BigDecimal expUse) {
-    try {
-      Map<String, Object> params = new HashMap<>();
-      params.put("id", id);
-      params.put("nextLevel", nextLevel);
-      params.put("maxLevel", maxLevel);
-      params.put("pointUse", pointUse);
-      params.put("expUse", expUse);
-      return update(
-        "level.id = :nextLevel, point = point + :pointUse, xp = xp + :expUse " + "where id = :id and level.id < :nextLevel " + "and point + :pointUse >= 0 and xp + :expUse >= 0 and :nextLevel <= :maxLevel",
-        params) > 0;
-    } catch (Exception e) {
-      throw e;
-    }
+  public static long findRankEarnedByUserId(long userId) {
+    return find(
+      "select position from ( select id as id, row_number() over(order by pointEarned desc, miningPowerReal desc) as position from User where id != 1) result where id =?1",
+      userId).project(Long.class).firstResult();
   }
 
   public static void updateRate(long id, BigDecimal rateMining, BigDecimal ratePurchase, BigDecimal rateReward,
@@ -234,6 +229,20 @@ public class User extends BaseEntity {
       Sort.descending("pointRef").and("createdAt", Sort.Direction.Ascending), userId);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(FriendResponse.class).list(), pageable,
       panacheQuery.count());
+  }
+
+  public static ResponsePage<MemberLeagueResponse> findMemberLeagueByUserAndPaging(PagingParameters pageable,
+    long leagueId, String username) {
+    String sql = "league.id = :leagueId";
+    Map<String, Object> params = new HashMap<>();
+    params.put("leagueId", leagueId);
+    if (StringUtils.isNotBlank(username)) {
+      params.put("username", "%" + username.toLowerCase().trim() + "%");
+      sql += " and lower(username) like :username";
+    }
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
+    return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(MemberLeagueResponse.class).list(),
+      pageable, panacheQuery.count());
   }
 
   public static long countFriendByUser(long userId) {

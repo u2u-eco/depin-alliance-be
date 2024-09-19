@@ -1,6 +1,5 @@
 package xyz.telegram.depinalliance.common.models.response;
 
-import jakarta.persistence.Column;
 import xyz.telegram.depinalliance.common.constans.Enums;
 
 import java.math.BigDecimal;

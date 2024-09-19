@@ -22,6 +22,8 @@ public class LeagueResponse {
   public Boolean isOwner;
   public long level;
   public BigDecimal xp;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Boolean isPendingRequest;
 
   public LeagueResponse(String code, String name, String avatar, Long totalContributors, BigDecimal totalMining) {
     this.code = code;
@@ -52,5 +54,16 @@ public class LeagueResponse {
     this.isOwner = league.user.id == user.id;
     this.xp = Utils.stripDecimalZeros(league.xp);
     this.level = league.level.id;
+  }
+
+  public LeagueResponse(League league, boolean isPendingRequest) {
+    this.code = league.code;
+    this.name = league.name;
+    this.totalContributors = league.totalContributors;
+    this.totalMining = Utils.stripDecimalZeros(league.totalMining);
+    this.avatar = league.avatar;
+    this.xp = Utils.stripDecimalZeros(league.xp);
+    this.level = league.level.id;
+    this.isPendingRequest = isPendingRequest;
   }
 }
