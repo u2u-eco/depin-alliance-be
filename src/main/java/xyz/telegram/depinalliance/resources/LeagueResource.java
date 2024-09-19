@@ -36,8 +36,8 @@ public class LeagueResource extends BaseResource {
 
   @GET
   @Path("")
-  public ResponseData getLeague(PagingParameters pagingParameters) {
-    return ResponseData.ok(League.findByPaging(pagingParameters));
+  public ResponseData getLeague(PagingParameters pagingParameters, @QueryParam("name") String nameSearch) {
+    return ResponseData.ok(League.findByPagingAndNameSearch(pagingParameters, nameSearch));
   }
 
   @POST

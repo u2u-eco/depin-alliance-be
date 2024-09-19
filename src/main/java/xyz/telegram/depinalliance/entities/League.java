@@ -5,6 +5,7 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
@@ -74,10 +75,15 @@ public class League extends BaseEntity {
     return count("nameNormalize", nameNormalize.toLowerCase());
   }
 
-  public static ResponsePage<LeagueResponse> findByPaging(PagingParameters pageable) {
-    PanacheQuery<PanacheEntityBase> panacheQuery = find(
-      "select code, name, avatar, totalContributors, totalMining from League",
-      Sort.descending("totalMining", "xp").and("createdAt", Sort.Direction.Ascending));
+  public static ResponsePage<LeagueResponse> findByPagingAndNameSearch(PagingParameters pageable, String nameSearch) {
+    String sql = "select code, name, avatar, totalContributors, totalMining from League";
+    Map<String, Object> params = new HashMap<>();
+    if (StringUtils.isNotBlank(nameSearch)) {
+      sql += " where name like :nameSearch";
+      params.put("nameSearch", "%" + nameSearch + "%");
+    }
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql,
+      Sort.descending("totalMining", "xp").and("createdAt", Sort.Direction.Ascending), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(LeagueResponse.class).list(), pageable,
       panacheQuery.count());
   }

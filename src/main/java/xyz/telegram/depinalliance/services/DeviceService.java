@@ -425,8 +425,9 @@ public class DeviceService {
           Utils.stripDecimalZeros(eventTableReward.amount));
       case DEVICE:
         UserItem.create(new UserItem(user, eventTableReward.item, null));
-        return new ItemBoxOpenResponse(eventTableReward.item.type.name(), eventTableReward.item.name,
-          Utils.stripDecimalZeros(eventTableReward.item.price));
+        Item item = redisService.findItemById(eventTableReward.item.id);
+        return new ItemBoxOpenResponse(item.type.name(), item.name,
+          Utils.stripDecimalZeros(item.price));
       case USDT:
         if (Event.updateTotalUsdt(eventTableReward.amount, 1L)) {
           UserItem.create(new UserItem(user, eventTableReward.item, null));
