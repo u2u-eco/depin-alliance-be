@@ -37,7 +37,7 @@ public class LeagueResource extends BaseResource {
   @GET
   @Path("")
   public ResponseData getLeague(PagingParameters pagingParameters, @QueryParam("name") String nameSearch) {
-    return ResponseData.ok(League.findByPagingAndNameSearch(pagingParameters, nameSearch));
+    return ResponseData.ok(League.findByPagingAndNameSearchAndUserId(pagingParameters, nameSearch, getTelegramId()));
   }
 
   @POST
@@ -81,10 +81,10 @@ public class LeagueResource extends BaseResource {
   }
 
   @GET
-  @Path("cancel")
-  public ResponseData cancel() throws BusinessException {
+  @Path("cancel/{code}")
+  public ResponseData cancel(@PathParam("code") String code) throws BusinessException {
     synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.cancel(getUser()));
+      return ResponseData.ok(leagueService.cancel(getUser(), code));
     }
   }
 
@@ -141,7 +141,7 @@ public class LeagueResource extends BaseResource {
       pagingParameters.sortBy = "createdAt";
       pagingParameters.sortAscending = true;
     }
-    return ResponseData.ok(User.findMemberLeagueByUserAndPaging(pagingParameters, leagueId, username));
+    return ResponseData.ok(User.findMemberLeagueByUserAndPaging(pagingParameters, leagueId, username, user.id));
   }
 
   @GET
@@ -152,12 +152,13 @@ public class LeagueResource extends BaseResource {
     if (user.league == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    League userLeague = redisService.findLeagueById(user.league.id);
+    League userLeague = redisService.findLeagueById(user.league.id, true);
     if (!Objects.equals(userLeague.user.id, user.id)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     if (StringUtils.isBlank(pagingParameters.sortBy)) {
       pagingParameters.sortBy = "createdAt";
+      pagingParameters.sortAscending = true;
     }
     return ResponseData.ok(LeagueJoinRequest.findPendingByPagingAndLeagueId(pagingParameters, userLeague.id, username));
   }
@@ -169,7 +170,7 @@ public class LeagueResource extends BaseResource {
     if (user.league == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    League userLeague = redisService.findLeagueById(user.league.id);
+    League userLeague = redisService.findLeagueById(user.league.id, true);
     if (!Objects.equals(userLeague.user.id, user.id)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }

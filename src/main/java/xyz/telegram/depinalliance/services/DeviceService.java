@@ -220,8 +220,7 @@ public class DeviceService {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     User.updatePointUser(user.id, item.price.multiply(new BigDecimal("0.5")));
-    new UserItemTradeHistory(user, userItem, item.price, item.price.multiply(new BigDecimal("0.5")),
-      false).create();
+    new UserItemTradeHistory(user, userItem, item.price, item.price.multiply(new BigDecimal("0.5")), false).create();
     return true;
   }
 
@@ -251,8 +250,7 @@ public class DeviceService {
     }
     for (Long id : itemIds) {
       UserItem userItem = UserItem.findById(id);
-      new UserItemTradeHistory(user, userItem, item.price, item.price.multiply(new BigDecimal("0.5")),
-        false).create();
+      new UserItemTradeHistory(user, userItem, item.price, item.price.multiply(new BigDecimal("0.5")), false).create();
     }
     User.updatePointUser(user.id, item.price.multiply(new BigDecimal(request.number)).multiply(new BigDecimal("0.5")));
     return true;
@@ -272,11 +270,12 @@ public class DeviceService {
     } else if (userItemAdd.userDevice != null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    Item removeItem = redisService.findItemById(itemRemoveId);
-    Item addItem = redisService.findItemById(itemAddId);
+    Item removeItem = redisService.findItemById(userItemRemove.item.id);
+    Item addItem = redisService.findItemById(userItemAdd.item.id);
     String query = "totalMiningPower = totalMiningPower - :miningPowerOld + :miningPowerNew where id =:id";
+    long userDeviceId = userItemRemove.userDevice.id;
     Map<String, Object> params = new HashMap<>();
-    params.put("id", userItemRemove.userDevice.id);
+    params.put("id", userDeviceId);
     params.put("miningPowerOld", removeItem.miningPower);
     params.put("miningPowerNew", addItem.miningPower);
     if (!UserDevice.updateObject(query, params)) {
@@ -284,7 +283,7 @@ public class DeviceService {
     }
     Map<String, Object> paramsUserItemAdd = new HashMap<>();
     paramsUserItemAdd.put("id", itemAddId);
-    paramsUserItemAdd.put("userDeviceId", userItemAdd.userDevice.id);
+    paramsUserItemAdd.put("userDeviceId", userDeviceId);
     if (UserItem.updateObject(" userDevice.id = :userDeviceId where id = :id and userDevice is null",
       paramsUserItemAdd) == 0) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
@@ -426,8 +425,7 @@ public class DeviceService {
       case DEVICE:
         UserItem.create(new UserItem(user, eventTableReward.item, null));
         Item item = redisService.findItemById(eventTableReward.item.id);
-        return new ItemBoxOpenResponse(item.type.name(), item.name,
-          Utils.stripDecimalZeros(item.price));
+        return new ItemBoxOpenResponse(item.type.name(), item.name, Utils.stripDecimalZeros(item.price));
       case USDT:
         if (Event.updateTotalUsdt(eventTableReward.amount, 1L)) {
           UserItem.create(new UserItem(user, eventTableReward.item, null));

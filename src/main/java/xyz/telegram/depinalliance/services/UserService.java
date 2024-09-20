@@ -52,7 +52,7 @@ public class UserService {
             Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_REF)));
           user.pointRef = pointRef;
           if (StringUtils.isNotBlank(league)) {
-//            user.league = ref.league;
+            //            user.league = ref.league;
             refCode += " request league " + league;
           }
           Map<String, Object> params = new HashMap<>();
@@ -149,10 +149,10 @@ public class UserService {
     if (user.league != null) {
       Map<String, Object> leagueParams = new HashMap<>();
       leagueParams.put("id", user.league.id);
-      leagueParams.put("totalMining", miningPower);
-      League.updateObject(
-        "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
-        leagueParams);
+      //      leagueParams.put("totalMining", miningPower);
+      League.updateObject("totalContributors = totalContributors + 1 " +
+        //          ", totalMining = totalMining + :totalMining" +
+        " where id = :id", leagueParams);
     }
     return pointUnClaimed;
   }
@@ -258,10 +258,10 @@ public class UserService {
     if (user.league != null) {
       Map<String, Object> leagueParams = new HashMap<>();
       leagueParams.put("id", user.league.id);
-      leagueParams.put("totalMining", miningPower);
-      League.updateObject(
-        "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
-        leagueParams);
+      //      leagueParams.put("totalMining", miningPower);
+      League.updateObject("totalContributors = totalContributors + 1" +
+        //          ", totalMining = totalMining + :totalMining" +
+        " where id = :id", leagueParams);
     }
     return Utils.stripDecimalZeros(pointUnClaimed);
   }
@@ -313,13 +313,16 @@ public class UserService {
       mining(user);
       user = User.findById(user.id);
       Long userRefId;
+      BigDecimal refPointClaim = BigDecimal.ZERO;
       if (user.ref != null) {
         userRefId = user.ref.id;
+        refPointClaim = redisService.findRefPercentClaimById(userRefId, true);
       } else {
         userRefId = Long.valueOf(Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.ROOT_POINT_CLAIM)));
       }
-      BigDecimal refPointClaim = new BigDecimal(
-        Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.REF_POINT_CLAIM)));
+      refPointClaim = refPointClaim.compareTo(BigDecimal.ZERO) <= 0 ?
+        new BigDecimal(Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.REF_POINT_CLAIM))) :
+        refPointClaim;
       BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
       BigDecimal percentBonus = bonusClaim(rateBonus.intValue());
       BigDecimal pointBonus = user.pointUnClaimed.multiply(percentBonus);
@@ -389,12 +392,12 @@ public class UserService {
       User.updateUser(
         "miningPower = miningPower + :miningPower, miningPowerReal = (select COALESCE(sum(ui.item.miningPower),0) from UserItem ui where ui.user.id = :id and userDevice is not null ) * rateMining where id = :id",
         paramsUser);
-      if (user.league != null) {
-        Map<String, Object> paramsLeague = new HashMap<>();
-        paramsLeague.put("id", user.league.id);
-        paramsLeague.put("miningPower", miningPower.multiply(user.rateMining));
-        League.updateObject("totalMining = totalMining + :miningPower where id = :id", paramsLeague);
-      }
+      //      if (user.league != null) {
+      //        Map<String, Object> paramsLeague = new HashMap<>();
+      //        paramsLeague.put("id", user.league.id);
+      //        paramsLeague.put("miningPower", miningPower.multiply(user.rateMining));
+      //        League.updateObject("totalMining = totalMining + :miningPower where id = :id", paramsLeague);
+      //      }
     }
   }
 
@@ -409,14 +412,14 @@ public class UserService {
       User.updateUser(
         "miningPower = miningPower - :miningPowerOld + :miningPowerNew, miningPowerReal = (select COALESCE(sum(ui.item.miningPower),0) from UserItem ui where ui.user.id = :id and userDevice is not null ) * rateMining where id = :id",
         paramsUser);
-      if (user.league != null) {
-        Map<String, Object> paramsLeague = new HashMap<>();
-        paramsLeague.put("id", user.league.id);
-        paramsLeague.put("miningPowerOld", miningPowerOld.multiply(user.rateMining));
-        paramsLeague.put("miningPowerNew", miningPowerNew.multiply(user.rateMining));
-        League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
-          paramsLeague);
-      }
+      //      if (user.league != null) {
+      //        Map<String, Object> paramsLeague = new HashMap<>();
+      //        paramsLeague.put("id", user.league.id);
+      //        paramsLeague.put("miningPowerOld", miningPowerOld.multiply(user.rateMining));
+      //        paramsLeague.put("miningPowerNew", miningPowerNew.multiply(user.rateMining));
+      //        League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
+      //          paramsLeague);
+      //      }
     }
   }
 
@@ -498,15 +501,15 @@ public class UserService {
     boolean status = UserSkill.updateLevel(his.userId, his.skillId, his.levelUpgrade);
     if (status) {
       if (his.rateMining != null && his.rateMining.compareTo(BigDecimal.ZERO) > 0) {
-        User user = User.findById(his.userId);
-        if (user.league != null) {
-          Map<String, Object> paramsLeague = new HashMap<>();
-          paramsLeague.put("id", user.league.id);
-          paramsLeague.put("miningPowerOld", user.miningPower.multiply(user.rateMining));
-          paramsLeague.put("miningPowerNew", user.miningPower.multiply(user.rateMining.add(his.rateMining)));
-          League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
-            paramsLeague);
-        }
+        //        User user = User.findById(his.userId);
+        //        if (user.league != null) {
+        //          Map<String, Object> paramsLeague = new HashMap<>();
+        //          paramsLeague.put("id", user.league.id);
+        //          paramsLeague.put("miningPowerOld", user.miningPower.multiply(user.rateMining));
+        //          paramsLeague.put("miningPowerNew", user.miningPower.multiply(user.rateMining.add(his.rateMining)));
+        //          League.updateObject("totalMining = totalMining - :miningPowerOld + :miningPowerNew where id = :id",
+        //            paramsLeague);
+        //        }
       }
       User.updateRate(his.userId, his.rateMining, his.ratePurchase, his.rateReward, his.rateCountDown,
         his.rateCapacity);

@@ -65,4 +65,8 @@ public class Enums {
   public enum LeagueJoinRequestStatus {
     PENDING, APPROVED, REJECTED, CANCELLED
   }
+
+  public enum LeagueMemberType {
+    CREATE, JOIN, KICK, LEAVE, UP_TO_MOD
+  }
 }

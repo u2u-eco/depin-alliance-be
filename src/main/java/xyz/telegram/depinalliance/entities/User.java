@@ -101,6 +101,8 @@ public class User extends BaseEntity {
   public String deviceModel;
   @Column(name = "is_premium")
   public Boolean isPremium;
+  @Column(name = "ref_percent_claim", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
+  public BigDecimal refPercentClaim = BigDecimal.ZERO;
 
   public User(Long id) {
     this.id = id;
@@ -232,10 +234,11 @@ public class User extends BaseEntity {
   }
 
   public static ResponsePage<MemberLeagueResponse> findMemberLeagueByUserAndPaging(PagingParameters pageable,
-    long leagueId, String username) {
-    String sql = "league.id = :leagueId";
+    long leagueId, String username, long currentUserId) {
+    String sql = "league.id = :leagueId and id != :currentUserId";
     Map<String, Object> params = new HashMap<>();
     params.put("leagueId", leagueId);
+    params.put("currentUserId", currentUserId);
     if (StringUtils.isNotBlank(username)) {
       params.put("username", "%" + username.toLowerCase().trim() + "%");
       sql += " and lower(username) like :username";

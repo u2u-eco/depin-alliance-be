@@ -11,10 +11,7 @@ import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.LeagueRequest;
 import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
-import xyz.telegram.depinalliance.entities.League;
-import xyz.telegram.depinalliance.entities.LeagueJoinRequest;
-import xyz.telegram.depinalliance.entities.LeagueLevel;
-import xyz.telegram.depinalliance.entities.User;
+import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -45,6 +42,7 @@ public class LeagueService {
     }
     String urlImage = s3Service.uploadFile(Enums.FolderImage.LEAGUE.getFolder(), UUID.randomUUID().toString(),
       request.file);
+    long currentTime = Utils.getCalendar().getTimeInMillis();
     League league = new League();
     league.name = request.name;
     league.user = user;
@@ -56,7 +54,24 @@ public class LeagueService {
     Map<String, Object> params = new HashMap<>();
     params.put("league", league.id);
     params.put("id", user.id);
-    User.updateUser("league.id = :league where id = :id", params);
+    params.put("joinedLeagueAt", currentTime);
+    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id and league is null",
+      params)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+
+    Map<String, Object> paramsCancel = new HashMap<>();
+    paramsCancel.put("status", Enums.LeagueJoinRequestStatus.CANCELLED);
+    paramsCancel.put("statusStr", Enums.LeagueJoinRequestStatus.CANCELLED.name());
+    paramsCancel.put("userId", user.id);
+    paramsCancel.put("userAction", user.id);
+    paramsCancel.put("updatedAt", currentTime);
+    paramsCancel.put("statusOld", Enums.LeagueJoinRequestStatus.PENDING);
+    LeagueJoinRequest.update(
+      "status = :status, hash = CONCAT(:userId,'_',league.id,'_',:statusStr,'_',:updatedAt), updatedAt = :updatedAt, userAction.id = :userAction where user.id = :userId and status = :statusOld",
+      paramsCancel);
+
+    LeagueMemberHistory.create(league, user, user, Enums.LeagueMemberType.CREATE);
     return new LeagueResponse(league, user.code);
   }
 
@@ -65,19 +80,19 @@ public class LeagueService {
     if (user.league != null || StringUtils.isBlank(code)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    LeagueJoinRequest requestCheck = LeagueJoinRequest.findPendingByUser(user.id);
-    if (requestCheck != null) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
-    }
-    League league = redisService.findLeagueByCode(code);
+    League league = redisService.findLeagueByCode(code, true);
     if (league == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    LeagueJoinRequest requestCheck = LeagueJoinRequest.findPendingByUserAndLeague(user.id, league.id);
+    if (requestCheck != null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     LeagueJoinRequest request = new LeagueJoinRequest();
     request.league = league;
     request.user = user;
     request.status = Enums.LeagueJoinRequestStatus.PENDING;
-    request.hash = user.id + "_" + request.status;
+    request.hash = user.id + "_" + league.id + "_" + request.status;
     request.create();
     request.persist();
     return new LeagueResponse(league, user.code);
@@ -88,7 +103,7 @@ public class LeagueService {
     if (user.league == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    user.league = redisService.findLeagueById(user.league.id);
+    user.league = redisService.findLeagueById(user.league.id, true);
     if (Objects.equals(user.league.user.id, user.id)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
@@ -97,13 +112,16 @@ public class LeagueService {
     params.put("league", null);
     params.put("joinedLeagueAt", null);
     params.put("id", user.id);
-    User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params);
+    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    LeagueMemberHistory.create(user.league, user, user, Enums.LeagueMemberType.LEAVE);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", user.league.id);
-    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
-    League.updateObject(
-      "totalContributors = totalContributors - 1, totalMining = totalMining - :totalMining where id = :id",
-      leagueParams);
+    //    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
+    League.updateObject("totalContributors = totalContributors - 1" +
+      //        ", totalMining = totalMining - :totalMining " +
+      " where id = :id", leagueParams);
     return true;
   }
 
@@ -116,7 +134,7 @@ public class LeagueService {
     if (user.league == null || userKick.league == null || user.id == id || userKick.league.id != user.league.id) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    user.league = redisService.findLeagueById(user.league.id);
+    user.league = redisService.findLeagueById(user.league.id, true);
     if (!Objects.equals(user.league.user.id, user.id)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
@@ -125,35 +143,43 @@ public class LeagueService {
     params.put("league", null);
     params.put("joinedLeagueAt", null);
     params.put("id", id);
-    User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params);
+    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    LeagueMemberHistory.create(user.league, userKick, user, Enums.LeagueMemberType.KICK);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", user.league.id);
-    leagueParams.put("totalMining", userKick.miningPower.multiply(userKick.rateMining));
-    League.updateObject(
-      "totalContributors = totalContributors - 1, totalMining = totalMining - :totalMining where id = :id",
-      leagueParams);
+    //    leagueParams.put("totalMining", userKick.miningPower.multiply(userKick.rateMining));
+    League.updateObject("totalContributors = totalContributors - 1" +
+      //        ", totalMining = totalMining - :totalMining" +
+      " where id = :id", leagueParams);
     return true;
   }
 
   @Transactional
-  public boolean cancel(User user) throws BusinessException {
+  public boolean cancel(User user, String code) throws BusinessException {
     if (user.league != null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    LeagueJoinRequest request = LeagueJoinRequest.findPendingByUser(user.id);
-    if (request == null) {
+    League league = redisService.findLeagueByCode(code, true);
+    if (league == null) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    LeagueJoinRequest requestCheck = LeagueJoinRequest.findPendingByUserAndLeague(user.id, league.id);
+    if (requestCheck == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     long currentTime = Utils.getCalendar().getTimeInMillis();
     Map<String, Object> params = new HashMap<>();
     params.put("status", Enums.LeagueJoinRequestStatus.CANCELLED);
-    params.put("hash", user.id + "_" + request.status + "_" + currentTime);
-    params.put("id", request.id);
+    params.put("hash", user.id + "_" + Enums.LeagueJoinRequestStatus.CANCELLED + "_" + currentTime);
+    params.put("id", requestCheck.id);
     params.put("updatedAt", currentTime);
     params.put("userAction", user);
     params.put("statusOld", Enums.LeagueJoinRequestStatus.PENDING);
     LeagueJoinRequest.update(
-      "status = :status, hash = :hash, updatedAt = :updatedAt, userAction = :userAction where id = :id and status = :statusOld", params);
+      "status = :status, hash = :hash, updatedAt = :updatedAt, userAction = :userAction where id = :id and status = :statusOld",
+      params);
     return true;
   }
 
@@ -162,7 +188,7 @@ public class LeagueService {
     if (ownerUser.league == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    League league = redisService.findLeagueById(ownerUser.league.id);
+    League league = redisService.findLeagueById(ownerUser.league.id, true);
     if (!Objects.equals(ownerUser.id, league.user.id)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
@@ -173,13 +199,14 @@ public class LeagueService {
     long currentTime = Utils.getCalendar().getTimeInMillis();
     Map<String, Object> params = new HashMap<>();
     params.put("status", Enums.LeagueJoinRequestStatus.REJECTED);
-    params.put("hash", userId + "_" + request.status + "_" + currentTime);
+    params.put("hash", userId + "_" + Enums.LeagueJoinRequestStatus.REJECTED + "_" + currentTime);
     params.put("id", request.id);
     params.put("userAction", ownerUser);
     params.put("updatedAt", currentTime);
     params.put("statusOld", Enums.LeagueJoinRequestStatus.PENDING);
     LeagueJoinRequest.update(
-      "status = :status, hash = :hash, updatedAt = :updatedAt, userAction = :userAction where id = :id and status = :statusOld", params);
+      "status = :status, hash = :hash, updatedAt = :updatedAt, userAction = :userAction where id = :id and status = :statusOld",
+      params);
     return true;
   }
 
@@ -200,27 +227,44 @@ public class LeagueService {
     long currentTime = Utils.getCalendar().getTimeInMillis();
     Map<String, Object> params = new HashMap<>();
     params.put("status", Enums.LeagueJoinRequestStatus.APPROVED);
-    params.put("hash", userId + "_" + request.status + "_" + currentTime);
+    params.put("hash", userId + "_" + league.id + "_" + Enums.LeagueJoinRequestStatus.APPROVED + "_" + currentTime);
     params.put("id", request.id);
     params.put("userAction", ownerUser);
     params.put("updatedAt", currentTime);
     params.put("statusOld", Enums.LeagueJoinRequestStatus.PENDING);
     if (LeagueJoinRequest.update(
-      "status = :status, hash = :hash, updatedAt = :updatedAt, userAction = :userAction where id = :id and status = :statusOld", params) <= 0) {
+      "status = :status, hash = :hash, updatedAt = :updatedAt, userAction = :userAction where id = :id and status = :statusOld",
+      params) <= 0) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
+    Map<String, Object> paramsCancel = new HashMap<>();
+    paramsCancel.put("status", Enums.LeagueJoinRequestStatus.CANCELLED);
+    paramsCancel.put("statusStr", Enums.LeagueJoinRequestStatus.CANCELLED.name());
+    //    paramsCancel.put("hash", userId + "_" + league.id + "_" + request.status + "_" + currentTime);
+    paramsCancel.put("userId", userId);
+    paramsCancel.put("userAction", userId);
+    paramsCancel.put("updatedAt", currentTime);
+    paramsCancel.put("statusOld", Enums.LeagueJoinRequestStatus.PENDING);
+    LeagueJoinRequest.update(
+      "status = :status, hash = CONCAT(:userId,'_',league.id,'_',:statusStr,'_',:updatedAt), updatedAt = :updatedAt, userAction.id = :userAction where user.id = :userId and status = :statusOld",
+      paramsCancel);
+
+
     User user = User.findById(userId);
     Map<String, Object> paramsLeague = new HashMap<>();
     paramsLeague.put("league", league.id);
     paramsLeague.put("id", userId);
     paramsLeague.put("joinedLeagueAt", currentTime);
-    User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", paramsLeague);
+    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", paramsLeague)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    LeagueMemberHistory.create(league, user, ownerUser, Enums.LeagueMemberType.JOIN);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", league.id);
-    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
-    League.updateObject(
-      "totalContributors = totalContributors + 1, totalMining = totalMining + :totalMining where id = :id",
-      leagueParams);
+    //    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
+    League.updateObject("totalContributors = totalContributors + 1" +
+      //        ", totalMining = totalMining + :totalMining " +
+      " where id = :id", leagueParams);
     return new LeagueResponse(league, user.code);
   }
 

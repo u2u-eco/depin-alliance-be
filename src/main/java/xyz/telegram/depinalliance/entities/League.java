@@ -6,6 +6,7 @@ import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
@@ -75,15 +76,18 @@ public class League extends BaseEntity {
     return count("nameNormalize", nameNormalize.toLowerCase());
   }
 
-  public static ResponsePage<LeagueResponse> findByPagingAndNameSearch(PagingParameters pageable, String nameSearch) {
-    String sql = "select code, name, avatar, totalContributors, totalMining from League";
+  public static ResponsePage<LeagueResponse> findByPagingAndNameSearchAndUserId(PagingParameters pageable,
+    String nameSearch, long userId) {
+    String sql = "select l.code, l.name, l.avatar, l.totalContributors, l.totalMining, r.league.id from League l left join LeagueJoinRequest r on l.id = r.league.id and r.status = :status and r.user.id = :userId";
     Map<String, Object> params = new HashMap<>();
+    params.put("status", Enums.LeagueJoinRequestStatus.PENDING);
+    params.put("userId", userId);
     if (StringUtils.isNotBlank(nameSearch)) {
-      sql += " where name like :nameSearch";
-      params.put("nameSearch", "%" + nameSearch + "%");
+      sql += " where l.nameNormalize like :nameSearch";
+      params.put("nameSearch", "%" + nameSearch.toLowerCase().trim() + "%");
     }
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql,
-      Sort.descending("totalMining", "xp").and("createdAt", Sort.Direction.Ascending), params);
+      Sort.descending("l.totalMining", "l.xp").and("l.createdAt", Sort.Direction.Ascending), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(LeagueResponse.class).list(), pageable,
       panacheQuery.count());
   }

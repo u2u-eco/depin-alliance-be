@@ -9,6 +9,7 @@ import org.redisson.api.RedissonClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.entities.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -139,42 +140,68 @@ public class RedisService {
     return Level.maxLevel();
   }
 
-  public League findLeagueById(Long id) {
-    try {
-      String redisKey = "LEAGUE_ID_" + id;
-      RBucket<LeagueRedis> value = redissonClient.getBucket(redisKey);
-      if (value.isExists()) {
-        return value.get().getLeague();
+  public League findLeagueById(Long id, boolean isUseCache) {
+    if (isUseCache) {
+      try {
+        String redisKey = "LEAGUE_ID_" + id;
+        RBucket<LeagueRedis> value = redissonClient.getBucket(redisKey);
+        if (value.isExists()) {
+          return value.get().getLeague();
+        }
+        logger.info("Get from db and set cache league id " + id + " ttl : " + timeOut);
+        League object = League.findById(id);
+        if (object != null) {
+          value.setAsync(new LeagueRedis(object.id, object.user.id, object.code), timeOut, TimeUnit.SECONDS);
+        }
+        return object;
+      } catch (Exception e) {
+        logger.errorv(e, "Error while finding league id " + id);
       }
-      logger.info("Get from db and set cache league id " + id + " ttl : " + timeOut);
-      League object = League.findById(id);
-      if (object != null) {
-        value.setAsync(new LeagueRedis(object.id, object.user.id, object.code), timeOut, TimeUnit.SECONDS);
-      }
-      return object;
-    } catch (Exception e) {
-      logger.errorv(e, "Error while finding league id " + id);
     }
     return League.findById(id);
   }
 
-  public League findLeagueByCode(String code) {
-    try {
-      String redisKey = "LEAGUE_CODE_" + code;
-      RBucket<LeagueRedis> value = redissonClient.getBucket(redisKey);
-      if (value.isExists()) {
-        return value.get().getLeague();
+  public League findLeagueByCode(String code, boolean isUseCache) {
+    if (isUseCache) {
+      try {
+        String redisKey = "LEAGUE_CODE_" + code;
+        RBucket<LeagueRedis> value = redissonClient.getBucket(redisKey);
+        if (value.isExists()) {
+          return value.get().getLeague();
+        }
+        logger.info("Get from db and set cache league code " + code + " ttl : " + timeOut);
+        League object = League.findByCode(code);
+        if (object != null) {
+          value.setAsync(new LeagueRedis(object.id, object.user.id, object.code), timeOut, TimeUnit.SECONDS);
+        }
+        return object;
+      } catch (Exception e) {
+        logger.errorv(e, "Error while finding league code " + code);
       }
-      logger.info("Get from db and set cache league code " + code + " ttl : " + timeOut);
-      League object = League.findByCode(code);
-      if (object != null) {
-        value.setAsync(new LeagueRedis(object.id, object.user.id, object.code), timeOut, TimeUnit.SECONDS);
-      }
-      return object;
-    } catch (Exception e) {
-      logger.errorv(e, "Error while finding league code " + code);
     }
     return League.findByCode(code);
+  }
+
+  public BigDecimal findRefPercentClaimById(Long id, boolean isUseCache) {
+    if (isUseCache) {
+      try {
+        String redisKey = "REF_PERCENT_CLAIM_ID_" + id;
+        RBucket<BigDecimal> value = redissonClient.getBucket(redisKey);
+        if (value.isExists()) {
+          return value.get();
+        }
+        logger.info("Get from db and set cache ref percent claim by id  " + id + " ttl : " + timeOut);
+        User object = User.findById(id);
+        if (object != null) {
+          value.setAsync(object.refPercentClaim, timeOut, TimeUnit.SECONDS);
+          return object.refPercentClaim;
+        }
+        return BigDecimal.ZERO;
+      } catch (Exception e) {
+        logger.errorv(e, "Error while finding ref percent claim by id " + id);
+      }
+    }
+    return BigDecimal.ZERO;
   }
 
   public class LeagueRedis {
