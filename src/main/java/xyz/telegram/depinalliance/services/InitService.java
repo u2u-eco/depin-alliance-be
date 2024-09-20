@@ -1273,7 +1273,7 @@ public class InitService {
         mission.groupMission = partner.name;
         mission.name = "Play game to get 5000 FREE USDT CHIPS";
         mission.type = Enums.MissionType.PLAY_MINI_TON;
-        mission.isFake = true;
+        mission.isFake = false;
         mission.description = "Play game to get 5000 FREE USDT CHIPS";
         mission.orders = 4;
         mission.url = " https://t.me/MiniTonBot/MiniTonGame?startapp=from_U2U";

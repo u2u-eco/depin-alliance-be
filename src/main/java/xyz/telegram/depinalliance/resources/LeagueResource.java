@@ -126,6 +126,7 @@ public class LeagueResource extends BaseResource {
     if (user.league == null) {
       return ResponseData.ok();
     }
+    League userLeague = redisService.findLeagueById(user.league.id, true);
     long leagueId = user.league.id;
     if (isRanking) {
       Map<String, Object> res = new HashMap<>();
@@ -141,7 +142,8 @@ public class LeagueResource extends BaseResource {
       pagingParameters.sortBy = "createdAt";
       pagingParameters.sortAscending = true;
     }
-    return ResponseData.ok(User.findMemberLeagueByUserAndPaging(pagingParameters, leagueId, username, user.id));
+    return ResponseData.ok(
+      User.findMemberLeagueByLeagueAndUserName(pagingParameters, leagueId, username, userLeague.user.id));
   }
 
   @GET

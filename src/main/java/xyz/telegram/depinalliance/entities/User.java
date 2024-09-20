@@ -233,12 +233,12 @@ public class User extends BaseEntity {
       panacheQuery.count());
   }
 
-  public static ResponsePage<MemberLeagueResponse> findMemberLeagueByUserAndPaging(PagingParameters pageable,
-    long leagueId, String username, long currentUserId) {
-    String sql = "league.id = :leagueId and id != :currentUserId";
+  public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
+    long leagueId, String username, long adminUserId) {
+    String sql = "league.id = :leagueId and id != :adminUserId";
     Map<String, Object> params = new HashMap<>();
     params.put("leagueId", leagueId);
-    params.put("currentUserId", currentUserId);
+    params.put("adminUserId", adminUserId);
     if (StringUtils.isNotBlank(username)) {
       params.put("username", "%" + username.toLowerCase().trim() + "%");
       sql += " and lower(username) like :username";

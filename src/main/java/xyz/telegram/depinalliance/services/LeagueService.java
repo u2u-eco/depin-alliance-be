@@ -159,7 +159,7 @@ public class LeagueService {
   @Transactional
   public boolean cancel(User user, String code) throws BusinessException {
     if (user.league != null) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
     League league = redisService.findLeagueByCode(code, true);
     if (league == null) {
@@ -167,7 +167,7 @@ public class LeagueService {
     }
     LeagueJoinRequest requestCheck = LeagueJoinRequest.findPendingByUserAndLeague(user.id, league.id);
     if (requestCheck == null) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
     long currentTime = Utils.getCalendar().getTimeInMillis();
     Map<String, Object> params = new HashMap<>();
@@ -194,7 +194,7 @@ public class LeagueService {
     }
     LeagueJoinRequest request = LeagueJoinRequest.findPendingByUserAndLeague(userId, league.id);
     if (request == null) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
     long currentTime = Utils.getCalendar().getTimeInMillis();
     Map<String, Object> params = new HashMap<>();
@@ -221,7 +221,7 @@ public class LeagueService {
     }
     LeagueJoinRequest request = LeagueJoinRequest.findPendingByUserAndLeague(userId, league.id);
     if (request == null) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
 
     long currentTime = Utils.getCalendar().getTimeInMillis();
@@ -235,7 +235,7 @@ public class LeagueService {
     if (LeagueJoinRequest.update(
       "status = :status, hash = :hash, updatedAt = :updatedAt, userAction = :userAction where id = :id and status = :statusOld",
       params) <= 0) {
-      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
     Map<String, Object> paramsCancel = new HashMap<>();
     paramsCancel.put("status", Enums.LeagueJoinRequestStatus.CANCELLED);
@@ -255,8 +255,8 @@ public class LeagueService {
     paramsLeague.put("league", league.id);
     paramsLeague.put("id", userId);
     paramsLeague.put("joinedLeagueAt", currentTime);
-    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", paramsLeague)) {
-      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id and league is null", paramsLeague)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
     LeagueMemberHistory.create(league, user, ownerUser, Enums.LeagueMemberType.JOIN);
     Map<String, Object> leagueParams = new HashMap<>();

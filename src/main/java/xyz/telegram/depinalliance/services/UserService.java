@@ -428,8 +428,8 @@ public class UserService {
     if (user.status != Enums.UserStatus.MINING) {
       return BigDecimal.ZERO;
     }
-    BigDecimal pointUnClaimed = user.miningPower.multiply(user.rateMining)
-      .divide(new BigDecimal(3600), 18, RoundingMode.FLOOR).multiply(new BigDecimal(time - user.timeStartMining));
+    BigDecimal pointUnClaimed = user.miningPowerReal.divide(new BigDecimal(3600), 18, RoundingMode.FLOOR)
+      .multiply(new BigDecimal(time - user.timeStartMining));
     BigDecimal maximumPower = user.maximumPower.multiply(user.rateCapacity);
     if (user.pointUnClaimed.add(pointUnClaimed).compareTo(maximumPower) > 0) {
       pointUnClaimed = maximumPower.subtract(user.pointUnClaimed);
