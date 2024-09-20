@@ -389,7 +389,6 @@ public class InitService {
           new QuizResponse.Answer(4, "Using a proprietary protocol inaccessible to users", false));
         listQuizResponses.add(quizResponse);
 
-        //
         mission = new Mission();
         mission.groupMission = partner.name;
         mission.name = "Quiz IQ";
@@ -1182,6 +1181,163 @@ public class InitService {
         mission.partner = partner;
         mission.isActive = true;
         mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+      partner = Partner.findByName("Slinky network");
+      if (partner == null) {
+        Item item = redisService.findItemByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "Slinky network";
+        partner.description = "Slinky Web3AI is an infrastructure for the Web3 x AI Creator Economy, secured by Babylon and Bitcoin";
+        partner.rewards = "Up to +110,000 points";
+        partner.orders = 9;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/slinky.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Twitter";
+        mission.orders = 1;
+        mission.url = "https://twitter.com/slinky_network";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Discord";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = "Join Discord";
+        mission.orders = 2;
+        mission.url = "https://discord.slinky.network";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram Group";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join Telegram Group";
+        mission.orders = 3;
+        mission.referId = "slinky_network";
+        mission.url = "https://t.me/slinky_network";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram Channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join Telegram Channel";
+        mission.orders = 4;
+        mission.referId = "slinky_ann";
+        mission.url = "https://t.me/slinky_ann";
+        mission.point = new BigDecimal(20000);
+        mission.xp = new BigDecimal(200);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Subscribe YouTube Channel";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = "Subscribe YouTube Channel";
+        mission.orders = 5;
+        mission.url = "https://youtube.com/@slinky_network?sub_confirmation=1";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        List<QuizResponse> listQuizResponses = new ArrayList<>();
+        QuizResponse quizResponse = new QuizResponse();
+        quizResponse.index = 1;
+        quizResponse.isMultiple = false;
+        quizResponse.question = "What is the primary purpose of Slinky Web3AI?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Trading cryptocurrencies", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "Enabling users to create tokenized AI-powered dApps", true));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Storing NFTs", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Managing blockchain security", false));
+
+        listQuizResponses.add(quizResponse);
+        quizResponse = new QuizResponse();
+        quizResponse.index = 2;
+        quizResponse.question = "Slinky's infrastructure derives security from which blockchain?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Bitcoin, through Babylon", true));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "Ethereum", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Binance Smart Chain", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Solana", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 3;
+        quizResponse.question = "Where can you trade AI dApp tokens created with Slinky?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Uniswap", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "Binance", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Slinky Swap", true));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(4, "Kucoin", false));
+        listQuizResponses.add(quizResponse);
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Quiz";
+        mission.type = Enums.MissionType.QUIZ;
+        mission.isFake = false;
+        mission.description = Utils.convertObjectToString(listQuizResponses);
+        mission.orders = 6;
+        mission.url = "";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.box = 1L;
+        mission.partner = partner;
+        mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
         mission.create();
         mission.persist();
 
