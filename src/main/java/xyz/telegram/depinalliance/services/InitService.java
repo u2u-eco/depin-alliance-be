@@ -794,159 +794,6 @@ public class InitService {
         mission.persist();
       }
 
-      //      partner = Partner.findByName("MiniTon");
-      //      if (partner == null) {
-      //        Item item = redisService.findItemByCode("CYBER_BOX");
-      //        partner = new Partner();
-      //        partner.name = "MiniTon";
-      //        partner.description = "MiniTon is a crypto social esports platform backed by the TON Foundation.";
-      //        partner.rewards = "Up to +80,000 points";
-      //        partner.orders = 6;
-      //        partner.participants = 0;
-      //        partner.isActive = false;
-      //        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/mini-ton.png";
-      //        partner.create();
-      //        partner.persist();
-      //
-      //        Mission mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Join the Telegram Channel";
-      //        mission.type = Enums.MissionType.TELEGRAM;
-      //        mission.isFake = false;
-      //        mission.description = "Join the Telegram Channel";
-      //        mission.orders = 1;
-      //        mission.referId = "MiniTon_Official";
-      //        mission.url = " https://t.me/MiniTon_Official";
-      //        mission.point = new BigDecimal(30000);
-      //        mission.xp = new BigDecimal(500);
-      //        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.isActive = false;
-      //        mission.box = 1L;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        EventMission eventMission = new EventMission();
-      //        eventMission.event = new Event(1L);
-      //        eventMission.mission = mission;
-      //        eventMission.item = item;
-      //        eventMission.number = 1;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Follow Twitter";
-      //        mission.type = Enums.MissionType.TWITTER;
-      //        mission.isFake = true;
-      //        mission.description = "Follow Twitter";
-      //        mission.orders = 2;
-      //        mission.url = "https://x.com/RealMiniTon";
-      //        mission.point = new BigDecimal(10000);
-      //        mission.xp = new BigDecimal(100);
-      //        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.isActive = false;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Visit the website";
-      //        mission.type = Enums.MissionType.URL;
-      //        mission.isFake = true;
-      //        mission.description = "Visit the website";
-      //        mission.orders = 3;
-      //        mission.url = "https://miniton.mvp.games/";
-      //        mission.point = new BigDecimal(10000);
-      //        mission.xp = new BigDecimal(100);
-      //        mission.image = "";
-      //        mission.partner = partner;
-      //        mission.isActive = false;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Play game to get 5000 FREE USDT CHIPS";
-      //        mission.type = Enums.MissionType.PLAY_MINI_TON;
-      //        mission.isFake = false;
-      //        mission.description = "Play game to get 5000 FREE USDT CHIPS";
-      //        mission.orders = 4;
-      //        mission.url = " https://t.me/MiniTonBot/MiniTonGame?startapp=from_U2U";
-      //        mission.point = new BigDecimal(30000);
-      //        mission.xp = new BigDecimal(500);
-      //        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.isActive = false;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        EventMission eventMission = new EventMission();
-      //        eventMission.event = new Event(1L);
-      //        eventMission.mission = mission;
-      //        eventMission.item = item;
-      //        eventMission.number = 1;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Follow Twitter";
-      //        mission.type = Enums.MissionType.TWITTER;
-      //        mission.isFake = true;
-      //        mission.description = "Follow Twitter";
-      //        mission.orders = 2;
-      //        mission.url = "https://x.com/RealMiniTon";
-      //        mission.point = new BigDecimal(10000);
-      //        mission.xp = new BigDecimal(100);
-      //        mission.image = "/assets/images/icons/icon-x-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.isActive = false;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Visit the website";
-      //        mission.type = Enums.MissionType.URL;
-      //        mission.isFake = true;
-      //        mission.description = "Visit the website";
-      //        mission.orders = 3;
-      //        mission.url = "https://miniton.mvp.games/";
-      //        mission.point = new BigDecimal(10000);
-      //        mission.xp = new BigDecimal(100);
-      //        mission.image = "";
-      //        mission.partner = partner;
-      //        mission.isActive = false;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        mission = new Mission();
-      //        mission.groupMission = partner.name;
-      //        mission.name = "Play game to get 5000 FREE USDT CHIPS";
-      //        mission.type = Enums.MissionType.PLAY_MINI_TON;
-      //        mission.isFake = false;
-      //        mission.description = "Play game to get 5000 FREE USDT CHIPS";
-      //        mission.orders = 4;
-      //        mission.url = " https://t.me/MiniTonBot/MiniTonGame?startapp=from_U2U";
-      //        mission.point = new BigDecimal(30000);
-      //        mission.xp = new BigDecimal(500);
-      //        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-      //        mission.partner = partner;
-      //        mission.isActive = false;
-      //        mission.create();
-      //        mission.persist();
-      //
-      //        EventMission eventMission = new EventMission();
-      //        eventMission.event = new Event(1L);
-      //        eventMission.mission = mission;
-      //        eventMission.item = item;
-      //        eventMission.number = 1;
-      //        eventMission.create();
-      //        eventMission.persist();
-      //      }
-
       partner = Partner.findByName("Dextr");
       if (partner == null) {
         Item item = redisService.findItemByCode("CYBER_BOX");
@@ -1300,7 +1147,8 @@ public class InitService {
         quizResponse.isMultiple = false;
         quizResponse.question = "What is the primary purpose of Slinky Web3AI?";
         quizResponse.answers.add(new QuizResponse.Answer(1, "Trading cryptocurrencies", false));
-        quizResponse.answers.add(new QuizResponse.Answer(2, "Enabling users to create tokenized AI-powered dApps", true));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "Enabling users to create tokenized AI-powered dApps", true));
         quizResponse.answers.add(new QuizResponse.Answer(3, "Storing NFTs", false));
         quizResponse.answers.add(new QuizResponse.Answer(4, "Managing blockchain security", false));
 
@@ -1320,8 +1168,7 @@ public class InitService {
         quizResponse.answers.add(new QuizResponse.Answer(1, "Uniswap", false));
         quizResponse.answers.add(new QuizResponse.Answer(2, "Binance", false));
         quizResponse.answers.add(new QuizResponse.Answer(3, "Slinky Swap", true));
-        quizResponse.answers.add(
-          new QuizResponse.Answer(4, "Kucoin", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Kucoin", false));
         listQuizResponses.add(quizResponse);
 
         mission = new Mission();
@@ -1347,6 +1194,105 @@ public class InitService {
         eventMission.number = 1;
         eventMission.create();
         eventMission.persist();
+      }
+
+      partner = Partner.findByName("MiniTon");
+      if (partner == null) {
+        Item item = redisService.findItemByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "MiniTon";
+        partner.description = "MiniTon is a crypto social esports platform backed by the TON Foundation";
+        partner.rewards = "Up to +80,000 points";
+        partner.orders = 10;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/mini-ton.png";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join the Telegram Channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join the Telegram Channel";
+        mission.orders = 1;
+        mission.referId = "MiniTon_Official";
+        mission.url = " https://t.me/MiniTon_Official";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Twitter";
+        mission.orders = 2;
+        mission.url = "https://x.com/RealMiniTon";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Visit the website";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = "Visit the website";
+        mission.orders = 3;
+        mission.url = "https://miniton.mvp.games/";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Play game to get 5000 FREE USDT CHIPS";
+        mission.type = Enums.MissionType.PLAY_MINI_TON;
+        mission.isFake = true;
+        mission.description = "Play game to get 5000 FREE USDT CHIPS";
+        mission.orders = 4;
+        mission.url = " https://t.me/MiniTonBot/MiniTonGame?startapp=from_U2U";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
       }
     }
   }
