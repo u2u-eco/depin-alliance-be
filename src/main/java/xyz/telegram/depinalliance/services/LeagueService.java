@@ -250,13 +250,13 @@ public class LeagueService {
       "status = :status, hash = CONCAT(:userId,'_',league.id,'_',:statusStr,'_',:updatedAt), updatedAt = :updatedAt, userAction.id = :userAction where user.id = :userId and status = :statusOld",
       paramsCancel);
 
-
     User user = User.findById(userId);
     Map<String, Object> paramsLeague = new HashMap<>();
     paramsLeague.put("league", league.id);
     paramsLeague.put("id", userId);
     paramsLeague.put("joinedLeagueAt", currentTime);
-    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id and league is null", paramsLeague)) {
+    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id and league is null",
+      paramsLeague)) {
       throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
     LeagueMemberHistory.create(league, user, ownerUser, Enums.LeagueMemberType.JOIN);

@@ -44,6 +44,10 @@ public class Enums {
     VERIFIED, CLAIMED, NOT_VERIFIED
   }
 
+  public enum MissionRewardType {
+    CYBER_BOX, OPEN_MESH
+  }
+
   public enum FolderImage {
     LEAGUE("league");
 
