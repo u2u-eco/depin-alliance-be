@@ -12,5 +12,4 @@ public class LevelResponse {
   public BigDecimal xpLevelTo;
   public long maxDevice;
 
-
 }

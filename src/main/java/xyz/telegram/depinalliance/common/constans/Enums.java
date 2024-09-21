@@ -44,6 +44,10 @@ public class Enums {
     VERIFIED, CLAIMED, NOT_VERIFIED
   }
 
+  public enum MissionRewardType {
+    CYBER_BOX, OPEN_MESH
+  }
+
   public enum FolderImage {
     LEAGUE("league");
 
@@ -59,6 +63,14 @@ public class Enums {
   }
 
   public enum EventTableType {
-    POINT,USDT,DEVICE
+    POINT, USDT, DEVICE
+  }
+
+  public enum LeagueJoinRequestStatus {
+    PENDING, APPROVED, REJECTED, CANCELLED
+  }
+
+  public enum LeagueMemberType {
+    CREATE, JOIN, KICK, LEAVE, UP_TO_MOD
   }
 }

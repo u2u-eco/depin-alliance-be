@@ -109,8 +109,9 @@ public class UserResource extends BaseResource {
     userInfoResponse.point = Utils.stripDecimalZeros(user.point);
     userInfoResponse.pointUnClaimed = user.pointUnClaimed;
     userInfoResponse.xp = Utils.stripDecimalZeros(user.xp);
-    userInfoResponse.xpLevelFrom = Utils.stripDecimalZeros(user.level.expFrom);
-    userInfoResponse.xpLevelTo = Utils.stripDecimalZeros(user.level.expTo);
+    Level userLevel = redisService.findLevelById(user.level.id);
+    userInfoResponse.xpLevelFrom = Utils.stripDecimalZeros(userLevel.expFrom);
+    userInfoResponse.xpLevelTo = Utils.stripDecimalZeros(userLevel.expTo);
     userInfoResponse.status = user.status;
     userInfoResponse.username = user.username;
     userInfoResponse.pointSkill = Utils.stripDecimalZeros(user.pointSkill);
@@ -118,6 +119,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.lastLoginTime = user.lastLoginTime;
     userInfoResponse.lastCheckin = user.lastCheckIn;
     userInfoResponse.code = user.code;
+    userInfoResponse.pointEarned = user.pointEarned;
     userInfoResponse.totalDevice = user.totalDevice;
     BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
     userInfoResponse.rateBonusReward = new BigDecimal("5").add(rateBonus);
@@ -143,7 +145,6 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("detect-device-info")
-
   public ResponseData detectDeviceInfo(@RestHeader("device-info") String device,
     @RestHeader("platform") String platform) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
@@ -158,7 +159,6 @@ public class UserResource extends BaseResource {
   public ResponseData detectDeviceInfo1(Object request) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.detectDeviceInfo1(getUser(), request);
-      //      Thread.sleep(1000);
       return ResponseData.ok(res);
     }
   }
@@ -168,7 +168,6 @@ public class UserResource extends BaseResource {
   public ResponseData claimRewardNewUser() throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.claimRewardNewUser(getUser());
-      //      Thread.sleep(1000);
       return ResponseData.ok(res);
     }
   }
@@ -178,7 +177,6 @@ public class UserResource extends BaseResource {
   public ResponseData startContributing() throws Exception {
     synchronized (getTelegramId().toString().intern()) {
       Object res = userService.startContributing(getUser());
-      //      Thread.sleep(1000);
       return ResponseData.ok(res);
     }
   }
@@ -203,6 +201,17 @@ public class UserResource extends BaseResource {
     res.put("ranking",
       User.find("id != 1 ", Sort.descending("miningPowerReal").and("createdAt", Sort.Direction.Ascending)).page(0, 30)
         .project(RankingResponse.class).list());
+    return ResponseData.ok(res);
+  }
+
+  @GET
+  @Path("ranking-earned")
+  public ResponseData rankingEarned() {
+    Map<String, Object> res = new HashMap<>();
+    res.put("currentRank", User.findRankEarnedByUserId(getTelegramId()));
+    res.put("ranking",
+      User.find("id != 1 ", Sort.descending("pointEarned").and("miningPowerReal", Sort.Direction.Descending))
+        .page(0, 30).project(RankingEarnedResponse.class).list());
     return ResponseData.ok(res);
   }
 
@@ -243,9 +252,10 @@ public class UserResource extends BaseResource {
     SkillLevelNextResponse levelNextResponse = new SkillLevelNextResponse();
     if (optional.isPresent()) {
       SkillLevel skillLevel = optional.get();
-      levelNextResponse.skillId = skillLevel.skill.id;
-      levelNextResponse.name = skillLevel.skill.name;
-      levelNextResponse.description = skillLevel.skill.description;
+      Skill skill = redisService.findSkillById(skillLevel.skill.id);
+      levelNextResponse.skillId = skill.id;
+      levelNextResponse.name = skill.name;
+      levelNextResponse.description = skill.description;
       levelNextResponse.levelCurrent = userSkill.level;
       levelNextResponse.levelUpgrade = userSkill.level + 1;
       levelNextResponse.feeUpgrade = Utils.stripDecimalZeros(skillLevel.feeUpgrade);

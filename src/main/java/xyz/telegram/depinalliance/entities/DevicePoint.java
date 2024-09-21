@@ -16,8 +16,8 @@ public class DevicePoint extends PanacheEntityBase {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "devicePointSequence")
   public Long id;
   public String name;
-//  @Column(name = "name_normalize")
-//  public String nameNormalize;
+  //  @Column(name = "name_normalize")
+  //  public String nameNormalize;
   public String platform;
   public BigDecimal point;
 

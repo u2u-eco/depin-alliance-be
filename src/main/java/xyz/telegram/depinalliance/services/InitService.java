@@ -324,6 +324,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join Telegram channel";
         mission.orders = 2;
+        mission.referId = "UnicornUltraGlobal";
         mission.url = "https://t.me/UnicornUltraGlobal/120759";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);

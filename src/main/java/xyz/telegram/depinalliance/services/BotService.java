@@ -22,11 +22,11 @@ import java.util.concurrent.Executors;
 
 public class BotService extends TelegramLongPollingBot {
 
-  Executor updatesProcessorExecutor = Executors.newFixedThreadPool(20);
   private final String botName;
   private final InlineKeyboardMarkup inlineKeyboardMarkup;
   private final String messageStr;
   private final UserService userService;
+  Executor updatesProcessorExecutor = Executors.newFixedThreadPool(20);
 
   public BotService(String botToken, String url, String botName, UserService userService) {
     super(botToken);

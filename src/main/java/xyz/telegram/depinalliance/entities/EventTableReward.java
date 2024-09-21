@@ -1,6 +1,5 @@
 package xyz.telegram.depinalliance.entities;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import xyz.telegram.depinalliance.common.constans.Enums;

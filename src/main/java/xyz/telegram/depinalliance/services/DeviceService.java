@@ -51,9 +51,9 @@ public class DeviceService {
       if (userDevice == null) {
         throw new BusinessException(ResponseMessageConstants.DEVICE_USER_NOT_FOUND);
       }
-      int maxSlot = 0;
-      int slotUsed = 0;
-      String query = "";
+      int maxSlot;
+      int slotUsed;
+      String query;
       switch (item.type) {
       case CPU:
         maxSlot = redisService.getSystemConfigInt(Enums.Config.CPU_SLOT);
@@ -118,8 +118,9 @@ public class DeviceService {
     }
     int maxSlot;
     int slotUsed;
+    Item item = redisService.findItemById(userItem.item.id);
     String query = "{field} = {field} + 1, totalMiningPower = totalMiningPower + :miningPower where id =:id and {field} + 1 <= :maxSlot";
-    switch (userItem.item.type) {
+    switch (item.type) {
     case CPU:
       maxSlot = redisService.getSystemConfigInt(Enums.Config.CPU_SLOT);
       slotUsed = userDevice.slotCpuUsed;
@@ -149,7 +150,7 @@ public class DeviceService {
     Map<String, Object> params = new HashMap<>();
     params.put("id", userDevice.id);
     params.put("maxSlot", maxSlot);
-    params.put("miningPower", userItem.item.miningPower);
+    params.put("miningPower", item.miningPower);
     if (!UserDevice.updateObject(query, params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
@@ -157,7 +158,7 @@ public class DeviceService {
     paramsUserItem.put("id", itemId);
     paramsUserItem.put("userDeviceId", userDevice.id);
     UserItem.updateObject(" userDevice.id = :userDeviceId where id = :id and userDevice is null", paramsUserItem);
-    userService.changeMiningPower(user, userItem.item.miningPower);
+    userService.changeMiningPower(user, item.miningPower);
     return true;
   }
 
@@ -170,7 +171,8 @@ public class DeviceService {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     String query = "{field} = {field} - 1, totalMiningPower = totalMiningPower - :miningPower where id =:id and {field} - 1 >=0 ";
-    switch (userItem.item.type) {
+    Item item = redisService.findItemById(userItem.item.id);
+    switch (item.type) {
     case CPU:
       query = query.replace("{field}", "slotCpuUsed");
       break;
@@ -186,7 +188,7 @@ public class DeviceService {
     }
     Map<String, Object> params = new HashMap<>();
     params.put("id", userItem.userDevice.id);
-    params.put("miningPower", userItem.item.miningPower);
+    params.put("miningPower", item.miningPower);
     if (!UserDevice.updateObject(query, params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
@@ -195,7 +197,7 @@ public class DeviceService {
     paramsUserItem.put("id", itemId);
     paramsUserItem.put("userDeviceId", null);
     UserItem.updateObject(" userDevice.id = :userDeviceId where id = :id and userDevice is not null", paramsUserItem);
-    userService.changeMiningPower(user, userItem.item.miningPower.multiply(new BigDecimal("-1")));
+    userService.changeMiningPower(user, item.miningPower.multiply(new BigDecimal("-1")));
     return true;
   }
 
@@ -206,7 +208,9 @@ public class DeviceService {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
     } else if (userItem.userDevice != null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
-    } else if (!userItem.item.isCanSell) {
+    }
+    Item item = redisService.findItemById(userItem.item.id);
+    if (!item.isCanSell) {
       throw new BusinessException(ResponseMessageConstants.ITEM_CANNOT_SELL);
     }
     Map<String, Object> paramsUserItem = new HashMap<>();
@@ -215,9 +219,8 @@ public class DeviceService {
     if (UserItem.updateObject(" isActive = :isActive where id = :id and isActive = true", paramsUserItem) <= 0) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
-    User.updatePointUser(user.id, userItem.item.price.multiply(new BigDecimal("0.5")));
-    new UserItemTradeHistory(user, userItem, userItem.item.price, userItem.item.price.multiply(new BigDecimal("0.5")),
-      false).create();
+    User.updatePointUser(user.id, item.price.multiply(new BigDecimal("0.5")));
+    new UserItemTradeHistory(user, userItem, item.price, item.price.multiply(new BigDecimal("0.5")), false).create();
     return true;
   }
 
@@ -247,10 +250,53 @@ public class DeviceService {
     }
     for (Long id : itemIds) {
       UserItem userItem = UserItem.findById(id);
-      new UserItemTradeHistory(user, userItem, userItem.item.price, userItem.item.price.multiply(new BigDecimal("0.5")),
-        false).create();
+      new UserItemTradeHistory(user, userItem, item.price, item.price.multiply(new BigDecimal("0.5")), false).create();
     }
     User.updatePointUser(user.id, item.price.multiply(new BigDecimal(request.number)).multiply(new BigDecimal("0.5")));
+    return true;
+  }
+
+  @Transactional
+  public boolean swapItem(User user, long itemRemoveId, long itemAddId) throws Exception {
+    UserItem userItemRemove = UserItem.findByIdAndUser(itemRemoveId, user.id);
+    if (userItemRemove == null) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    } else if (userItemRemove.userDevice == null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    UserItem userItemAdd = UserItem.findByIdAndUser(itemAddId, user.id);
+    if (userItemAdd == null) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    } else if (userItemAdd.userDevice != null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Item removeItem = redisService.findItemById(userItemRemove.item.id);
+    Item addItem = redisService.findItemById(userItemAdd.item.id);
+    String query = "totalMiningPower = totalMiningPower - :miningPowerOld + :miningPowerNew where id =:id";
+    long userDeviceId = userItemRemove.userDevice.id;
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", userDeviceId);
+    params.put("miningPowerOld", removeItem.miningPower);
+    params.put("miningPowerNew", addItem.miningPower);
+    if (!UserDevice.updateObject(query, params)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    Map<String, Object> paramsUserItemAdd = new HashMap<>();
+    paramsUserItemAdd.put("id", itemAddId);
+    paramsUserItemAdd.put("userDeviceId", userDeviceId);
+    if (UserItem.updateObject(" userDevice.id = :userDeviceId where id = :id and userDevice is null",
+      paramsUserItemAdd) == 0) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+
+    Map<String, Object> paramsUserItemRemove = new HashMap<>();
+    paramsUserItemRemove.put("id", itemRemoveId);
+    paramsUserItemRemove.put("userDeviceId", null);
+    if (UserItem.updateObject(" userDevice.id = :userDeviceId where id = :id and userDevice is not null",
+      paramsUserItemRemove) == 0) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    userService.changeMiningPower(user, removeItem.miningPower, addItem.miningPower);
     return true;
   }
 
@@ -378,8 +424,8 @@ public class DeviceService {
           Utils.stripDecimalZeros(eventTableReward.amount));
       case DEVICE:
         UserItem.create(new UserItem(user, eventTableReward.item, null));
-        return new ItemBoxOpenResponse(eventTableReward.item.type.name(), eventTableReward.item.name,
-          Utils.stripDecimalZeros(eventTableReward.item.price));
+        Item item = redisService.findItemById(eventTableReward.item.id);
+        return new ItemBoxOpenResponse(item.type.name(), item.name, Utils.stripDecimalZeros(item.price));
       case USDT:
         if (Event.updateTotalUsdt(eventTableReward.amount, 1L)) {
           UserItem.create(new UserItem(user, eventTableReward.item, null));
@@ -396,4 +442,5 @@ public class DeviceService {
     }
     return null;
   }
+
 }

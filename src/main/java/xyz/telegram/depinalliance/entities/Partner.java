@@ -35,6 +35,8 @@ public class Partner extends BaseEntity {
   }
 
   public static void updateParticipants(long partnerId) {
-    update("update Partner p set participants = participants + 1 where id = ?1 and participants < (select count(1) from User)", partnerId);
+    update(
+      "update Partner p set participants = participants + 1 where id = ?1 and participants < (select count(1) from User)",
+      partnerId);
   }
 }

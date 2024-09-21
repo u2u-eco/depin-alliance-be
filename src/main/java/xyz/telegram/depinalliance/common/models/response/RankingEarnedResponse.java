@@ -7,15 +7,14 @@ import java.math.BigDecimal;
 /**
  * @author holden on 26-Aug-2024
  */
-public class RankingResponse {
+public class RankingEarnedResponse {
   public String username;
   public String avatar;
-  public BigDecimal miningPower;
+  public BigDecimal pointEarned;
 
-  public RankingResponse(String username, String avatar, BigDecimal miningPowerReal) {
+  public RankingEarnedResponse(String username, String avatar, BigDecimal pointEarned) {
     this.username = username;
     this.avatar = avatar;
-    this.miningPower = Utils.stripDecimalZeros(miningPowerReal);
+    this.pointEarned = Utils.stripDecimalZeros(pointEarned);
   }
-
 }

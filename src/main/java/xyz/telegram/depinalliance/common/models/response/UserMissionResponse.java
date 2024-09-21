@@ -2,6 +2,7 @@ package xyz.telegram.depinalliance.common.models.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.utils.Utils;
 
@@ -35,6 +36,10 @@ public class UserMissionResponse {
   public List<QuizResponse> quizArrays;
   @JsonIgnore
   public Long partnerId;
+  @JsonIgnore
+  public Enums.MissionRewardType rewardType;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public String rewardImage;
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
     Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,
@@ -54,7 +59,6 @@ public class UserMissionResponse {
     this.box = box;
     this.referId = referId;
     this.partnerId = partnerId;
-
     if (type == Enums.MissionType.QUIZ) {
       try {
         this.quizArrays = Utils.mapToList(description, QuizResponse.class);

@@ -22,13 +22,23 @@ public class LeagueResponse {
   public Boolean isOwner;
   public long level;
   public BigDecimal xp;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Boolean isPendingRequest;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public String adminUsername;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public BigDecimal adminMiningPower;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public String adminAvatar;
 
-  public LeagueResponse(String code, String name, String avatar, Long totalContributors, BigDecimal totalMining) {
+  public LeagueResponse(String code, String name, String avatar, Long totalContributors, BigDecimal totalMining,
+    Long leagueId) {
     this.code = code;
     this.name = name;
     this.totalContributors = totalContributors;
     this.totalMining = Utils.stripDecimalZeros(totalMining);
     this.avatar = avatar;
+    this.isPendingRequest = leagueId != null;
   }
 
   public LeagueResponse(League league, String userCode) {
@@ -39,7 +49,7 @@ public class LeagueResponse {
     this.avatar = league.avatar;
     this.inviteLink = userCode + "_" + league.code;
     this.xp = Utils.stripDecimalZeros(league.xp);
-    this.level = league.level.id;
+    //    this.level = league.level.id;
   }
 
   public LeagueResponse(League league, User user) {
@@ -50,7 +60,24 @@ public class LeagueResponse {
     this.avatar = league.avatar;
     this.inviteLink = user.code + "_" + league.code;
     this.isOwner = league.user.id == user.id;
+    User userAdmin = league.user;
+    if (userAdmin != null) {
+      this.adminUsername = userAdmin.username;
+      this.adminMiningPower = userAdmin.miningPowerReal;
+      this.adminAvatar = userAdmin.avatar;
+    }
     this.xp = Utils.stripDecimalZeros(league.xp);
-    this.level = league.level.id;
+    //    this.level = league.level.id;
+  }
+
+  public LeagueResponse(League league, boolean isPendingRequest) {
+    this.code = league.code;
+    this.name = league.name;
+    this.totalContributors = league.totalContributors;
+    this.totalMining = Utils.stripDecimalZeros(league.totalMining);
+    this.avatar = league.avatar;
+    this.xp = Utils.stripDecimalZeros(league.xp);
+    //    this.level = league.level.id;
+    this.isPendingRequest = isPendingRequest;
   }
 }
