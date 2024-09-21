@@ -131,7 +131,8 @@ public class LeagueService {
     if (userKick == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
     }
-    if (user.league == null || userKick.league == null || user.id == id || userKick.league.id != user.league.id) {
+    if (user.league == null || userKick.league == null || user.id == id || !Objects.equals(userKick.league.id,
+      user.league.id)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     user.league = redisService.findLeagueById(user.league.id, true);

@@ -32,4 +32,5 @@ public class UserInfoResponse {
   public Boolean isPremium;
   public String detectDevice;
   public String devicePlatform;
+  public BigDecimal pointEarned;
 }

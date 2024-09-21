@@ -119,6 +119,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.lastLoginTime = user.lastLoginTime;
     userInfoResponse.lastCheckin = user.lastCheckIn;
     userInfoResponse.code = user.code;
+    userInfoResponse.pointEarned = user.pointEarned;
     userInfoResponse.totalDevice = user.totalDevice;
     BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
     userInfoResponse.rateBonusReward = new BigDecimal("5").add(rateBonus);
