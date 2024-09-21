@@ -47,7 +47,7 @@ public class LeagueJoinRequest extends BaseEntity {
 
   public static ResponsePage<LeagueJoinResponse> findPendingByPagingAndLeagueId(PagingParameters pageable,
     long leagueId, String username) {
-    String sql = "select user.username, user.id, user.miningPower, user.avatar from LeagueJoinRequest where league.id = :leagueId and status = :status";
+    String sql = "select user.username, user.id, user.miningPowerReal, user.avatar from LeagueJoinRequest where league.id = :leagueId and status = :status";
     Map<String, Object> params = new HashMap<>();
     params.put("leagueId", leagueId);
     params.put("status", Enums.LeagueJoinRequestStatus.PENDING);

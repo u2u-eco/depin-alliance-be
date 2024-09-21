@@ -11,10 +11,10 @@ public class LeagueJoinResponse {
   public BigDecimal miningPower;
   public String avatar;
 
-  public LeagueJoinResponse(String username, Long userId, BigDecimal miningPower, String avatar) {
+  public LeagueJoinResponse(String username, Long userId, BigDecimal miningPowerReal, String avatar) {
     this.username = username;
     this.userId = userId;
-    this.miningPower = miningPower;
+    this.miningPower = miningPowerReal;
     this.avatar = avatar;
   }
 }

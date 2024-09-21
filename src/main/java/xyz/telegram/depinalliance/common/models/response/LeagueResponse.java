@@ -63,7 +63,7 @@ public class LeagueResponse {
     User userAdmin = league.user;
     if (userAdmin != null) {
       this.adminUsername = userAdmin.username;
-      this.adminMiningPower = userAdmin.miningPower;
+      this.adminMiningPower = userAdmin.miningPowerReal;
       this.adminAvatar = userAdmin.avatar;
     }
     this.xp = Utils.stripDecimalZeros(league.xp);

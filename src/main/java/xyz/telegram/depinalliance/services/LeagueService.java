@@ -133,11 +133,11 @@ public class LeagueService {
     }
     if (user.league == null || userKick.league == null || user.id == id || !Objects.equals(userKick.league.id,
       user.league.id)) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
     }
     user.league = redisService.findLeagueById(user.league.id, true);
     if (!Objects.equals(user.league.user.id, user.id)) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
     }
 
     Map<String, Object> params = new HashMap<>();
