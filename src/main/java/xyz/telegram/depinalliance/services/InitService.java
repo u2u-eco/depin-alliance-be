@@ -1295,6 +1295,105 @@ public class InitService {
         eventMission.persist();
 
       }
+
+      partner = Partner.findByName("Re");
+      if (partner == null) {
+        Item item = redisService.findItemByCode("CYBER_BOX");
+        partner = new Partner();
+        partner.name = "Re";
+        partner.description = "Re is a real world restaking platform that connects DeFi with reinsurance as a real-world asset (RWA)";
+        partner.rewards = "Up to +60,000 points";
+        partner.orders = 11;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/re.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/re";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Twitter";
+        mission.orders = 2;
+        mission.url = "https://x.com/REprotocol";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Discord";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = "Join Discord";
+        mission.orders = 3;
+        mission.url = "https://discord.com/invite/reprotocol";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join Telegram channel";
+        mission.orders = 4;
+        mission.url = " https://t.me/re_protocol";
+        mission.referId = "re_protocol";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.box = 1L;
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(1L);
+        eventMission.mission = mission;
+        eventMission.item = item;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+      }
     }
   }
 }
