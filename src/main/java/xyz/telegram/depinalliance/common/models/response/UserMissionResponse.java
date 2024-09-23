@@ -2,7 +2,6 @@ package xyz.telegram.depinalliance.common.models.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Column;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.utils.Utils;
 
@@ -29,7 +28,7 @@ public class UserMissionResponse {
   @JsonIgnore
   public Enums.MissionRequire missionRequire;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public Long box;
+  public Long amount;
   @JsonIgnore
   public String referId;
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -39,11 +38,14 @@ public class UserMissionResponse {
   @JsonIgnore
   public Enums.MissionRewardType rewardType;
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  public String rewardName;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public String rewardImage;
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
     Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,
-    Enums.MissionRequire missionRequire, Long box, String referId, Long partnerId) {
+    Enums.MissionRequire missionRequire, Long amount, String referId, Long partnerId, Enums.MissionRewardType rewardType,
+    String rewardImage) {
     this.groupMission = groupMission;
     this.name = name;
     this.description = description;
@@ -56,7 +58,7 @@ public class UserMissionResponse {
     this.image = image;
     this.isFake = isFake;
     this.missionRequire = missionRequire;
-    this.box = box;
+    this.amount = amount;
     this.referId = referId;
     this.partnerId = partnerId;
     if (type == Enums.MissionType.QUIZ) {
@@ -66,6 +68,14 @@ public class UserMissionResponse {
 
       }
       this.description = "";
+    }
+    this.rewardType = rewardType;
+    this.rewardImage = rewardImage;
+    if (rewardType != null) {
+      this.rewardName = switch (rewardType) {
+        case CYBER_BOX -> "box";
+        case OPEN_MESH -> "OPEN";
+      };
     }
   }
 }

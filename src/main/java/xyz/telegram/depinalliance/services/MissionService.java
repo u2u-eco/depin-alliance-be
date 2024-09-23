@@ -1,6 +1,5 @@
 package xyz.telegram.depinalliance.services;
 
-import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -8,10 +7,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
-import xyz.telegram.depinalliance.common.models.response.DailyCheckinResponse;
-import xyz.telegram.depinalliance.common.models.response.GroupMissionResponse;
-import xyz.telegram.depinalliance.common.models.response.QuizResponse;
-import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
+import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
@@ -31,6 +27,8 @@ public class MissionService {
   LeagueService leagueService;
   @Inject
   TelegramService telegramService;
+  @Inject
+  RedisService redisService;
   @RestClient
   MiniTonClient miniTonClient;
 
@@ -40,9 +38,9 @@ public class MissionService {
     long today = calendar.getTimeInMillis() / 1000;
     long dayCheckin = user.startCheckIn == 0 ? 1 : ((today - user.startCheckIn) / 86400);
     if (user.startCheckIn == 0 || today - user.lastCheckIn > 86400 || dayCheckin < 4) {
-      dailyCheckins = DailyCheckin.findAll(Sort.ascending("id")).page(0, 8).list();
+      dailyCheckins = redisService.findFirstCheckin();
     } else {
-      dailyCheckins = DailyCheckin.list("id >= ?1 and id <= ?2", Sort.ascending("id"), dayCheckin - 2, dayCheckin + 5);
+      dailyCheckins = redisService.findListDailyCheckinByDay(dayCheckin);
     }
     if (user.lastCheckIn == today) {
       if (dayCheckin >= 4) {
@@ -100,7 +98,7 @@ public class MissionService {
     }
     //chua checkin or miss
     if (user.startCheckIn == 0 || today - user.lastCheckIn > 86400) {
-      DailyCheckin dailyCheckin = DailyCheckin.findById(1);
+      DailyCheckin dailyCheckin = redisService.findDailyCheckinByDay(1);
       Map<String, Object> paramsUser = new HashMap<>();
       paramsUser.put("id", user.id);
       paramsUser.put("startCheckIn", today);
@@ -119,16 +117,16 @@ public class MissionService {
     //checkin lien tiep
     if (today - user.lastCheckIn == 86400) {
       long day = ((today - user.startCheckIn) / 86400) + 1;
-      long countDays = DailyCheckin.count();
+      long countDays = redisService.findDailyCheckinCount();
       String sql = "";
       DailyCheckin dailyCheckin;
       Map<String, Object> paramsUser = new HashMap<>();
       if (day == (countDays + 1)) {
-        dailyCheckin = DailyCheckin.findById(1);
+        dailyCheckin = redisService.findDailyCheckinByDay(1);
         paramsUser.put("startCheckIn", today);
         sql += "startCheckIn = :startCheckIn,";
       } else {
-        dailyCheckin = DailyCheckin.findById(day);
+        dailyCheckin = redisService.findDailyCheckinByDay(day);
       }
 
       paramsUser.put("id", user.id);
@@ -148,7 +146,7 @@ public class MissionService {
   }
 
   @Transactional
-  public boolean verify(User user, long missionId, List<QuizResponse> answerArrays) throws Exception {
+  public boolean verify(User user, long missionId, List<QuizResponse> answerArrays) {
     UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
     if (check == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
@@ -241,6 +239,13 @@ public class MissionService {
       UserMission.create(userMission);
       if (check.partnerId != null) {
         Partner.updateParticipants(check.partnerId);
+        redisService.clearMissionUser("PARTNER", user.id);
+      } else {
+        if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+          redisService.clearMissionUser("REWARD_ONE_TIME", user.id);
+        } else {
+          redisService.clearMissionUser("REWARD", user.id);
+        }
       }
       return true;
     }
@@ -248,7 +253,7 @@ public class MissionService {
   }
 
   public void event1(User user, long missionId) throws BusinessException {
-    EventMission eventMission = EventMission.findByEventAndMission(1L, missionId);
+    EventMission eventMission = EventMission.findByEventAndMission(Enums.EventId.CYBER_BOX.getId(), missionId);
     if (eventMission == null) {
       return;
     }
@@ -258,7 +263,7 @@ public class MissionService {
   }
 
   @Transactional
-  public boolean claim(User user, long missionId) throws BusinessException {
+  public MissionRewardResponse claim(User user, long missionId) throws BusinessException {
     UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
     if (check == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
@@ -275,14 +280,36 @@ public class MissionService {
         userService.updateLevelByExp(user.id);
         leagueService.updateXp(user, check.xp);
       }
-      event1(user, check.id);
-      return true;
+      if (check.partnerId != null) {
+        redisService.clearMissionUser("PARTNER", user.id);
+      } else {
+        if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+          redisService.clearMissionUser("REWARD_ONE_TIME", user.id);
+        } else {
+          redisService.clearMissionUser("REWARD", user.id);
+        }
+      }
+      if (check.rewardType != null && check.amount > 0) {
+        switch (check.rewardType) {
+        case CYBER_BOX:
+          event1(user, check.id);
+          return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
+        case OPEN_MESH:
+          if (Event.updateTotalUsdt(new BigDecimal(check.amount), Enums.EventId.OPEN_MESH.getId())) {
+            UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.OPEN_MESH.name()), null));
+            return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
+          } else {
+            Mission.update("amount = 0 where id = ?1 and amount > 0", check.id);
+          }
+        }
+      }
+      return null;
     }
-    return false;
+    throw new BusinessException(ResponseMessageConstants.MISSION_CLAIM_ERROR);
   }
 
-  public List<GroupMissionResponse> getMissionReward(User user) throws Exception {
-    List<UserMissionResponse> userMissions = Mission.findByUserId(user.id, false);
+  public List<GroupMissionResponse> getMissionReward(User user) {
+    List<UserMissionResponse> userMissions = redisService.findMissionRewardNotOneTime(user.id, false);
     List<GroupMissionResponse> groupMissions = new ArrayList<>();
     for (UserMissionResponse userMission : userMissions) {
       GroupMissionResponse groupMission = groupMissions.stream()
@@ -299,7 +326,7 @@ public class MissionService {
     long level = user.level.id;
     long countFriend = -1;
     long countFriendEvent = -1;
-    List<UserMissionResponse> userMissionProduct = Mission.findTypeOnTimeInAppByUserId(user.id);
+    List<UserMissionResponse> userMissionProduct = redisService.findMissionRewardOneTime(user.id);
     boolean isHasMissionLevel = false;
     boolean isHasMissionInvite = false;
     boolean isHasMissionInviteEvent = false;

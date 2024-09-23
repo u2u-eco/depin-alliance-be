@@ -70,7 +70,7 @@ public class InitService {
           mission.create();
           mission.persist();
 
-          Item item = redisService.findItemByCode("CYBER_BOX");
+          Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
           mission = new Mission();
           mission.groupMission = "Summon DePIN Alliance";
           mission.name = "Follow U2U Network X";
@@ -81,13 +81,15 @@ public class InitService {
           mission.url = "https://x.com/uniultra_xyz";
           mission.point = new BigDecimal(10000);
           mission.xp = new BigDecimal(200);
-          mission.box = 1L;
+          mission.amount = 1L;
+          mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+          mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
           mission.image = "/assets/images/icons/icon-x-gradient.svg";
           mission.create();
           mission.persist();
 
           EventMission eventMissionInvite = new EventMission();
-          eventMissionInvite.event = new Event(1L);
+          eventMissionInvite.event = new Event(Enums.EventId.CYBER_BOX.getId());
           eventMissionInvite.mission = mission;
           eventMissionInvite.item = item;
           eventMissionInvite.number = 1;
@@ -106,12 +108,15 @@ public class InitService {
           mission.xp = new BigDecimal(200);
           mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
           mission.referId = "UnicornUltraGlobal";
-          mission.box = 1L;
+          mission.amount = 1L;
+          mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+          mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
           mission.create();
           mission.persist();
 
           eventMissionInvite = new EventMission();
-          eventMissionInvite.event = new Event(1L);
+          eventMissionInvite.event = new Event(Enums.EventId.CYBER_BOX.getId());
           eventMissionInvite.mission = mission;
           eventMissionInvite.item = item;
           eventMissionInvite.number = 1;
@@ -250,7 +255,7 @@ public class InitService {
         List<Long> rangeInviteEvent = Arrays.asList(3L, 8L, 13L, 18L, 23L, 28L, 33L, 38L, 43L, 48L, 53L, 58L, 63L, 68L,
           73L, 78L, 83L, 88L, 93L, 98L);
         int orders = 3000;
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         for (Long id : rangeInviteEvent) {
           Enums.MissionRequire require = Enums.MissionRequire.valueOf("EVENT_INVITE_" + id);
           if (Mission.findByMissionRequire(require) == null) {
@@ -264,11 +269,14 @@ public class InitService {
             mission.missionRequire = require;
             mission.point = new BigDecimal(0);
             mission.xp = new BigDecimal(0);
-            mission.box = 1L;
+            mission.amount = 1L;
+            mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+            mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
             mission.create();
             mission.persist();
             EventMission eventMissionInvite = new EventMission();
-            eventMissionInvite.event = new Event(1L);
+            eventMissionInvite.event = new Event(Enums.EventId.CYBER_BOX.getId());
             eventMissionInvite.mission = mission;
             eventMissionInvite.item = item;
             eventMissionInvite.number = 1;
@@ -280,7 +288,7 @@ public class InitService {
 
       Partner partner = Partner.findByName("U2DPN");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "U2DPN";
         partner.description = "Embrace the revolution of the decentralized Internet and monetize your unused bandwidth";
@@ -304,13 +312,16 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.isActive = true;
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -346,13 +357,16 @@ public class InitService {
         mission.xp = new BigDecimal(200);
         mission.image = "";
         mission.partner = partner;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.isActive = true;
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -399,14 +413,17 @@ public class InitService {
         mission.url = "";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.partner = partner;
         mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -416,7 +433,7 @@ public class InitService {
 
       partner = Partner.findByName("Mizzle");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "Mizzle";
         partner.description = "A DePIN platform empowering developers with No-Code DevOps, limitless cloud compute & storage resources, and unparalleled security through TEEs, eBPF, FHE, and ZK. \n" + "We're Quantum-Ready!";
@@ -440,13 +457,16 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.isActive = true;
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -467,12 +487,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -499,7 +522,7 @@ public class InitService {
 
       partner = Partner.findByName("Pindora");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "Pindora";
         partner.description = "We're building a DePIN Aggregator Platform";
@@ -525,12 +548,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -549,13 +575,16 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.isActive = true;
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -590,13 +619,16 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.isActive = true;
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -606,7 +638,7 @@ public class InitService {
 
       partner = Partner.findByName("ZkAGI");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "ZkAGI";
         partner.description = "ZkAGI is the first privacy AI DePIN, integrating advanced technologies like artificial intelligence (AI) and blockchain";
@@ -630,13 +662,16 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.isActive = true;
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -657,12 +692,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -689,7 +727,7 @@ public class InitService {
 
       partner = Partner.findByName("Hermes Alpha Zone");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "Hermes Alpha Zone";
         partner.description = "A go to space for all native crypto alpha, news, airdrops, potential 100x gems and educational contents on DeFi";
@@ -713,13 +751,16 @@ public class InitService {
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.isActive = true;
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -740,12 +781,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -766,12 +810,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -797,7 +844,7 @@ public class InitService {
 
       partner = Partner.findByName("Dextr");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "Dextr";
         partner.description = "The world’s first Actively Validated Market Maker (AVMM) featuring built-in MEV Insurance";
@@ -839,12 +886,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -871,7 +921,7 @@ public class InitService {
 
       partner = Partner.findByName("aZen Protocol");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "aZen Protocol";
         partner.description = "Empowers DePIN for Universal Computing Tasks";
@@ -913,12 +963,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -945,7 +998,7 @@ public class InitService {
 
       partner = Partner.findByName("Unicorn Kingdom");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "Unicorn Kingdom";
         partner.description = "The ultimate Tap to Earn adventure on Telegram! \uD83E\uDD84✨";
@@ -1002,12 +1055,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -1027,12 +1083,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -1041,7 +1100,7 @@ public class InitService {
       }
       partner = Partner.findByName("Slinky network");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "Slinky network";
         partner.description = "Slinky Web3AI is an infrastructure for the Web3 x AI Creator Economy, secured by Babylon and Bitcoin";
@@ -1098,12 +1157,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -1182,14 +1244,17 @@ public class InitService {
         mission.url = "";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.partner = partner;
         mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -1199,7 +1264,7 @@ public class InitService {
 
       partner = Partner.findByName("MiniTon");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "MiniTon";
         partner.description = "MiniTon is a crypto social esports platform backed by the TON Foundation";
@@ -1225,12 +1290,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -1282,12 +1350,15 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -1298,7 +1369,7 @@ public class InitService {
 
       partner = Partner.findByName("Re");
       if (partner == null) {
-        Item item = redisService.findItemByCode("CYBER_BOX");
+        Item item = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
         partner = new Partner();
         partner.name = "Re";
         partner.description = "Re is a real world restaking platform that connects DeFi with reinsurance as a real-world asset (RWA)";
@@ -1323,12 +1394,14 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-x-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
         mission.create();
         mission.persist();
 
         EventMission eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
@@ -1381,18 +1454,101 @@ public class InitService {
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
-        mission.box = 1L;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+
         mission.create();
         mission.persist();
 
         eventMission = new EventMission();
-        eventMission.event = new Event(1L);
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
         eventMission.mission = mission;
         eventMission.item = item;
         eventMission.number = 1;
         eventMission.create();
         eventMission.persist();
 
+      }
+
+      partner = Partner.findByName("Openmesh");
+      if (partner == null) {
+        Item itemOpenmesh = redisService.findItemByCode(Enums.ItemSpecial.OPEN_MESH.name());
+        Item itemBox = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
+
+        partner = new Partner();
+        partner.name = "Openmesh";
+        partner.description = "Building a Decentralized Cloud + Data + Oracle Network for the world, without a middleman!\n" + "\n" + "Giveaway 100,000 OPEN tokens, don't miss out!";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 12;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/open.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow OpenMesh on Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow OpenMesh on Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/OpenmeshNetwork";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.OPEN_MESH;
+        mission.rewardImage = itemOpenmesh.image;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join OpenMesh's Telegram";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join OpenMesh's Telegram";
+        mission.orders = 2;
+        mission.url = " https://t.me/openmesh";
+        mission.referId = "openmesh";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Visit the website";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = "Visit the website";
+        mission.orders = 3;
+        mission.url = "https://www.openmesh.network";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
       }
     }
   }

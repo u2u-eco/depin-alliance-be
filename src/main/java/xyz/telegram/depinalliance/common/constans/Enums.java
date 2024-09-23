@@ -29,7 +29,7 @@ public class Enums {
   }
 
   public enum ItemSpecial {
-    CYBER_BOX, USDT_0_001, USDT_0_002, USDT_0_1, USDT_0_5, USDT_1
+    CYBER_BOX, OPEN_MESH
   }
 
   public enum MissionType {
@@ -72,5 +72,18 @@ public class Enums {
 
   public enum LeagueMemberType {
     CREATE, JOIN, KICK, LEAVE, UP_TO_MOD
+  }
+
+  public enum EventId {
+    CYBER_BOX(1), OPEN_MESH(2);
+    private final long id;
+
+    EventId(long id) {
+      this.id = id;
+    }
+
+    public long getId() {
+      return this.id;
+    }
   }
 }

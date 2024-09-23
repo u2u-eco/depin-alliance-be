@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.services;
 
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -7,9 +8,11 @@ import org.jboss.logging.Logger;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
+import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -202,6 +205,141 @@ public class RedisService {
       }
     }
     return BigDecimal.ZERO;
+  }
+
+  public List<DailyCheckin> findFirstCheckin() {
+    try {
+      String redisKey = "DAILY_CHECKIN_LIST_FIRST";
+      RBucket<List<DailyCheckin>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache daily checkin list first");
+      List<DailyCheckin> object = DailyCheckin.findAll(Sort.ascending("id")).page(0, 8).list();
+      if (object != null) {
+        value.setAsync(object);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding daily checkin list first");
+    }
+    return DailyCheckin.findAll(Sort.ascending("id")).page(0, 8).list();
+  }
+
+  public List<DailyCheckin> findListDailyCheckinByDay(long dayCheckin) {
+    try {
+      String redisKey = "DAILY_CHECKIN_LIST_" + dayCheckin;
+      RBucket<List<DailyCheckin>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache daily checkin list by day " + dayCheckin);
+      List<DailyCheckin> object = DailyCheckin.list("id >= ?1 and id <= ?2", Sort.ascending("id"), dayCheckin - 2,
+        dayCheckin + 5);
+      if (object != null) {
+        value.setAsync(object);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding daily checkin by day " + dayCheckin);
+    }
+    return DailyCheckin.list("id >= ?1 and id <= ?2", Sort.ascending("id"), dayCheckin - 2, dayCheckin + 5);
+  }
+
+  public DailyCheckin findDailyCheckinByDay(long dayCheckin) {
+    try {
+      String redisKey = "DAILY_CHECKIN_" + dayCheckin;
+      RBucket<DailyCheckin> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache daily checkin by day " + dayCheckin);
+      DailyCheckin object = DailyCheckin.findById(dayCheckin);
+      if (object != null) {
+        value.setAsync(object);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding daily by day " + dayCheckin);
+    }
+    return DailyCheckin.findById(dayCheckin);
+  }
+
+  public long findDailyCheckinCount() {
+    try {
+      String redisKey = "DAILY_CHECKIN_COUNT";
+      RBucket<Long> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache daily checkin count ");
+      Long object = DailyCheckin.count();
+      if (object != null) {
+        value.setAsync(object);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding daily count ");
+    }
+    return DailyCheckin.count();
+  }
+
+  public List<UserMissionResponse> findMissionRewardNotOneTime(long userId, boolean isPartner) {
+    try {
+      String redisKey = "MISSION_REWARD_NOT_ONE_TIME_" + userId + "_" + isPartner;
+      RBucket<List<UserMissionResponse>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info(
+        "Get from db and set cache mission reward not one time " + userId + " isPartner " + isPartner + " ttl : 1 days");
+      List<UserMissionResponse> object = Mission.findByUserId(userId, isPartner);
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding mission reward not one time " + userId + " isPartner " + isPartner);
+    }
+    return Mission.findByUserId(userId, isPartner);
+  }
+
+  public List<UserMissionResponse> findMissionRewardOneTime(long userId) {
+    try {
+      String redisKey = "MISSION_REWARD_ONE_TIME_" + userId;
+      RBucket<List<UserMissionResponse>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache mission reward one time " + userId + " ttl : 1 days");
+      List<UserMissionResponse> object = Mission.findTypeOnTimeInAppByUserId(userId);
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding mission reward one time " + userId);
+    }
+    return Mission.findTypeOnTimeInAppByUserId(userId);
+  }
+
+  public void clearMissionUser(String type, long userId) {
+    String redisKey = "";
+    switch (type.toUpperCase()) {
+    case "REWARD":
+      redisKey = "MISSION_REWARD_NOT_ONE_TIME_" + userId + "_false";
+      break;
+    case "REWARD_ONE_TIME":
+      redisKey = "MISSION_REWARD_ONE_TIME_" + userId;
+      break;
+    case "PARTNER":
+      redisKey = "MISSION_REWARD_NOT_ONE_TIME_" + userId + "_true";
+      break;
+    }
+    RBucket<List<UserMissionResponse>> value = redissonClient.getBucket(redisKey);
+    if (value.isExists()) {
+      value.deleteAsync();
+    }
   }
 
   public class LeagueRedis {
