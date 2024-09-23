@@ -44,7 +44,7 @@ public class MissionResource extends BaseResource {
 
   @GET
   @Path("")
-  public ResponseData getAllMissions() throws Exception {
+  public ResponseData getAllMissions() {
     return ResponseData.ok(missionService.getMissionReward(getUser()));
   }
 
@@ -60,7 +60,7 @@ public class MissionResource extends BaseResource {
 
   @GET
   @Path("verify-task/{id}")
-  public ResponseData verifyTask(@PathParam("id") Long missionId) throws Exception {
+  public ResponseData verifyTask(@PathParam("id") Long missionId) {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(missionService.verify(getUser(), missionId, null));
     }
@@ -68,8 +68,7 @@ public class MissionResource extends BaseResource {
 
   @POST
   @Path("verify-task/{id}")
-  public ResponseData verifyTaskQuiz(@PathParam("id") Long missionId, List<QuizResponse> answerRequests)
-    throws Exception {
+  public ResponseData verifyTaskQuiz(@PathParam("id") Long missionId, List<QuizResponse> answerRequests) {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(missionService.verify(getUser(), missionId, answerRequests));
     }

@@ -1534,7 +1534,6 @@ public class InitService {
         eventMission.create();
         eventMission.persist();
 
-
         mission = new Mission();
         mission.groupMission = partner.name;
         mission.name = "Visit the website";

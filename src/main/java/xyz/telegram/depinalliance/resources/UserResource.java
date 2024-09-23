@@ -87,9 +87,9 @@ public class UserResource extends BaseResource {
     }
 
     User.updateUser(sql + "lastLoginTime = :lastLoginTime where id = :id", params);
-    if (user.status == Enums.UserStatus.MINING) {
-      userService.mining(user);
-    }
+    //    if (user.status == Enums.UserStatus.MINING) {
+    //      userService.mining(user);
+    //    }
     Map<String, Object> res = new HashMap<>();
     res.put("currentStatus", user.status);
     res.put("accessToken", jwtService.generateToken(String.valueOf(userTelegramResponse.id), username));
@@ -312,7 +312,7 @@ public class UserResource extends BaseResource {
   @Path("next-level")
   public ResponseData nextLevel() {
     User user = getUser();
-    List<Level> levels = Level.find("id > ?1", Sort.ascending("id"), user.level.id).page(0, 2).list();
+    List<Level> levels = redisService.findNextLevel(user.level.id);
     BigDecimal maxMiningPower = BigDecimal.ZERO;
     List<LevelResponse> levelResponses = new ArrayList<>();
     for (int i = 0; i < levels.size(); i++) {

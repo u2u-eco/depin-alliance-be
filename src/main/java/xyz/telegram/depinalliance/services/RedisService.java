@@ -8,6 +8,9 @@ import org.jboss.logging.Logger;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
+import xyz.telegram.depinalliance.common.models.request.PagingParameters;
+import xyz.telegram.depinalliance.common.models.response.ItemResponse;
+import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.entities.*;
 
@@ -340,6 +343,44 @@ public class RedisService {
     if (value.isExists()) {
       value.deleteAsync();
     }
+  }
+
+  public ResponsePage<ItemResponse> findListItemInShop(PagingParameters pageable, String type) {
+    String redisKey = "ITEM_IN_SHOP_" + pageable.sortBy + "_" + pageable.sortAscending + "_" + pageable.page + "_" + pageable.size + "_" + type;
+    try {
+      RBucket<ResponsePage<ItemResponse>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache list item in shop " + redisKey + " ttl : 1 days");
+      ResponsePage<ItemResponse> object = Item.findByTypeAndPaging(pageable, type);
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding list item in shop " + redisKey);
+    }
+    return Item.findByTypeAndPaging(pageable, type);
+  }
+
+  public List<Level> findNextLevel(long levelId) {
+    String redisKey = "NEXT_LEVEL_" + levelId;
+    try {
+      RBucket<List<Level>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache list next level " + levelId + " ttl : 1 days");
+      List<Level> object = Level.find("id > ?1", Sort.ascending("id"), levelId).page(0, 2).list();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding list next level " + redisKey);
+    }
+    return Level.find("id > ?1", Sort.ascending("id"), levelId).page(0, 2).list();
   }
 
   public class LeagueRedis {
