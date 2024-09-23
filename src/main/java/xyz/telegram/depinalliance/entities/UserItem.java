@@ -65,20 +65,22 @@ public class UserItem extends BaseEntity {
 
   public static ResponsePage<UserItemResponse> findByUserIdAndIndexAndType(PagingParameters pageable, long userId,
     Long index, String type) {
-    String sql = "select ui.id, i.name, i.code, i.type, i.miningPower, i.image, i.price from UserItem ui inner join Item i on item.id = i.id left join UserDevice ud on ud.id= ui.userDevice.id where ui.user.id = :userId and isActive = true";
+    String sqlSelect = "select ui.id, i.name, i.code, i.type, i.miningPower, i.image, i.price from UserItem ui inner join Item i on item.id = i.id ";
+    String sqlWhere = " where ui.user.id = :userId and isActive = true";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
     if (StringUtils.isNotBlank(type)) {
-      sql += " and item.type = :type";
+      sqlWhere += " and item.type = :type";
       params.put("type", Enums.ItemType.valueOf(type.toUpperCase()));
     }
     if (index != null && index > 0) {
-      sql += " and userDevice.index = :index";
+      sqlWhere += " and userDevice.index = :index";
       params.put("index", index);
     } else {
-      sql += " and userDevice is null";
+      sqlWhere += " and userDevice is null";
+//      sqlSelect += " left join UserDevice ud on ud.id= ui.userDevice.id";
     }
-    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(sqlSelect + sqlWhere, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
       panacheQuery.count());
   }
