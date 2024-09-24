@@ -383,6 +383,10 @@ public class RedisService {
     return Level.find("id > ?1", Sort.ascending("id"), levelId).page(0, 2).list();
   }
 
+  public void clearCacheByPrefix(String prefix) {
+    System.out.println(redissonClient.getKeys().deleteByPattern(prefix + "*"));
+  }
+
   public class LeagueRedis {
     public Long id;
     public Long userId;

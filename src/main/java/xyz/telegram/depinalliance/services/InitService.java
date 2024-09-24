@@ -24,7 +24,7 @@ public class InitService {
 
   @Transactional
   void onStart(@Observes StartupEvent event) {
-    if (LaunchMode.current().isDevOrTest()) {
+   /* if (LaunchMode.current().isDevOrTest()) {
       if (Mission.count() == 0) {
         if (true) {
           Mission mission = new Mission();
@@ -1549,6 +1549,6 @@ public class InitService {
         mission.create();
         mission.persist();
       }
-    }
+    }*/
   }
 }
