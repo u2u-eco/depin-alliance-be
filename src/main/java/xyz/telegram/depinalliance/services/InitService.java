@@ -23,8 +23,9 @@ public class InitService {
   RedisService redisService;
 
   @Transactional
-  void onStart(@Observes StartupEvent event) {
-   /* if (LaunchMode.current().isDevOrTest()) {
+  void onSonStart(){
+//  void onStart(@Observes StartupEvent event) {
+    if (LaunchMode.current().isDevOrTest()) {
       if (Mission.count() == 0) {
         if (true) {
           Mission mission = new Mission();
@@ -1478,7 +1479,7 @@ public class InitService {
 
         partner = new Partner();
         partner.name = "Openmesh";
-        partner.description = "Building a Decentralized Cloud + Data + Oracle Network for the world, without a middleman!\n" + "\n" + "Giveaway 100,000 OPEN tokens, don't miss out!";
+        partner.description = "Building a Decentralized Cloud + Data + Oracle Network for the world, without a middleman!\n" + "\n" + "<p class=\"text-white font-semibold\">Giveaway 100,000 OPEN tokens, don't miss out!</p>";
         partner.rewards = "Up to +50,000 points";
         partner.orders = 12;
         partner.participants = 0;
@@ -1549,6 +1550,236 @@ public class InitService {
         mission.create();
         mission.persist();
       }
-    }*/
+
+      partner = Partner.findByName("Timpi");
+      if (partner == null) {
+        Item itemBox = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
+
+        partner = new Partner();
+        partner.name = "Timpi";
+        partner.description = "Timpi is the first decentralized web index, and one of the largest databases in the world. With various products and real world use cases, Timpi’s mission is to democratize the world’s access to information. \n" + "\n" + "<p class=\"text-white font-semibold\">Giveaway 17,500 NTMPI tokens, don't miss out!</p>";
+        partner.rewards = "Up to +80,000 points";
+        partner.orders = 13;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/timpi.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = "Follow Twitter";
+        mission.orders = 1;
+        mission.url = "https://x.com/Timpi_TheNewWay";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Community";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join Community";
+        mission.orders = 2;
+        mission.url = " https://t.me/TimpiMe";
+        mission.referId = "TimpiMe";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Visit the website";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = "Visit the website";
+        mission.orders = 3;
+        mission.url = "https://timpi.io";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        List<QuizResponse> listQuizResponses = new ArrayList<>();
+        QuizResponse quizResponse = new QuizResponse();
+        quizResponse.index = 1;
+        quizResponse.isMultiple = false;
+        quizResponse.question = "What is the name and ticker symbol of Timpi's native token?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Timpi Coin ($TPC)", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "Neutaro Token ($NTMPI)", true));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Timpi Dollar ($TMD)", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Timpi Credit ($TMC)", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 2;
+        quizResponse.question = "Which of the following best describes the utility of the $NTMPI token within the Timpi ecosystem?";
+        quizResponse.answers.add(new QuizResponse.Answer(1,
+          "It’s used for governance, staking, node rewards, accessing ad credits and node NFTs, and for buybacks based on revenue generated by Timpi’s products",
+          true));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "It is solely a speculative investment with no practical utility", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3,
+          "It is a stablecoin pegged to major world currencies for international transactions", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(4, "It is used exclusively for purchasing Timpi-branded merchandise", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 3;
+        quizResponse.question = "Where can you acquire Timpi's tokens?";
+        quizResponse.answers.add(
+          new QuizResponse.Answer(1, "By purchasing them on traditional stock exchanges", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "Through BitMart Centralized exchange and Cosmos based Decentralized exchange",
+            true));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "From the shady guy in the corner of your street", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(4, "By earning them exclusively through referral programs", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 4;
+        quizResponse.question = "Which of the following best describes the primary function of Timpi's Guardian Nodes in the TAP network?";
+        quizResponse.answers.add(
+          new QuizResponse.Answer(1, "Storing web data securely in a decentralized manner", true));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "Connecting to GeoCore nodes to perform web crawling operations", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(3, "Handling search requests and separating the network from users", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Managing user accounts and personal preferences", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 5;
+        quizResponse.question = "What is the name of Timpi's referral program?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Knight Timplars", true));
+        quizResponse.answers.add(new QuizResponse.Answer(2, "Timpi Ambassadors", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Guardians Guild", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Search Crusaders", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 6;
+        quizResponse.question = "What has Timpi built?";
+        quizResponse.answers.add(new QuizResponse.Answer(1,
+          "The world's first non-custodial exchange specializing in floating point RWA assets", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2,
+          "The world’s first decentralized web index, a structured database of the internet, on par with e,.g. Bing",
+          true));
+        quizResponse.answers.add(new QuizResponse.Answer(3,
+          "The first protocol optimizing user yields by automatically arbitraging the underlying assets across multiple chains",
+          false));
+        quizResponse.answers.add(new QuizResponse.Answer(4,
+          "The first decentralized oracle network enabling real world data acquisition from local resource markets",
+          false));
+        listQuizResponses.add(quizResponse);
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "IQ Quiz";
+        mission.type = Enums.MissionType.QUIZ;
+        mission.isFake = false;
+        mission.description = Utils.convertObjectToString(listQuizResponses);
+        mission.orders = 4;
+        mission.url = "";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.rewardType = Enums.MissionRewardType.TIMPI;
+        mission.rewardImage = "/assets/images/workspace/timpi.png";
+        mission.partner = partner;
+        mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
+        mission.create();
+        mission.persist();
+        redisService.clearCacheByPrefix("MISSION_REWARD_NOT_ONE_TIME_");
+      }
+
+      partner = Partner.findByName("Ton AI");
+      if (partner == null) {
+        Item itemBox = redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name());
+
+        partner = new Partner();
+        partner.name = "Ton AI";
+        partner.description = "Ton AI provides the best growth solutions for Telegram ecosystem projects, driving targeted traffic rapidly for projects.";
+        partner.rewards = "Up to +40,000 points";
+        partner.orders = 14;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/ton-ai.png";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Play Ton AI and Earn 10 USDT";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = "Play Ton AI and Earn 10 USDT";
+        mission.orders = 1;
+        mission.url = "http://t.me/PeaAIBot/CashRally?startapp=cid-66b20324baee0f0035a5b4d8_ch-u2u";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Ton AI Channel and Earn";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = "Join Ton AI Channel and Earn";
+        mission.orders = 2;
+        mission.url = " https://t.me/+UGViuMymlixmNTk9";
+        mission.referId = "Ton_AI_News";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        redisService.clearCacheByPrefix("MISSION_REWARD_NOT_ONE_TIME_");
+      }
+    }
   }
 }

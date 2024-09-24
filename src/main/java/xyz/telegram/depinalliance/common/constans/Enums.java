@@ -8,7 +8,7 @@ public class Enums {
   public enum Config {
     POINT_REF(1), CPU_SLOT(2), GPU_SLOT(3), RAM_SLOT(4), STORAGE_SLOT(5), CPU_DEFAULT(6), GPU_DEFAULT(7), RAM_DEFAULT(
       8), STORAGE_DEFAULT(9), AVATAR_DEFAULT(10), AVATAR_LIST(11), MAX_MINING_POWER_DEFAULT(12), REF_POINT_CLAIM(
-      13), ROOT_POINT_CLAIM(14), POINT_BUY_DEVICE(15), BONUS_REWARD_DEFAULT(16);
+      13), ROOT_POINT_CLAIM(14), POINT_BUY_DEVICE(15), BONUS_REWARD_DEFAULT(16), RANDOM_PERCENT_TIMPI(17);
     private final int type;
 
     Config(int type) {
@@ -29,7 +29,7 @@ public class Enums {
   }
 
   public enum ItemSpecial {
-    CYBER_BOX, OPEN_MESH
+    CYBER_BOX, OPEN_MESH, NTMPI
   }
 
   public enum MissionType {
@@ -45,7 +45,7 @@ public class Enums {
   }
 
   public enum MissionRewardType {
-    CYBER_BOX, OPEN_MESH
+    CYBER_BOX, OPEN_MESH, TIMPI
   }
 
   public enum FolderImage {
@@ -75,7 +75,7 @@ public class Enums {
   }
 
   public enum EventId {
-    CYBER_BOX(1), OPEN_MESH(2);
+    CYBER_BOX(1), OPEN_MESH(2), TIMPI(3);
     private final long id;
 
     EventId(long id) {

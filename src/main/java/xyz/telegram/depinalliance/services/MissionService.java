@@ -289,18 +289,36 @@ public class MissionService {
           redisService.clearMissionUser("REWARD", user.id);
         }
       }
-      if (check.rewardType != null && check.amount > 0) {
+      if (check.rewardType != null) {
         switch (check.rewardType) {
         case CYBER_BOX:
-          event1(user, check.id);
-          return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
-        case OPEN_MESH:
-          if (Event.updateTotalUsdt(new BigDecimal(check.amount), Enums.EventId.OPEN_MESH.getId())) {
-            UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.OPEN_MESH.name()), null));
+          if (check.amount > 0) {
+            event1(user, check.id);
             return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
-          } else {
-            Mission.update("amount = 0 where id = ?1 and amount > 0", check.id);
           }
+          break;
+        case OPEN_MESH:
+          if (check.amount > 0) {
+            if (Event.updateTotalUsdt(new BigDecimal(check.amount), Enums.EventId.OPEN_MESH.getId())) {
+              UserItem.create(
+                new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.OPEN_MESH.name()), null));
+              return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
+            } else {
+              Mission.update("amount = 0 where id = ?1 and amount > 0", check.id);
+            }
+          }
+          break;
+        case TIMPI:
+          int a = new Random().nextInt(10000);
+          if (a < (redisService.getSystemConfigInt(Enums.Config.RANDOM_PERCENT_TIMPI))) {
+            if (Event.updateTotalUsdt(new BigDecimal(1L), Enums.EventId.TIMPI.getId())) {
+              UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.NTMPI.name()), null));
+              return new MissionRewardResponse(1L, "NTMPI", check.rewardImage);
+            } else {
+              Mission.update("rewardType = null where id = ?1", check.id);
+            }
+          }
+          break;
         }
       }
       return null;

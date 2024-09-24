@@ -75,6 +75,7 @@ public class UserMissionResponse {
       this.rewardName = switch (rewardType) {
         case CYBER_BOX -> "box";
         case OPEN_MESH -> "OPEN";
+        default -> "";
       };
     }
   }
