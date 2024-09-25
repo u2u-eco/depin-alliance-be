@@ -44,10 +44,10 @@ public class RedisService {
       if (value.isExists()) {
         return value.get();
       }
-      logger.info("Get from db and set cache system config " + config.name() + " ttl : " + timeOut);
+      logger.info("Get from db and set cache system config " + config.name() + " ttl 1 day ");
       SystemConfig systemConfig = SystemConfig.findById(config.getType());
       String valueStr = systemConfig != null ? systemConfig.value : null;
-      value.setAsync(valueStr, timeOut, TimeUnit.SECONDS);
+      value.setAsync(valueStr, 1, TimeUnit.DAYS);
       return valueStr;
     } catch (Exception e) {
       logger.errorv(e, "Error while finding system config " + config.name());
@@ -64,10 +64,10 @@ public class RedisService {
       if (value.isExists()) {
         return value.get();
       }
-      logger.info("Get from db and set cache item code " + code.toUpperCase() + " ttl : " + timeOut);
+      logger.info("Get from db and set cache item code " + code.toUpperCase() + " ttl : 1 day");
       Item item = Item.find("code", code.toUpperCase()).firstResult();
       if (item != null) {
-        value.setAsync(item, timeOut, TimeUnit.SECONDS);
+        value.setAsync(item, 1, TimeUnit.DAYS);
       }
       return item;
     } catch (Exception e) {
@@ -83,10 +83,10 @@ public class RedisService {
       if (value.isExists()) {
         return value.get();
       }
-      logger.info("Get from db and set cache item id " + id + " ttl : " + timeOut);
+      logger.info("Get from db and set cache item id " + id + " ttl : 1 day");
       Item item = Item.findById(id);
       if (item != null) {
-        value.setAsync(item, timeOut, TimeUnit.SECONDS);
+        value.setAsync(item, 1, TimeUnit.DAYS);
       }
       return item;
     } catch (Exception e) {
@@ -102,9 +102,9 @@ public class RedisService {
       if (value.isExists()) {
         return value.get();
       }
-      logger.info("Get from db and set cache level id " + id + " ttl : " + timeOut);
+      logger.info("Get from db and set cache level id " + id + " ttl : 1 day");
       Level object = Level.findById(id);
-      value.setAsync(object, timeOut, TimeUnit.SECONDS);
+      value.setAsync(object, 1, TimeUnit.DAYS);
       return object;
     } catch (Exception e) {
       logger.errorv(e, "Error while finding level id " + id);
@@ -119,9 +119,9 @@ public class RedisService {
       if (value.isExists()) {
         return value.get();
       }
-      logger.info("Get from db and set cache skill id " + id + " ttl : " + timeOut);
+      logger.info("Get from db and set cache skill id " + id + " ttl : 1 day");
       Skill object = Skill.findById(id);
-      value.setAsync(object, timeOut, TimeUnit.SECONDS);
+      value.setAsync(object, 1, TimeUnit.DAYS);
       return object;
     } catch (Exception e) {
       logger.errorv(e, "Error while finding skill id " + id);
@@ -136,9 +136,9 @@ public class RedisService {
       if (value.isExists()) {
         return value.get();
       }
-      logger.info("Get from db and set cache max level ttl : " + timeOut);
+      logger.info("Get from db and set cache max level ttl : 1 day");
       Long object = Level.maxLevel();
-      value.setAsync(object, timeOut, TimeUnit.SECONDS);
+      value.setAsync(object, 1, TimeUnit.DAYS);
       return object;
     } catch (Exception e) {
       logger.errorv(e, "Error while finding level");
@@ -354,9 +354,7 @@ public class RedisService {
       }
       logger.info("Get from db and set cache list item in shop " + redisKey + " ttl : 1 days");
       ResponsePage<ItemResponse> object = Item.findByTypeAndPaging(pageable, type);
-      if (object != null) {
-        value.setAsync(object, 1, TimeUnit.DAYS);
-      }
+      value.setAsync(object, 1, TimeUnit.DAYS);
       return object;
     } catch (Exception e) {
       logger.errorv(e, "Error while finding list item in shop " + redisKey);
@@ -387,7 +385,7 @@ public class RedisService {
     System.out.println(redissonClient.getKeys().deleteByPattern(prefix + "*"));
   }
 
-  public class LeagueRedis {
+  public static class LeagueRedis {
     public Long id;
     public Long userId;
     public String code;

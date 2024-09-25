@@ -44,8 +44,8 @@ public class UserMissionResponse {
 
   public UserMissionResponse(Long id, String groupMission, String name, String image, String description,
     Enums.MissionType type, String url, BigDecimal point, BigDecimal xp, Enums.MissionStatus status, Boolean isFake,
-    Enums.MissionRequire missionRequire, Long amount, String referId, Long partnerId, Enums.MissionRewardType rewardType,
-    String rewardImage) {
+    Enums.MissionRequire missionRequire, Long amount, String referId, Long partnerId,
+    Enums.MissionRewardType rewardType, String rewardImage) {
     this.groupMission = groupMission;
     this.name = name;
     this.description = description;

@@ -74,6 +74,7 @@ public class User extends BaseEntity {
   public long timeStartMining = 0L;
   @Column(name = "last_login_time")
   public long lastLoginTime = 0L;
+  public String ip;
   @Column(name = "first_login_time")
   public Long firstLoginTime = 0L;
   @Column(name = "start_check_in")

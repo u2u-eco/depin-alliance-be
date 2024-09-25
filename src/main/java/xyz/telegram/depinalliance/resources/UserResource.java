@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.resources;
 
 import io.quarkus.panache.common.Sort;
+import io.vertx.core.http.HttpServerRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -8,6 +9,8 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -56,7 +59,8 @@ public class UserResource extends BaseResource {
   @Path("auth")
   @PermitAll
   @Transactional
-  public ResponseData auth(TelegramInitDataRequest request) throws Exception {
+  public ResponseData auth(TelegramInitDataRequest request, HttpHeaders headers,
+    @Context HttpServerRequest httpServerRequest) throws Exception {
     UserTelegramResponse userTelegramResponse = telegramService.validateInitData(request.initData);
     if (userTelegramResponse == null) {
       logger.error("Auth fail init data " + request.initData);
@@ -85,8 +89,9 @@ public class UserResource extends BaseResource {
       sql = "username = :username,";
       params.put("username", username);
     }
-
-    User.updateUser(sql + "lastLoginTime = :lastLoginTime where id = :id", params);
+    String ip = Utils.getClientIpAddress(headers, httpServerRequest);
+    params.put("ip", ip);
+    User.updateUser(sql + "lastLoginTime = :lastLoginTime, ip = :ip where id = :id", params);
     //    if (user.status == Enums.UserStatus.MINING) {
     //      userService.mining(user);
     //    }
