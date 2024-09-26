@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 /**
  * @author holden on 24-Sep-2024
  */
-//@Entity
-//@Table(name = "league_fund_histories")
+@Entity
+@Table(name = "league_fund_histories")
 public class LeagueFundHistory extends BaseEntity {
   @Id
   @SequenceGenerator(name = "leagueFundHistorySequence", sequenceName = "league_fund_history_id_seq", allocationSize = 1)

@@ -8,8 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
-import xyz.telegram.depinalliance.common.models.request.LeagueRequest;
-import xyz.telegram.depinalliance.common.models.request.PagingParameters;
+import xyz.telegram.depinalliance.common.models.request.*;
 import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.RankingResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
@@ -20,6 +19,7 @@ import xyz.telegram.depinalliance.services.LeagueService;
 import xyz.telegram.depinalliance.services.RedisService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -85,7 +85,7 @@ public class LeagueResource extends BaseResource {
   @GET
   @Path("leave")
   public ResponseData leaveLeague() throws BusinessException {
-    return ResponseData.ok(leagueService.leaveLeague(getUser()));
+    return ResponseData.ok(leagueService.leaveLeague(getTelegramId()));
   }
 
   @POST
@@ -145,8 +145,9 @@ public class LeagueResource extends BaseResource {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     League userLeague = redisService.findLeagueById(user.league.id, true);
-    if (!Objects.equals(userLeague.user.id, user.id)) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(user.league.id, Enums.LeagueRole.ADMIN_REQUEST);
+    if (!Objects.equals(userLeague.user.id, user.id) && !admins.contains(user.id)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
     }
     if (StringUtils.isBlank(pagingParameters.sortBy)) {
       pagingParameters.sortBy = "createdAt";
@@ -170,5 +171,23 @@ public class LeagueResource extends BaseResource {
     params.put("leagueId", userLeague.id);
     params.put("status", Enums.LeagueJoinRequestStatus.PENDING);
     return ResponseData.ok(LeagueJoinRequest.count("league.id = :leagueId and status = :status", params));
+  }
+
+  @POST
+  @Path("funding")
+  public ResponseData funding(FundRequest request) {
+    return ResponseData.ok(leagueService.fund(getUser(), request));
+  }
+
+  @POST
+  @Path("contribute")
+  public ResponseData contribute(ContributeItemRequest request) {
+    return ResponseData.ok(leagueService.contribute(getUser(), request));
+  }
+
+  @POST
+  @Path("role")
+  public ResponseData updateRole(LeagueRoleRequest request) {
+    return ResponseData.ok(leagueService.updateRole(getUser(), request));
   }
 }

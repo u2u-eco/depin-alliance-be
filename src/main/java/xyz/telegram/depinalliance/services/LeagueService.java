@@ -8,7 +8,10 @@ import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
+import xyz.telegram.depinalliance.common.models.request.ContributeItemRequest;
+import xyz.telegram.depinalliance.common.models.request.FundRequest;
 import xyz.telegram.depinalliance.common.models.request.LeagueRequest;
+import xyz.telegram.depinalliance.common.models.request.LeagueRoleRequest;
 import xyz.telegram.depinalliance.common.models.response.LeagueResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
@@ -70,7 +73,8 @@ public class LeagueService {
     LeagueJoinRequest.update(
       "status = :status, hash = CONCAT(:userId,'_',league.id,'_',:statusStr,'_',:updatedAt), updatedAt = :updatedAt, userAction.id = :userAction where user.id = :userId and status = :statusOld",
       paramsCancel);
-
+    List<String> roles = Arrays.asList(Enums.LeagueRole.ADMIN_KICK.name(), Enums.LeagueRole.ADMIN_REQUEST.name());
+    LeagueMember.create(league, user, true, String.join(";", roles));
     LeagueMemberHistory.create(league, user, user, Enums.LeagueMemberType.CREATE);
     return new LeagueResponse(league, user.code);
   }
@@ -122,45 +126,48 @@ public class LeagueService {
   }
 
   @Transactional
-  public boolean leaveLeague(User user) throws BusinessException {
-    if (user.league == null) {
+  public boolean leaveLeague(long userId) throws BusinessException {
+    LeagueMember member = redisService.findLeagueMemberByUserId(userId);
+    if (member == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    user.league = redisService.findLeagueById(user.league.id, true);
-    if (Objects.equals(user.league.user.id, user.id)) {
+    if (member.isAdmin) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
 
     Map<String, Object> params = new HashMap<>();
     params.put("league", null);
     params.put("joinedLeagueAt", null);
-    params.put("id", user.id);
+    params.put("leagueRole", null);
+    params.put("id", member.user.id);
     if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
-    LeagueMemberHistory.create(user.league, user, user, Enums.LeagueMemberType.LEAVE);
+    LeagueMemberHistory.create(member.league, member.user, member.user, Enums.LeagueMemberType.LEAVE);
+
     Map<String, Object> leagueParams = new HashMap<>();
-    leagueParams.put("id", user.league.id);
-    //    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
-    League.updateObject("totalContributors = totalContributors - 1" +
-      //        ", totalMining = totalMining - :totalMining " +
-      " where id = :id", leagueParams);
+    leagueParams.put("id", member.league.id);
+    League.updateObject("totalContributors = totalContributors - 1" + " where id = :id", leagueParams);
+    member.delete();
+    if (StringUtils.isNotBlank(member.leagueRole)) {
+      clearCacheAdmin(member.league.id);
+    }
     return true;
   }
 
   @Transactional
   public boolean kick(User user, long id) throws BusinessException {
-    User userKick = User.findById(id);
+    LeagueMember userKick = redisService.findLeagueMemberByUserId(id);
     if (userKick == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
     }
-    if (user.league == null || userKick.league == null || user.id == id || !Objects.equals(userKick.league.id,
-      user.league.id)) {
+    if (user.league == null || user.id == id || !Objects.equals(userKick.league.id, user.league.id)) {
       throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
     }
     user.league = redisService.findLeagueById(user.league.id, true);
-    if (!Objects.equals(user.league.user.id, user.id)) {
-      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
+    List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(user.league.id, Enums.LeagueRole.ADMIN_KICK);
+    if (!admins.contains(user.id) && id == user.league.user.id) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
     }
 
     Map<String, Object> params = new HashMap<>();
@@ -170,13 +177,14 @@ public class LeagueService {
     if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
-    LeagueMemberHistory.create(user.league, userKick, user, Enums.LeagueMemberType.KICK);
+    LeagueMemberHistory.create(user.league, userKick.user, user, Enums.LeagueMemberType.KICK);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", user.league.id);
-    //    leagueParams.put("totalMining", userKick.miningPower.multiply(userKick.rateMining));
-    League.updateObject("totalContributors = totalContributors - 1" +
-      //        ", totalMining = totalMining - :totalMining" +
-      " where id = :id", leagueParams);
+    League.updateObject("totalContributors = totalContributors - 1" + " where id = :id", leagueParams);
+    userKick.delete();
+    if (StringUtils.isNotBlank(userKick.leagueRole)) {
+      clearCacheAdmin(user.league.id);
+    }
     return true;
   }
 
@@ -213,8 +221,10 @@ public class LeagueService {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     League league = redisService.findLeagueById(ownerUser.league.id, true);
-    if (!Objects.equals(ownerUser.id, league.user.id)) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(ownerUser.league.id,
+      Enums.LeagueRole.ADMIN_REQUEST);
+    if (!admins.contains(ownerUser.id)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
     }
     LeagueJoinRequest request = LeagueJoinRequest.findPendingByUserAndLeague(userId, league.id);
     if (request == null) {
@@ -240,8 +250,10 @@ public class LeagueService {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     League league = League.findById(ownerUser.league.id);
-    if (!Objects.equals(ownerUser.id, league.user.id)) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(ownerUser.league.id,
+      Enums.LeagueRole.ADMIN_REQUEST);
+    if (!admins.contains(ownerUser.id)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
     }
     LeagueJoinRequest request = LeagueJoinRequest.findPendingByUserAndLeague(userId, league.id);
     if (request == null) {
@@ -264,7 +276,6 @@ public class LeagueService {
     Map<String, Object> paramsCancel = new HashMap<>();
     paramsCancel.put("status", Enums.LeagueJoinRequestStatus.CANCELLED);
     paramsCancel.put("statusStr", Enums.LeagueJoinRequestStatus.CANCELLED.name());
-    //    paramsCancel.put("hash", userId + "_" + league.id + "_" + request.status + "_" + currentTime);
     paramsCancel.put("userId", userId);
     paramsCancel.put("userAction", userId);
     paramsCancel.put("updatedAt", currentTime);
@@ -282,14 +293,118 @@ public class LeagueService {
       paramsLeague)) {
       throw new BusinessException(ResponseMessageConstants.LEAGUE_REQUEST_INVALID);
     }
+    LeagueMember.create(league, user);
     LeagueMemberHistory.create(league, user, ownerUser, Enums.LeagueMemberType.JOIN);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", league.id);
-    //    leagueParams.put("totalMining", user.miningPower.multiply(user.rateMining));
-    League.updateObject("totalContributors = totalContributors + 1" +
-      //        ", totalMining = totalMining + :totalMining " +
-      " where id = :id", leagueParams);
+    League.updateObject("totalContributors = totalContributors + 1" + " where id = :id", leagueParams);
     return new LeagueResponse(league, user.code);
+  }
+
+  @Transactional
+  public boolean fund(User user, FundRequest request) {
+    if (user.league == null) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
+    }
+    if (request == null || Utils.validateAmountBigDecimal(request.amount) || user.point.compareTo(request.amount) < 0) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    if (User.updatePointUser(user.id, request.amount.multiply(new BigDecimal("-1"))) && League.updatePoint(
+      user.league.id, request.amount) && LeagueMember.updatePointFundingLeague(user.id, request.amount)) {
+      LeagueFundHistory fundHistory = new LeagueFundHistory();
+      fundHistory.league = user.league;
+      fundHistory.user = user;
+      fundHistory.point = request.amount;
+      fundHistory.create();
+      fundHistory.persist();
+
+      return true;
+    }
+    throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+  }
+
+  @Transactional
+  public boolean contribute(User user, ContributeItemRequest request) {
+    if (user.league == null) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
+    }
+    if (request == null || request.amount <= 0 || StringUtils.isNotBlank(request.code)) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Item item = redisService.findItemByCode(request.code);
+    if (item == null || item.type == Enums.ItemType.SPECIAL) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    List<Long> itemIds = UserItem.findItemNotHasDevice(user.id, item.id, request.amount);
+
+    String sql = "isActive = false where id in (:ids) and user.id = :userId and isActive = true and userDevice is null and item.type != :type ";
+    Map<String, Object> params = new HashMap<>();
+    params.put("ids", request.ids);
+    params.put("userId", user.id);
+    params.put("type", Enums.ItemType.SPECIAL);
+    if (UserItem.updateObject(sql, params) == request.ids.size()) {
+      BigDecimal sum = UserItem.sumMiningPowerByIds(request.ids);
+      if (League.updateProfit(user.league.id, sum) && LeagueMember.updateLeagueContributeProfit(user.id, sum)) {
+        for (Long id : request.ids) {
+          LeagueContributeHistory history = new LeagueContributeHistory();
+          history.league = user.league;
+          history.user = user;
+          history.userItem = new UserItem(id);
+          history.create();
+          history.persist();
+        }
+      }
+      return true;
+    }
+    throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+  }
+
+  public boolean updateRole(User ownerUser, LeagueRoleRequest request) {
+    if (ownerUser.league == null || request == null || request.userId <= 0 || ownerUser.id == request.userId || StringUtils.isBlank(
+      request.role)) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Enums.LeagueRole role = Enums.LeagueRole.valueOf(request.role.toUpperCase());
+    League league = redisService.findLeagueById(ownerUser.league.id, true);
+    if (!Objects.equals(ownerUser.id, league.user.id)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
+    }
+    LeagueMember member = redisService.findLeagueMemberByUserId(request.userId);
+    if (member == null || !member.league.id.equals(league.id)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
+    }
+    Set<String> roles = new HashSet<>();
+    if (StringUtils.isNotBlank(member.leagueRole)) {
+      roles = new HashSet<>(Arrays.asList(member.leagueRole.split(";")));
+    }
+    if (request.isActive && roles.contains(request.role)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
+    } else if (!request.isActive && !roles.contains(request.role)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
+    }
+    String sql = " leagueRole = :leagueRole where user.id = :id ";
+    Map<String, Object> params = new HashMap<>();
+
+    params.put("id", member.user.id);
+    if (request.isActive) {
+      roles.add(request.role);
+    }
+    params.put("leagueRole", String.join(";", roles));
+    if (LeagueMember.updateMember(sql, params)) {
+      Enums.LeagueMemberType memberType;
+      memberType = switch (role) {
+        case ADMIN_REQUEST -> request.isActive ?
+          Enums.LeagueMemberType.TURN_ON_ADMIN_REQUEST :
+          Enums.LeagueMemberType.TURN_OFF_ADMIN_REQUEST;
+        case ADMIN_KICK ->
+          request.isActive ? Enums.LeagueMemberType.TURN_ON_ADMIN_KICK : Enums.LeagueMemberType.TURN_OFF_ADMIN_KICK;
+      };
+
+      LeagueMemberHistory.create(league, member.user, ownerUser, memberType);
+      clearCacheAdmin(member.league.id);
+      return true;
+    }
+    throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
   }
 
   public void updateXp(User user, BigDecimal xp) {
@@ -308,6 +423,10 @@ public class LeagueService {
     //    if (null != level && level.id - user.level.id > 0 && level.id < maxLevel) {
     //      League.updateLevel(user.league.id, level.id);
     //    }
+  }
+
+  public void clearCacheAdmin(long leagueId) {
+    redisService.clearCacheByPrefix("ADMIN_LEAGUE_" + leagueId);
   }
 
   public boolean validateName(LeagueRequest request) {

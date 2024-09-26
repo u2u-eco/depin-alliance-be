@@ -2,6 +2,7 @@ package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Parameters;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -9,9 +10,11 @@ import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 import xyz.telegram.depinalliance.common.models.response.UserItemResponse;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author holden on 26-Aug-2024
@@ -42,6 +45,10 @@ public class UserItem extends BaseEntity {
   }
 
   public UserItem() {
+  }
+
+  public UserItem(Long id) {
+    this.id = id;
   }
 
   public static ResponsePage<UserItemResponse> findByUserIdAndType(PagingParameters pageable, long userId,
@@ -78,7 +85,7 @@ public class UserItem extends BaseEntity {
       params.put("index", index);
     } else {
       sqlWhere += " and userDevice is null";
-//      sqlSelect += " left join UserDevice ud on ud.id= ui.userDevice.id";
+      //      sqlSelect += " left join UserDevice ud on ud.id= ui.userDevice.id";
     }
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sqlSelect + sqlWhere, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
@@ -91,6 +98,26 @@ public class UserItem extends BaseEntity {
     params.put("userId", userId);
     params.put("itemId", itemId);
     return find(sql, params).page(0, number).project(Long.class).list();
+  }
+
+  public static ResponsePage<UserItemResponse> findItemNotHasDeviceAndNotSpecial(PagingParameters pageable,
+    long userId) {
+    String sql = "select item.name, item.code, item.type, item.miningPower, item.image, item.price, count(1)";
+    String sqlFrom = " from UserItem";
+    String sqlWhere = " where user.id = :userId and isActive = true and userDevice is null and item.type != :type";
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
+    params.put("type", Enums.ItemType.SPECIAL);
+    String sqlGroup = " group by i.name, i.code, i.type, i.miningPower, i.image, i.price";
+    return new ResponsePage<>(
+      find(sql + sqlFrom + sqlWhere + sqlGroup, pageable.getSort(), params).page(pageable.getPage())
+        .project(UserItemResponse.class).list(), pageable,
+      find("select count(distinct i.id) " + sqlFrom + sqlWhere, params).project(Long.class).firstResult());
+  }
+
+  public static BigDecimal sumMiningPowerByIds(Set<Long> ids) {
+    return find("select sum(item.miningPower) from UserItem where id in (:ids)", Parameters.with("ids", ids)).project(
+      BigDecimal.class).firstResult();
   }
 
   public static int updateObject(String query, Map<String, Object> params) {

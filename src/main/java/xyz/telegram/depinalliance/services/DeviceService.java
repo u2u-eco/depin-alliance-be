@@ -272,6 +272,9 @@ public class DeviceService {
     }
     Item removeItem = redisService.findItemById(userItemRemove.item.id);
     Item addItem = redisService.findItemById(userItemAdd.item.id);
+    if (removeItem.type!= addItem.type) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
     String query = "totalMiningPower = totalMiningPower - :miningPowerOld + :miningPowerNew where id =:id";
     long userDeviceId = userItemRemove.userDevice.id;
     Map<String, Object> params = new HashMap<>();

@@ -40,9 +40,20 @@ public class League extends BaseEntity {
   public BigDecimal totalMining = BigDecimal.ZERO;
   @Column(name = "xp", scale = 18, precision = 29)
   public BigDecimal xp = BigDecimal.ZERO;
+  @Column(name = "point", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
+  public BigDecimal point = BigDecimal.ZERO;
+  @Column(name = "profit", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
+  public BigDecimal profit = BigDecimal.ZERO;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "level_id")
   public LeagueLevel level;
+
+  public League() {
+  }
+
+  public League(Long id) {
+    this.id = id;
+  }
 
   public static League createLeague(League league) {
     league.create();
@@ -54,6 +65,20 @@ public class League extends BaseEntity {
 
   public static boolean updateObject(String query, Map<String, Object> params) {
     return update(query, params) > 0;
+  }
+
+  public static boolean updateProfit(Long leagueId, BigDecimal profit) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("profit", profit);
+    params.put("id", leagueId);
+    return updateObject("profit = profit + :profit where id = :id and profit + :profit >= 0", params);
+  }
+
+  public static boolean updatePoint(Long leagueId, BigDecimal profit) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("point", profit);
+    params.put("id", leagueId);
+    return updateObject("point = point + :point where id = :id and point + :point >= 0", params);
   }
 
   public static String getCodeLeague() {

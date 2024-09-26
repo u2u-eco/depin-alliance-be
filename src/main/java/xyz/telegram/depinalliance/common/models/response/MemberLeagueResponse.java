@@ -12,11 +12,14 @@ public class MemberLeagueResponse {
   public String username;
   public String avatar;
   public BigDecimal miningPower;
+  public BigDecimal pointEarned;
 
-  public MemberLeagueResponse(Long id, String username, String avatar, BigDecimal miningPowerReal) {
+  public MemberLeagueResponse(Long id, String username, String avatar, BigDecimal miningPowerReal,
+    BigDecimal pointEarned) {
     this.id = id;
     this.username = username;
     this.avatar = avatar;
     this.miningPower = Utils.stripDecimalZeros(miningPowerReal);
+    this.pointEarned = Utils.stripDecimalZeros(pointEarned);
   }
 }

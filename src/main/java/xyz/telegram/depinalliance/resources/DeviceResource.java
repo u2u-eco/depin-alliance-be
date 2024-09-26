@@ -56,6 +56,14 @@ public class DeviceResource extends BaseResource {
     return ResponseData.ok(UserItem.findByUserIdAndIndexAndType(pagingParameters, getTelegramId(), index, type));
   }
 
+  @Path("user-device-item-contribute")
+  @GET
+  public ResponseData getUserDeviceItemContribute(PagingParameters pagingParameters) {
+    pagingParameters.setSortByDefault("price");
+    pagingParameters.sortAscending = true;
+    return ResponseData.ok(UserItem.findItemNotHasDeviceAndNotSpecial(pagingParameters, getTelegramId()));
+  }
+
   @Path("buy-item")
   @POST
   public ResponseData buyItem(BuyItemRequest request) throws Exception {

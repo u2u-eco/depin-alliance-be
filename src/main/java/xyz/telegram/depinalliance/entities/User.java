@@ -162,6 +162,22 @@ public class User extends BaseEntity {
     return updateUser(sql + "point = point + :point where id = :id and point + :point >= 0", params);
   }
 
+//  public static boolean updatePointFundingLeague(long id, BigDecimal point) {
+//    Map<String, Object> params = new HashMap<>();
+//    params.put("id", id);
+//    params.put("point", point);
+//    String sql = "pointUsed = pointUsed + :point, point = point - :point, leaguePointFunding = leaguePointFunding + :point  where id = :id and point - :point >= 0";
+//    return updateUser(sql, params);
+//  }
+//
+//  public static boolean updateLeagueContributeProfit(long id, BigDecimal profit) {
+//    Map<String, Object> params = new HashMap<>();
+//    params.put("id", id);
+//    params.put("profit", profit);
+//    String sql = "leagueContributeProfit = leagueContributeProfit + :profit where id = :id and leagueContributeProfit + :profit >= 0";
+//    return updateUser(sql, params);
+//  }
+
   public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);

@@ -6,6 +6,7 @@ import xyz.telegram.depinalliance.entities.League;
 import xyz.telegram.depinalliance.entities.User;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * @author holden on 29-Aug-2024
@@ -30,6 +31,12 @@ public class LeagueResponse {
   public BigDecimal adminMiningPower;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public String adminAvatar;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public BigDecimal profit;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public BigDecimal point;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public String role;
 
   public LeagueResponse(String code, String name, String avatar, Long totalContributors, BigDecimal totalMining,
     Long leagueId) {
@@ -58,7 +65,7 @@ public class LeagueResponse {
     this.totalMining = Utils.stripDecimalZeros(league.totalMining);
     this.avatar = league.avatar;
     this.inviteLink = user.code + "_" + league.code;
-    this.isOwner = league.user.id == user.id;
+    this.isOwner = Objects.equals(league.user.id, user.id);
     User userAdmin = league.user;
     if (userAdmin != null) {
       this.adminUsername = userAdmin.username;
@@ -66,7 +73,6 @@ public class LeagueResponse {
       this.adminAvatar = userAdmin.avatar;
     }
     this.xp = Utils.stripDecimalZeros(league.xp);
-    //    this.level = league.level.id;
   }
 
   public LeagueResponse(League league, boolean isPendingRequest) {
@@ -78,5 +84,7 @@ public class LeagueResponse {
     this.xp = Utils.stripDecimalZeros(league.xp);
     //    this.level = league.level.id;
     this.isPendingRequest = isPendingRequest;
+    this.point = Utils.stripDecimalZeros(league.point);
+    this.profit = Utils.stripDecimalZeros(league.profit);
   }
 }
