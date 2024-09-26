@@ -198,7 +198,7 @@ public class RedisService {
         return value.get();
       }
       logger.info("Get from db and set cache list " + redisKey + " ttl : " + timeOut);
-      List<Long> object = LeagueMember.find("select user.id from LeagueMember league.id = :leagueId and role like :role",
+      List<Long> object = LeagueMember.find("select user.id from LeagueMember where league.id = :leagueId and leagueRole like :role",
         Parameters.with("leagueId", leagueId).and("role", "%" + role.name() + "%")).project(Long.class).list();
       if (object != null) {
         value.setAsync(object, timeOut, TimeUnit.SECONDS);
@@ -207,7 +207,7 @@ public class RedisService {
     } catch (Exception e) {
       logger.errorv(e, "Error while finding " + redisKey);
     }
-    return LeagueMember.find("select user.id from LeagueMember league.id = :leagueId and role like :role",
+    return LeagueMember.find("select user.id from LeagueMember where league.id = :leagueId and leagueRole like :role",
       Parameters.with("leagueId", leagueId).and("role", "%" + role.name() + "%")).project(Long.class).list();
   }
 

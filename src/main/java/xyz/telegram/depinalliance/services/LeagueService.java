@@ -138,7 +138,6 @@ public class LeagueService {
     Map<String, Object> params = new HashMap<>();
     params.put("league", null);
     params.put("joinedLeagueAt", null);
-    params.put("leagueRole", null);
     params.put("id", member.user.id);
     if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params)) {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
@@ -328,24 +327,25 @@ public class LeagueService {
     if (user.league == null) {
       throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
     }
-    if (request == null || request.amount <= 0 || StringUtils.isNotBlank(request.code)) {
+    if (request == null || request.number <= 0 || StringUtils.isNotBlank(request.code)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
     Item item = redisService.findItemByCode(request.code);
     if (item == null || item.type == Enums.ItemType.SPECIAL) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    List<Long> itemIds = UserItem.findItemNotHasDevice(user.id, item.id, request.amount);
-
-    String sql = "isActive = false where id in (:ids) and user.id = :userId and isActive = true and userDevice is null and item.type != :type ";
+    List<Long> itemIds = UserItem.findItemNotHasDevice(user.id, item.id, request.number);
+    if (itemIds == null || itemIds.isEmpty() || itemIds.size() < request.number) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ITEM_CONTRIBUTE_NOT_ENOUGH);
+    }
+    String sql = "isActive = false where id in (:ids) and user.id = :userId and isActive = true and userDevice is null";
     Map<String, Object> params = new HashMap<>();
-    params.put("ids", request.ids);
+    params.put("ids", itemIds);
     params.put("userId", user.id);
-    params.put("type", Enums.ItemType.SPECIAL);
-    if (UserItem.updateObject(sql, params) == request.ids.size()) {
-      BigDecimal sum = UserItem.sumMiningPowerByIds(request.ids);
+    if (UserItem.updateObject(sql, params) == itemIds.size()) {
+      BigDecimal sum = UserItem.sumMiningPowerByIds(itemIds);
       if (League.updateProfit(user.league.id, sum) && LeagueMember.updateLeagueContributeProfit(user.id, sum)) {
-        for (Long id : request.ids) {
+        for (Long id : itemIds) {
           LeagueContributeHistory history = new LeagueContributeHistory();
           history.league = user.league;
           history.user = user;

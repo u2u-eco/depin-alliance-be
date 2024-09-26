@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author holden on 26-Aug-2024
@@ -102,20 +101,20 @@ public class UserItem extends BaseEntity {
 
   public static ResponsePage<UserItemResponse> findItemNotHasDeviceAndNotSpecial(PagingParameters pageable,
     long userId) {
-    String sql = "select item.name, item.code, item.type, item.miningPower, item.image, item.price, count(1)";
-    String sqlFrom = " from UserItem";
-    String sqlWhere = " where user.id = :userId and isActive = true and userDevice is null and item.type != :type";
+    String sqlSelect = "select i.name, i.code, i.type, i.miningPower, i.image, i.price, count(1) ";
+    String sqlFrom = " from UserItem ui inner join Item i on item.id = i.id ";
+    String sqlWhere = " where user.id = :userId and isActive = true and userDevice is null and i.type != :type";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
     params.put("type", Enums.ItemType.SPECIAL);
     String sqlGroup = " group by i.name, i.code, i.type, i.miningPower, i.image, i.price";
     return new ResponsePage<>(
-      find(sql + sqlFrom + sqlWhere + sqlGroup, pageable.getSort(), params).page(pageable.getPage())
+      find(sqlSelect + sqlFrom + sqlWhere + sqlGroup, pageable.getSort(), params).page(pageable.getPage())
         .project(UserItemResponse.class).list(), pageable,
       find("select count(distinct i.id) " + sqlFrom + sqlWhere, params).project(Long.class).firstResult());
   }
 
-  public static BigDecimal sumMiningPowerByIds(Set<Long> ids) {
+  public static BigDecimal sumMiningPowerByIds(List<Long> ids) {
     return find("select sum(item.miningPower) from UserItem where id in (:ids)", Parameters.with("ids", ids)).project(
       BigDecimal.class).firstResult();
   }

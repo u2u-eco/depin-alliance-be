@@ -144,16 +144,16 @@ public class LeagueResource extends BaseResource {
     if (user.league == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    League userLeague = redisService.findLeagueById(user.league.id, true);
+//    League userLeague = redisService.findLeagueById(user.league.id, true);
     List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(user.league.id, Enums.LeagueRole.ADMIN_REQUEST);
-    if (!Objects.equals(userLeague.user.id, user.id) && !admins.contains(user.id)) {
+    if (!admins.contains(user.id)) {
       throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
     }
     if (StringUtils.isBlank(pagingParameters.sortBy)) {
       pagingParameters.sortBy = "createdAt";
       pagingParameters.sortAscending = true;
     }
-    return ResponseData.ok(LeagueJoinRequest.findPendingByPagingAndLeagueId(pagingParameters, userLeague.id, username));
+    return ResponseData.ok(LeagueJoinRequest.findPendingByPagingAndLeagueId(pagingParameters, user.league.id, username));
   }
 
   @GET
