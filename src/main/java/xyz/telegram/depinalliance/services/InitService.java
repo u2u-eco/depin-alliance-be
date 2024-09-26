@@ -23,8 +23,8 @@ public class InitService {
   RedisService redisService;
 
   @Transactional
-  void onSonStart() {
-//      void onStart(@Observes StartupEvent event) {
+//  void onSonStart() {
+      void onStart(@Observes StartupEvent event) {
     if (LaunchMode.current().isDevOrTest()) {
       if (Mission.count() == 0) {
         if (true) {
@@ -1935,6 +1935,107 @@ public class InitService {
         mission.description = mission.name;
         mission.orders = 1;
         mission.url = "https://t.me/ClockieChaosBot/ClockieChaos?startapp=source_U2U";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+
+      partner = Partner.findByName("TelegaMAT Community");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "TelegaMAT Community";
+        partner.description = "TelegaMAT Community Is a Ukrainian community providing airdrop and crypto market news with nearly 2.5M subscribers";
+        partner.rewards = "Up to +40,000 points";
+        partner.orders = 17;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/telega-mat.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Bullish Farm Bot";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://t.me/BullishFarmBot/start?startapp=r_7041788989";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join TelegaMAT Community";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = mission.name;
+        mission.orders = 2;
+        mission.url = "https://t.me/kriptovalyuta_airdrop";
+        mission.referId = "kriptovalyuta_airdrop";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+      }
+
+      partner = Partner.findByName("Mhaya");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "Mhaya";
+        partner.description = "Mhaya is transforming the classic game of Monopoly into a groundbreaking \"Monopoly-GameFi\" blockchain experience. Dive into our urban simulation game where you can build, stake, and earn rewards in a decentralized world. With 40 game board blocks and 12 event types, players roll dice to navigate their city, upgrade buildings, and earn HAYA and MAYA tokens. Experience gaming and earning like never before!";
+        partner.rewards = "Up to +10,000 points";
+        partner.orders = 18;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/mhaya.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Mhaya Play & Spin to win";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://t.me/mhaya_bot?start=28ABuxL1YEC";
         mission.point = new BigDecimal(10000);
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
