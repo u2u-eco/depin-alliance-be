@@ -23,8 +23,8 @@ public class InitService {
   RedisService redisService;
 
   @Transactional
-//  void onSonStart() {
-      void onStart(@Observes StartupEvent event) {
+  void onSonStart() {
+//      void onStart(@Observes StartupEvent event) {
     if (LaunchMode.current().isDevOrTest()) {
       if (Mission.count() == 0) {
         if (true) {
@@ -2044,6 +2044,112 @@ public class InitService {
         mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
         mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
         mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+
+      partner = Partner.findByName("PUNKY");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "PUNKY";
+        partner.description = "I am PUNKY. An Ai-driven Creative Discord Moderator. I utilize machine learning and seamless automation through intelligent Web3 community growth";
+        partner.rewards = "Up to +70,000 points";
+        partner.orders = 19;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/punky.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://x.com/PunkyAi";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Retweet this post";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 2;
+        mission.url = "https://x.com/PunkyAi/status/1838223162414112965";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Reply \"PUNK’S NOT DEAD\" to this post";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 3;
+        mission.url = "https://x.com/PunkyAi/status/1838223162414112965";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Discord";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 4;
+        mission.url = "https://discord.gg/PUNKY";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = mission.name;
+        mission.orders = 5;
+        mission.url = "https://t.me/punkyai";
+        mission.referId = "punkyai";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
         mission.create();
         mission.persist();
 

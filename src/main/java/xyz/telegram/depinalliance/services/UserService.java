@@ -530,7 +530,7 @@ public class UserService {
     String sql = " where id = :id";
     switch (settings) {
     case NOTIFICATION:
-      currentSetting = settingResponse.enableNotifications;
+      currentSetting = settingResponse.enableNotification;
       sql = "enableNotification = :setting " + sql + " and enableNotification = :currentSetting";
       break;
     case MUSIC_THEME:
@@ -547,7 +547,7 @@ public class UserService {
     }
     Map<String, Object> params = new HashMap<>();
     params.put("id", userId);
-    params.put("setting", request.setting);
+    params.put("setting", request.enable);
     params.put("currentSetting", currentSetting);
     if (User.updateUser(sql, params)) {
       redisService.clearCacheByPrefix("SETTING_USER_" + userId);
