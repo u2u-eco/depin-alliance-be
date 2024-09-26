@@ -2006,7 +2006,7 @@ public class InitService {
         mission.url = "https://t.me/kriptovalyuta_airdrop";
         mission.referId = "kriptovalyuta_airdrop";
         mission.point = new BigDecimal(30000);
-        mission.xp = new BigDecimal(100);
+        mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
