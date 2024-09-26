@@ -19,10 +19,7 @@ import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
-import xyz.telegram.depinalliance.common.models.request.AvatarRequest;
-import xyz.telegram.depinalliance.common.models.request.PagingParameters;
-import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
-import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
+import xyz.telegram.depinalliance.common.models.request.*;
 import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
@@ -146,6 +143,18 @@ public class UserResource extends BaseResource {
       Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_BUY_DEVICE)));
     systemConfigResponse.urlImage = amazonS3Config.awsUrl();
     return ResponseData.ok(systemConfigResponse);
+  }
+
+  @GET
+  @Path("settings")
+  public ResponseData settings() throws BusinessException {
+    return ResponseData.ok(redisService.findSettingUserById(getTelegramId()));
+  }
+
+  @POST
+  @Path("settings")
+  public ResponseData settings(SettingRequest request) throws BusinessException {
+    return ResponseData.ok(userService.setting(getTelegramId(), request));
   }
 
   @GET
@@ -334,4 +343,5 @@ public class UserResource extends BaseResource {
     }
     return ResponseData.ok(levelResponses);
   }
+
 }

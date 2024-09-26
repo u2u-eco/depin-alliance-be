@@ -43,65 +43,55 @@ public class LeagueResource extends BaseResource {
   @POST
   @Path("")
   public ResponseData createLeague(LeagueRequest request) throws Exception {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.createLeague(getUser(), request));
-    }
+    return ResponseData.ok(leagueService.createLeague(getUser(), request));
+  }
+
+  @POST
+  @Path("avatar")
+  public ResponseData changeAvatar(LeagueRequest request) throws Exception {
+    return ResponseData.ok(leagueService.changeAvatar(getUser(), request));
   }
 
   @GET
   @Path("join/{code}")
   public ResponseData joinLeague(@PathParam("code") String code) throws BusinessException {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.joinLeague(getUser(), code));
-    }
+    return ResponseData.ok(leagueService.joinLeague(getUser(), code));
   }
 
   @GET
   @Path("kick/{id}")
   public ResponseData kick(@PathParam("id") Long id) throws BusinessException {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.kick(getUser(), id));
-    }
+    return ResponseData.ok(leagueService.kick(getUser(), id));
   }
 
   @GET
   @Path("reject/{id}")
   public ResponseData reject(@PathParam("id") Long id) throws BusinessException {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.reject(getUser(), id));
-    }
+    return ResponseData.ok(leagueService.reject(getUser(), id));
   }
 
   @GET
   @Path("approve/{id}")
   public ResponseData approve(@PathParam("id") Long id) throws BusinessException {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.approve(getUser(), id));
-    }
+    return ResponseData.ok(leagueService.approve(getUser(), id));
   }
 
   @GET
   @Path("cancel/{code}")
   public ResponseData cancel(@PathParam("code") String code) throws BusinessException {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.cancel(getUser(), code));
-    }
+    return ResponseData.ok(leagueService.cancel(getUser(), code));
   }
 
   @GET
   @Path("leave")
   public ResponseData leaveLeague() throws BusinessException {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.leaveLeague(getUser()));
-    }
+    return ResponseData.ok(leagueService.leaveLeague(getUser()));
   }
 
   @POST
   @Path("validate-name")
   public ResponseData validateName(LeagueRequest request) {
-    synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(leagueService.validateName(request));
-    }
+    return ResponseData.ok(leagueService.validateName(request));
   }
 
   @GET

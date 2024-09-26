@@ -11,7 +11,9 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.DeviceInfo;
+import xyz.telegram.depinalliance.common.models.request.SettingRequest;
 import xyz.telegram.depinalliance.common.models.response.ClaimResponse;
+import xyz.telegram.depinalliance.common.models.response.SettingResponse;
 import xyz.telegram.depinalliance.common.models.response.UserSkillResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
@@ -518,6 +520,40 @@ public class UserService {
       }
     }
     HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
+  }
+
+  @Transactional
+  public boolean setting(long userId, SettingRequest request) {
+    SettingResponse settingResponse = redisService.findSettingUserById(userId);
+    Enums.UserSettings settings = Enums.UserSettings.valueOf(request.setting);
+    boolean currentSetting = false;
+    String sql = " where id = :id";
+    switch (settings) {
+    case NOTIFICATION:
+      currentSetting = settingResponse.enableNotifications;
+      sql = "enableNotification = :setting " + sql + " and enableNotification = :currentSetting";
+      break;
+    case MUSIC_THEME:
+      currentSetting = settingResponse.enableMusicTheme;
+      sql = "enableMusicTheme = :setting " + sql + " and enableMusicTheme = :currentSetting";
+      break;
+    case SOUND_EFFECT:
+      currentSetting = settingResponse.enableSoundEffect;
+      sql = "enableSoundEffect = :setting " + sql + " and enableSoundEffect = :currentSetting";
+      break;
+    }
+    if (request.enable == currentSetting) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", userId);
+    params.put("setting", request.setting);
+    params.put("currentSetting", currentSetting);
+    if (User.updateUser(sql, params)) {
+      redisService.clearCacheByPrefix("SETTING_USER_" + userId);
+      return true;
+    }
+    throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
   }
 
   public void updateLevelByExp(long userId) {

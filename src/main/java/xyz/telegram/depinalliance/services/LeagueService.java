@@ -76,6 +76,29 @@ public class LeagueService {
   }
 
   @Transactional
+  public LeagueResponse changeAvatar(User user, LeagueRequest request) throws Exception {
+    if (user.league == null || request == null || request.file == null || !s3Service.validateFileType(request.file,
+      IMAGE_CONTENT_TYPE)) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    user.league = redisService.findLeagueById(user.league.id, true);
+    if (!Objects.equals(user.league.user.id, user.id)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
+    }
+    String urlImage = s3Service.uploadFile(Enums.FolderImage.LEAGUE.getFolder(), UUID.randomUUID().toString(),
+      request.file);
+    user.league.avatar = amazonS3Config.awsUrl() + urlImage;
+    Map<String, Object> params = new HashMap<>();
+    params.put("avatar", user.league.avatar);
+    params.put("id", user.league.id);
+    params.put("updatedAt", System.currentTimeMillis());
+    if (League.updateObject("avatar = :avatar, updatedAt = :updatedAt where id = :id", params)) {
+      return new LeagueResponse(user.league, user.code);
+    }
+    throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+  }
+
+  @Transactional
   public LeagueResponse joinLeague(User user, String code) throws BusinessException {
     if (user.league != null || StringUtils.isBlank(code)) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);

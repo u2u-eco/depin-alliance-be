@@ -11,6 +11,7 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ItemResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
+import xyz.telegram.depinalliance.common.models.response.SettingResponse;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 import xyz.telegram.depinalliance.entities.*;
 
@@ -379,6 +380,25 @@ public class RedisService {
       logger.errorv(e, "Error while finding list next level " + redisKey);
     }
     return Level.find("id > ?1", Sort.ascending("id"), levelId).page(0, 2).list();
+  }
+
+  public SettingResponse findSettingUserById(long userId) {
+    String redisKey = "SETTING_USER_" + userId;
+    try {
+      RBucket<SettingResponse> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      SettingResponse object = User.find("id = ?1", userId).project(SettingResponse.class).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return User.find("id = ?1", userId).project(SettingResponse.class).firstResult();
   }
 
   public void clearCacheByPrefix(String prefix) {

@@ -74,6 +74,10 @@ public class Enums {
     CREATE, JOIN, KICK, LEAVE, UP_TO_MOD
   }
 
+  public enum UserSettings {
+    NOTIFICATION, MUSIC_THEME, SOUND_EFFECT
+  }
+
   public enum EventId {
     CYBER_BOX(1), OPEN_MESH(2), TIMPI(3);
     private final long id;

@@ -104,6 +104,12 @@ public class User extends BaseEntity {
   public Boolean isPremium;
   @Column(name = "ref_percent_claim", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
   public BigDecimal refPercentClaim = BigDecimal.ZERO;
+  @Column(name = "enable_notification", columnDefinition = "boolean default true")
+  public boolean enableNotification = true;
+  @Column(name = "enable_music_theme", columnDefinition = "boolean default true")
+  public boolean enableMusicTheme = true;
+  @Column(name = "enable_sound_effect", columnDefinition = "boolean default true")
+  public boolean enableSoundEffect = true;
 
   public User(Long id) {
     this.id = id;
