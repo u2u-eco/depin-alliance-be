@@ -184,7 +184,7 @@ public class MissionService {
         }
         break;
       case TELEGRAM:
-        isChecked = telegramService.verifyJoinChannel("@" + check.referId, user.id.toString());
+        isChecked = telegramService.verifyJoinChannel(check.referId, user.id.toString());
         break;
       case PLAY_MINI_TON:
         try {
