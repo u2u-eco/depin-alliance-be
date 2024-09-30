@@ -23,8 +23,8 @@ public class InitService {
   RedisService redisService;
 
   @Transactional
-    //  void onSonStart() {
-  void onStart(@Observes StartupEvent event) {
+//  void onSonStart() {
+      void onStart(@Observes StartupEvent event) {
     if (LaunchMode.current().isDevOrTest()) {
       if (Mission.count() == 0) {
         if (true) {

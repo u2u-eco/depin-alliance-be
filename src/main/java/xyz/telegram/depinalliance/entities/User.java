@@ -5,11 +5,9 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.FriendResponse;
-import xyz.telegram.depinalliance.common.models.response.MemberLeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 
 import java.math.BigDecimal;
@@ -256,7 +254,7 @@ public class User extends BaseEntity {
       panacheQuery.count());
   }
 
-  public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
+  /*public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
     long leagueId, String username, long adminUserId) {
     String sql = "league.id = :leagueId and id != :adminUserId";
     Map<String, Object> params = new HashMap<>();
@@ -269,7 +267,7 @@ public class User extends BaseEntity {
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(MemberLeagueResponse.class).list(),
       pageable, panacheQuery.count());
-  }
+  }*/
 
   public static long countFriendByUser(long userId) {
     return count("ref.id =?1", userId);

@@ -45,6 +45,10 @@ public class LeagueMember extends BaseEntity {
     return leagueMember;
   }
 
+  public static LeagueMember findByUserIdAndLeagueId(long userId, long leagueId) {
+    return find("league.id = ?1 and user.id = ?2", leagueId, userId).firstResult();
+  }
+
   public static boolean updateMember(String query, Map<String, Object> params) {
     return update(query, params) > 0;
   }

@@ -350,6 +350,7 @@ public class LeagueService {
           history.league = user.league;
           history.user = user;
           history.userItem = new UserItem(id);
+          history.persist();
           history.create();
           history.persist();
         }
