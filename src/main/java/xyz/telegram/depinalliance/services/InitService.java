@@ -23,8 +23,8 @@ public class InitService {
   RedisService redisService;
 
   @Transactional
-  void onSonStart() {
-//      void onStart(@Observes StartupEvent event) {
+    //  void onSonStart() {
+  void onStart(@Observes StartupEvent event) {
     if (LaunchMode.current().isDevOrTest()) {
       if (Mission.count() == 0) {
         if (true) {
@@ -53,7 +53,7 @@ public class InitService {
           mission.point = new BigDecimal(7000);
           mission.xp = new BigDecimal(200);
           mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-          mission.referId = "DePIN_App";
+          mission.referId = "@DePIN_App";
           mission.create();
           mission.persist();
 
@@ -108,7 +108,7 @@ public class InitService {
           mission.point = new BigDecimal(10000);
           mission.xp = new BigDecimal(200);
           mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-          mission.referId = "UnicornUltraGlobal";
+          mission.referId = "@UnicornUltraGlobal";
           mission.amount = 1L;
           mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
           mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
@@ -294,7 +294,7 @@ public class InitService {
         partner.name = "U2DPN";
         partner.description = "Embrace the revolution of the decentralized Internet and monetize your unused bandwidth";
         partner.rewards = "Up to +90,000 points";
-        partner.orders = 1;
+        partner.orders = 0;
         partner.participants = 0;
         partner.isActive = true;
         partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/u2dpn.jpg";
@@ -336,7 +336,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join Telegram channel";
         mission.orders = 2;
-        mission.referId = "UnicornUltraGlobal";
+        mission.referId = "@UnicornUltraGlobal";
         mission.url = "https://t.me/UnicornUltraGlobal/120759";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -482,7 +482,7 @@ public class InitService {
         mission.description = "Join Mizzle's Telegram group";
         mission.orders = 2;
         mission.url = "https://t.me/mizzleio";
-        mission.referId = "mizzleio";
+        mission.referId = "@mizzleio";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -543,7 +543,7 @@ public class InitService {
         mission.description = "Join the Telegram announcement channel";
         mission.orders = 1;
         mission.url = "https://t.me/depindora";
-        mission.referId = "depindora";
+        mission.referId = "@depindora";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -686,7 +686,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join ZkAGI's Telegram group";
         mission.orders = 2;
-        mission.referId = "ZkAGI_AI";
+        mission.referId = "@ZkAGI_AI";
         mission.url = "https://t.me/ZkAGI_AI";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -775,7 +775,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join the Telegram Channel";
         mission.orders = 2;
-        mission.referId = "Gemjungle";
+        mission.referId = "@Gemjungle";
         mission.url = "https://t.me/Gemjungle";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -804,7 +804,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join the Telegram Channel";
         mission.orders = 3;
-        mission.referId = "HermesCryptohub";
+        mission.referId = "@HermesCryptohub";
         mission.url = "https://t.me/HermesCryptohub";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -880,7 +880,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join Dextr's Telegram group";
         mission.orders = 2;
-        mission.referId = "DextrExchange";
+        mission.referId = "@DextrExchange";
         mission.url = "https://t.me/DextrExchange";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -957,7 +957,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join aZen Community";
         mission.orders = 2;
-        mission.referId = "azenprotocol";
+        mission.referId = "@azenprotocol";
         mission.url = "https://t.me/azenprotocol";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -1151,7 +1151,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join Telegram Group";
         mission.orders = 3;
-        mission.referId = "slinky_network";
+        mission.referId = "@slinky_network";
         mission.url = "https://t.me/slinky_network";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -1180,7 +1180,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join Telegram Channel";
         mission.orders = 4;
-        mission.referId = "slinky_ann";
+        mission.referId = "@slinky_ann";
         mission.url = "https://t.me/slinky_ann";
         mission.point = new BigDecimal(20000);
         mission.xp = new BigDecimal(200);
@@ -1284,7 +1284,7 @@ public class InitService {
         mission.isFake = false;
         mission.description = "Join the Telegram Channel";
         mission.orders = 1;
-        mission.referId = "MiniTon_Official";
+        mission.referId = "@MiniTon_Official";
         mission.url = " https://t.me/MiniTon_Official";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
@@ -1449,7 +1449,7 @@ public class InitService {
         mission.description = "Join Telegram channel";
         mission.orders = 4;
         mission.url = " https://t.me/re_protocol";
-        mission.referId = "re_protocol";
+        mission.referId = "@re_protocol";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -1515,7 +1515,7 @@ public class InitService {
         mission.description = "Join OpenMesh's Telegram";
         mission.orders = 2;
         mission.url = " https://t.me/openmesh";
-        mission.referId = "openmesh";
+        mission.referId = "@openmesh";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -1606,7 +1606,7 @@ public class InitService {
         mission.description = "Join Community";
         mission.orders = 2;
         mission.url = " https://t.me/TimpiMe";
-        mission.referId = "TimpiMe";
+        mission.referId = "@TimpiMe";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -1774,7 +1774,7 @@ public class InitService {
         mission.description = "Join Ton AI Channel and Earn";
         mission.orders = 2;
         mission.url = " https://t.me/+UGViuMymlixmNTk9";
-        mission.referId = "Ton_AI_News";
+        mission.referId = "@Ton_AI_News";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -2004,7 +2004,7 @@ public class InitService {
         mission.description = mission.name;
         mission.orders = 2;
         mission.url = "https://t.me/kriptovalyuta_airdrop";
-        mission.referId = "kriptovalyuta_airdrop";
+        mission.referId = "@kriptovalyuta_airdrop";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -2141,9 +2141,256 @@ public class InitService {
         mission.description = mission.name;
         mission.orders = 5;
         mission.url = "https://t.me/punkyai";
-        mission.referId = "punkyai";
+        mission.referId = "@punkyai";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+
+      partner = Partner.findByName("TenEx");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "TenEx";
+        partner.description = "TENEX is a cutting-edge decentralized finance (DeFi) platform that's reimagining how we interact with digital assets. It's designed to make cryptocurrency trading and investment more accessible, efficient, and\n" + " rewarding for everyone – from crypto enthusiasts to traditional finance professionals";
+        partner.rewards = "Up to +60,000 points";
+        partner.orders = 20;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/ten-ex.png";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://t.me/+Bq6Csh-d7pw1NzM9";
+        mission.referId = "-1002167477745";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 2;
+        mission.url = "https://x.com/tenex_official?s=21";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Visit Website";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 3;
+        mission.url = "https://tenex.finance/";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Discord";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 4;
+        mission.url = "http://discord.gg/VcrzxkYV6y";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+      }
+
+      partner = Partner.findByName("PeckS");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "PeckS";
+        partner.description = "The native Telegram and TikTok meme coin \uD83E\uDEB5 Airdrop for the OGs! \uD83E\uDD11";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 1;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/pecks.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://x.com/realPecksHouse";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Telegram Channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = mission.name;
+        mission.orders = 2;
+        mission.url = "https://t.me/realPeckS/";
+        mission.referId = "@realPeckS";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Bot";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 3;
+        mission.url = "https://t.me/realpecks_bot";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+      }
+
+      partner = Partner.findByName("VOVO");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "VOVO";
+        partner.description = "Vovo is an innovative project centered on creating a rewarding experience within the blockchain ecosystem";
+        partner.rewards = "Up to +10,000 points";
+        partner.orders = 21;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/vovo.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Play Granny VOVO Bot";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://t.me/VovoTeleBot/OneApp?startapp=5916134027";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+      partner = Partner.findByName("PANIE");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "PANIE";
+        partner.description = "PANIE is a decentralised DeFi application on the TON Blockchain, committed to promoting growth and decentralisation within the TON Ecosystem. It offers a secure on-chain experience, seamlessly integrating with Telegram to enable users to mine PANIE tokens and take part in various activities";
+        partner.rewards = "Up to +10,000 points";
+        partner.orders = 22;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/panie.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join PANIE app";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://t.me/Panieapp_bot/launch?startapp=DePIN_Alliance_Bot";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
         mission.partner = partner;
         mission.isActive = true;
