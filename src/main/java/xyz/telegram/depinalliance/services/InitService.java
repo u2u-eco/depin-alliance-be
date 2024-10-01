@@ -2333,7 +2333,7 @@ public class InitService {
         partner.name = "VOVO";
         partner.description = "Vovo is an innovative project centered on creating a rewarding experience within the blockchain ecosystem";
         partner.rewards = "Up to +10,000 points";
-        partner.orders = 21;
+        partner.orders = 22;
         partner.participants = 0;
         partner.isActive = true;
         partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/vovo.jpg";
@@ -2374,7 +2374,7 @@ public class InitService {
         partner.name = "PANIE";
         partner.description = "PANIE is a decentralised DeFi application on the TON Blockchain, committed to promoting growth and decentralisation within the TON Ecosystem. It offers a secure on-chain experience, seamlessly integrating with Telegram to enable users to mine PANIE tokens and take part in various activities";
         partner.rewards = "Up to +10,000 points";
-        partner.orders = 22;
+        partner.orders = 23;
         partner.participants = 0;
         partner.isActive = true;
         partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/panie.jpg";
@@ -2407,6 +2407,81 @@ public class InitService {
         eventMission.number = 1;
         eventMission.create();
         eventMission.persist();
+      }
+
+      partner = Partner.findByName("FACABY");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "FACABY";
+        partner.description = "FACABY, the ultimate TON-based airdrop and real-money game!\n" + "As a meme game, FACABY rewards user based on the Telegram account's age and activity and join the lucky wheel daily to win $TON and $FACABY reward points! \n" + "Facaby is building the own meme world for community and going to conquer the gamefi space!";
+        partner.rewards = "Up to +50,000 points";
+        partner.orders = 24;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/test/mission/FACABY.png";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow FACABY";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://x.com/Facabyonton";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join FACABY Channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 2;
+        mission.url = "https://t.me/facabyofficial";
+        mission.referId = "facabyofficial";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join FACABY Game";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 3;
+        mission.url = "https://t.me/facaby_bot/facaby?startapp=GI59tE13E";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
       }
     }
   }
