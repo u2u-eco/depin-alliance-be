@@ -41,6 +41,17 @@ public class UserItemResponse {
     this.isCanClaim = isCanClaim;
   }
 
+  public UserItemResponse(String name, String code, Enums.ItemType type, BigDecimal miningPower, String image,
+    BigDecimal price, Long totalItem) {
+    this.name = name;
+    this.code = code;
+    this.type = type;
+    this.miningPower = Utils.stripDecimalZeros(miningPower);
+    this.image = image;
+    this.totalItem = totalItem;
+    this.price = Utils.stripDecimalZeros(price);
+  }
+
   public UserItemResponse(Long id, String name, String code, Enums.ItemType type, BigDecimal miningPower, String image,
     BigDecimal price) {
     this.id = id;

@@ -5,11 +5,9 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.FriendResponse;
-import xyz.telegram.depinalliance.common.models.response.MemberLeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 
 import java.math.BigDecimal;
@@ -162,6 +160,22 @@ public class User extends BaseEntity {
     return updateUser(sql + "point = point + :point where id = :id and point + :point >= 0", params);
   }
 
+//  public static boolean updatePointFundingLeague(long id, BigDecimal point) {
+//    Map<String, Object> params = new HashMap<>();
+//    params.put("id", id);
+//    params.put("point", point);
+//    String sql = "pointUsed = pointUsed + :point, point = point - :point, leaguePointFunding = leaguePointFunding + :point  where id = :id and point - :point >= 0";
+//    return updateUser(sql, params);
+//  }
+//
+//  public static boolean updateLeagueContributeProfit(long id, BigDecimal profit) {
+//    Map<String, Object> params = new HashMap<>();
+//    params.put("id", id);
+//    params.put("profit", profit);
+//    String sql = "leagueContributeProfit = leagueContributeProfit + :profit where id = :id and leagueContributeProfit + :profit >= 0";
+//    return updateUser(sql, params);
+//  }
+
   public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
@@ -240,7 +254,7 @@ public class User extends BaseEntity {
       panacheQuery.count());
   }
 
-  public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
+  /*public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
     long leagueId, String username, long adminUserId) {
     String sql = "league.id = :leagueId and id != :adminUserId";
     Map<String, Object> params = new HashMap<>();
@@ -253,7 +267,7 @@ public class User extends BaseEntity {
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(MemberLeagueResponse.class).list(),
       pageable, panacheQuery.count());
-  }
+  }*/
 
   public static long countFriendByUser(long userId) {
     return count("ref.id =?1", userId);

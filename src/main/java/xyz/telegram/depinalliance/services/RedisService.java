@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.services;
 
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -187,6 +188,49 @@ public class RedisService {
       }
     }
     return League.findByCode(code);
+  }
+
+  public List<Long> findListAdminLeagueByRoleAndLeague(Long leagueId, Enums.LeagueRole role) {
+    String redisKey = "ADMIN_LEAGUE_" + leagueId + "_" + role;
+    try {
+      RBucket<List<Long>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache list " + redisKey + " ttl : " + timeOut);
+      List<Long> object = LeagueMember.find(
+        "select user.id from LeagueMember where league.id = :leagueId and leagueRole like :role",
+        Parameters.with("leagueId", leagueId).and("role", "%" + role.name() + "%")).project(Long.class).list();
+      if (object != null) {
+        value.setAsync(object, timeOut, TimeUnit.SECONDS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return LeagueMember.find("select user.id from LeagueMember where league.id = :leagueId and leagueRole like :role",
+      Parameters.with("leagueId", leagueId).and("role", "%" + role.name() + "%")).project(Long.class).list();
+  }
+
+  public LeagueMember findLeagueMemberByUserId(long userId) {
+    String redisKey = "LEAGUE_MEMBER_" + userId;
+    try {
+      RBucket<LeagueMemberRedis> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get().getLeagueMember();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : " + timeOut);
+      LeagueMember object = LeagueMember.find("user.id = ?1", userId).firstResult();
+      if (object != null) {
+        value.setAsync(
+          new LeagueMemberRedis(object.id, object.user.id, object.league.id, object.isAdmin, object.leagueRole,
+            object.pointFunding, object.contributeProfit), timeOut, TimeUnit.SECONDS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return LeagueMember.find("user.id = ?1", userId).firstResult();
   }
 
   public BigDecimal findRefPercentClaimById(Long id, boolean isUseCache) {
@@ -402,7 +446,40 @@ public class RedisService {
   }
 
   public void clearCacheByPrefix(String prefix) {
-    System.out.println(redissonClient.getKeys().deleteByPattern(prefix + "*"));
+    redissonClient.getKeys().deleteByPattern(prefix + "*");
+  }
+
+  public static class LeagueMemberRedis {
+    public String id;
+    public long userid;
+    public long leagueId;
+    public boolean isAdmin;
+    public String leagueRole;
+    public BigDecimal pointFunding;
+    public BigDecimal contributeProfit;
+
+    public LeagueMemberRedis(String id, long userid, long leagueId, boolean isAdmin, String leagueRole,
+      BigDecimal pointFunding, BigDecimal contributeProfit) {
+      this.id = id;
+      this.userid = userid;
+      this.leagueId = leagueId;
+      this.isAdmin = isAdmin;
+      this.leagueRole = leagueRole;
+      this.pointFunding = pointFunding;
+      this.contributeProfit = contributeProfit;
+    }
+
+    public LeagueMember getLeagueMember() {
+      LeagueMember leagueMember = new LeagueMember();
+      leagueMember.id = this.id;
+      leagueMember.league = new League(this.leagueId);
+      leagueMember.user = new User(this.userid);
+      leagueMember.isAdmin = this.isAdmin;
+      leagueMember.leagueRole = this.leagueRole;
+      leagueMember.pointFunding = this.pointFunding;
+      leagueMember.contributeProfit = this.contributeProfit;
+      return leagueMember;
+    }
   }
 
   public static class LeagueRedis {

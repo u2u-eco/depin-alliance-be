@@ -53,10 +53,6 @@ public class UserService {
           BigDecimal pointRef = new BigDecimal(
             Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_REF)));
           user.pointRef = pointRef;
-          if (StringUtils.isNotBlank(league)) {
-            //            user.league = ref.league;
-            refCode += " request league " + league;
-          }
           Map<String, Object> params = new HashMap<>();
           params.put("id", ref.id);
           params.put("point", pointRef);
@@ -67,6 +63,11 @@ public class UserService {
       }
       user.ref = ref;
       User.createUser(user);
+      if (StringUtils.isNotBlank(league) && StringUtils.isNotBlank(refCode) && ref != null && ref.league != null) {
+        refCode += " request league " + league;
+        leagueService.joinLeague(user, ref.league.code);
+      }
+
       UserDevice userDevice = new UserDevice();
       userDevice.user = user;
       userDevice.name = "Device " + 1;

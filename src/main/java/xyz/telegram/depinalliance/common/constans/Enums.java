@@ -71,7 +71,11 @@ public class Enums {
   }
 
   public enum LeagueMemberType {
-    CREATE, JOIN, KICK, LEAVE, UP_TO_MOD
+    CREATE, JOIN, KICK, LEAVE, TURN_ON_ADMIN_REQUEST, TURN_OFF_ADMIN_REQUEST, TURN_ON_ADMIN_KICK, TURN_OFF_ADMIN_KICK
+  }
+
+  public enum LeagueRole {
+    ADMIN_REQUEST, ADMIN_KICK
   }
 
   public enum UserSettings {
