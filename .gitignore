@@ -42,3 +42,4 @@ build-home.sh
 import-dev.sql
 TestResource.java
 sql_migrate/
+clear*.sh

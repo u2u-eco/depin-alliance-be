@@ -2458,7 +2458,7 @@ public class InitService {
         mission.description = mission.name;
         mission.orders = 2;
         mission.url = "https://t.me/facabyofficial";
-        mission.referId = "facabyofficial";
+        mission.referId = "@facabyofficial";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -2482,6 +2482,255 @@ public class InitService {
         mission.isActive = true;
         mission.create();
         mission.persist();
+      }
+
+      partner = Partner.findByName("penomo");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "penomo";
+        partner.description = "The financial infra to hyperscale the clean energy economy. Bridging global capital markets with renewable RWA onchain";
+        partner.rewards = "Up to +100,000 points";
+        partner.orders = 25;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/test/mission/penomo.jpg";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://x.com/penomoprotocol";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Like announcement";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 2;
+        mission.url = "https://x.com/penomoprotocol/status/1841112835981537665";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "RT announcement";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 3;
+        mission.url = "https://x.com/penomoprotocol/status/1841112835981537665";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Discord";
+        mission.type = Enums.MissionType.URL;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 4;
+        mission.url = "https://discord.com/invite/k2Qamkv22s";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join the Telegram channel";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = false;
+        mission.description = mission.name;
+        mission.orders = 5;
+        mission.url = "https://t.me/penomoprotocol";
+        mission.referId = "@penomoprotocol";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
+        List<QuizResponse> listQuizResponses = new ArrayList<>();
+        QuizResponse quizResponse = new QuizResponse();
+        quizResponse.index = 1;
+        quizResponse.isMultiple = false;
+        quizResponse.question = "What is the primary mission of penomo?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "To tokenize digital currencies for DeFi use", false));
+        quizResponse.answers.add(new QuizResponse.Answer(2,
+          "To revolutionize clean energy finance by bringing renewable Real-World Assets (RWAs) on-chain", true));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(3, "To provide blockchain solutions for financial trading", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(4, "To create a new cryptocurrency for global payments", false));
+
+        listQuizResponses.add(quizResponse);
+        quizResponse = new QuizResponse();
+        quizResponse.index = 2;
+        quizResponse.question = "Which type of assets does penomo focus on tokenizing?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "Precious metals", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "Renewable energy assets like solar and battery storage", true));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Real estate properties", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Traditional stocks and bonds", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 3;
+        quizResponse.question = "What role does blockchain technology play in penomo's platform?";
+        quizResponse.answers.add(
+          new QuizResponse.Answer(1, "Enhances transparency and security for renewable energy investments", true));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "Provides a decentralized marketplace for luxury goods", false));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "Creates a new payment gateway for e-commerce", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "Supports only cryptocurrency trading", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 4;
+        quizResponse.question = "Which of the following is a key goal of penomo’s platform?";
+        quizResponse.answers.add(new QuizResponse.Answer(1, "To offer short-term trading solutions", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "To facilitate peer-to-peer investments in renewable energy", true));
+        quizResponse.answers.add(new QuizResponse.Answer(3, "To create a new social media platform", false));
+        quizResponse.answers.add(new QuizResponse.Answer(4, "To replace traditional stock markets", false));
+        listQuizResponses.add(quizResponse);
+
+        quizResponse = new QuizResponse();
+        quizResponse.index = 5;
+        quizResponse.question = "What is penomo’s approach to driving sustainable finance?";
+        quizResponse.answers.add(
+          new QuizResponse.Answer(1, "By offering high-risk, high-reward trading options", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(2, "By tokenizing renewable energy assets and bringing them on-chain", true));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(3, "By developing a new digital currency for the energy market", false));
+        quizResponse.answers.add(
+          new QuizResponse.Answer(4, "By creating an educational platform for blockchain technology", false));
+        listQuizResponses.add(quizResponse);
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Quiz and earn";
+        mission.type = Enums.MissionType.QUIZ;
+        mission.isFake = false;
+        mission.description = Utils.convertObjectToString(listQuizResponses);
+        mission.orders = 6;
+        mission.url = "";
+        mission.point = new BigDecimal(30000);
+        mission.xp = new BigDecimal(500);
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.partner = partner;
+        mission.image = "/assets/images/icons/icon-quiz-gradient.svg";
+        mission.create();
+        mission.persist();
+
+        eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+      }
+
+      partner = Partner.findByName("HUMAN Protocol");
+      if (partner == null) {
+        Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
+        partner = new Partner();
+        partner.name = "HUMAN Protocol";
+        partner.description = "HUMAN Protocol is a proof of humanity and socialfi protocol for onchain reputation and identity. Join Team HUMAN today and fight the bots!";
+        partner.rewards = "Up to +20,000 points";
+        partner.orders = 26;
+        partner.participants = 0;
+        partner.isActive = true;
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/test/mission/human.png";
+        partner.create();
+        partner.persist();
+
+        Mission mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Follow Twitter";
+        mission.type = Enums.MissionType.TWITTER;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 1;
+        mission.url = "https://x.com/imhmnxyz";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-x-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.amount = 1L;
+        mission.rewardType = Enums.MissionRewardType.CYBER_BOX;
+        mission.rewardImage = "/assets/images/upgrade/upgrade-special@2x.png";
+        mission.create();
+        mission.persist();
+
+        EventMission eventMission = new EventMission();
+        eventMission.event = new Event(Enums.EventId.CYBER_BOX.getId());
+        eventMission.mission = mission;
+        eventMission.item = itemBox;
+        eventMission.number = 1;
+        eventMission.create();
+        eventMission.persist();
+
+        mission = new Mission();
+        mission.groupMission = partner.name;
+        mission.name = "Join Team HUMAN";
+        mission.type = Enums.MissionType.TELEGRAM;
+        mission.isFake = true;
+        mission.description = mission.name;
+        mission.orders = 2;
+        mission.url = "https://t.me/imhmnbot/invite?startapp=1716421844";
+        mission.point = new BigDecimal(10000);
+        mission.xp = new BigDecimal(100);
+        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
+        mission.partner = partner;
+        mission.isActive = true;
+        mission.create();
+        mission.persist();
+
       }
     }
   }
