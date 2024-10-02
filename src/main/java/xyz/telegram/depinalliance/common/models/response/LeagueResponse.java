@@ -16,6 +16,8 @@ public class LeagueResponse {
   public String name;
   public String avatar;
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Long id;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public String inviteLink;
   public long totalContributors;
   public BigDecimal totalMining;
@@ -32,11 +34,15 @@ public class LeagueResponse {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public String adminAvatar;
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Long adminId;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public BigDecimal profit;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public BigDecimal point;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public String role;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public Long rank;
 
   public LeagueResponse(String code, String name, String avatar, Long totalContributors, BigDecimal totalMining,
     Long leagueId) {
@@ -58,7 +64,7 @@ public class LeagueResponse {
     this.xp = Utils.stripDecimalZeros(league.xp);
   }
 
-  public LeagueResponse(League league, User user) {
+  public LeagueResponse(League league, User user, String role) {
     this.code = league.code;
     this.name = league.name;
     this.totalContributors = league.totalContributors;
@@ -71,8 +77,13 @@ public class LeagueResponse {
       this.adminUsername = userAdmin.username;
       this.adminMiningPower = userAdmin.miningPowerReal;
       this.adminAvatar = userAdmin.avatar;
+      this.adminId = userAdmin.id;
     }
+    this.point = Utils.stripDecimalZeros(league.point);
+    this.profit = Utils.stripDecimalZeros(league.profit);
+    this.role = role;
     this.xp = Utils.stripDecimalZeros(league.xp);
+    this.id = user.id;
   }
 
   public LeagueResponse(League league, boolean isPendingRequest) {
@@ -86,5 +97,23 @@ public class LeagueResponse {
     this.isPendingRequest = isPendingRequest;
     this.point = Utils.stripDecimalZeros(league.point);
     this.profit = Utils.stripDecimalZeros(league.profit);
+  }
+
+  public LeagueResponse(String name, String avatar, long totalContributors, BigDecimal profit, BigDecimal point,
+    Long rank) {
+    this.name = name;
+    this.avatar = avatar;
+    this.totalContributors = totalContributors;
+    this.profit = profit;
+    this.point = point;
+    this.rank = rank;
+  }
+
+  public LeagueResponse(String code, String name, String avatar, Long totalContributors, BigDecimal totalMining) {
+    this.code = code;
+    this.name = name;
+    this.totalContributors = totalContributors;
+    this.totalMining = Utils.stripDecimalZeros(totalMining);
+    this.avatar = avatar;
   }
 }

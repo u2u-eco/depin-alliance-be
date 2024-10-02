@@ -13,12 +13,12 @@ public class LeagueContributeHistory extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "leagueContributeHistorySequence")
   public Long id;
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", unique = true)
+  @JoinColumn(name = "user_id")
   public User user;
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "league_id", unique = true)
+  @JoinColumn(name = "league_id")
   public League league;
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_item_id", unique = true)
+  @JoinColumn(name = "user_item_id")
   public UserItem userItem;
 }

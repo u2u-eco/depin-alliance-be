@@ -446,7 +446,7 @@ public class RedisService {
   }
 
   public void clearCacheByPrefix(String prefix) {
-    System.out.println(redissonClient.getKeys().deleteByPattern(prefix + "*"));
+    redissonClient.getKeys().deleteByPattern(prefix + "*");
   }
 
   public static class LeagueMemberRedis {

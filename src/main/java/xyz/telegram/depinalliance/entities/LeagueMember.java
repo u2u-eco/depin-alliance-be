@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.entities;
 
 import jakarta.persistence.*;
+import xyz.telegram.depinalliance.common.models.response.MemberLeagueDetail;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -45,8 +46,8 @@ public class LeagueMember extends BaseEntity {
     return leagueMember;
   }
 
-  public static LeagueMember findByUserIdAndLeagueId(long userId, long leagueId) {
-    return find("league.id = ?1 and user.id = ?2", leagueId, userId).firstResult();
+  public static MemberLeagueDetail findByUserIdAndLeagueId(long userId, long leagueId) {
+    return find("league.id = ?1 and user.id = ?2", leagueId, userId).project(MemberLeagueDetail.class).firstResult();
   }
 
   public static boolean updateMember(String query, Map<String, Object> params) {

@@ -103,7 +103,7 @@ public class League extends BaseEntity {
 
   public static ResponsePage<LeagueResponse> findByPagingAndNameSearchAndUserId(PagingParameters pageable,
     String nameSearch, long userId) {
-    String sql = "select l.code, l.name, l.avatar, l.totalContributors, l.totalMining, r.league.id from League l left join LeagueJoinRequest r on l.id = r.league.id and r.status = :status and r.user.id = :userId";
+    String sql = "select l.code, l.name, l.avatar, l.totalContributors, l.profit, r.league.id from League l left join LeagueJoinRequest r on l.id = r.league.id and r.status = :status and r.user.id = :userId";
     Map<String, Object> params = new HashMap<>();
     params.put("status", Enums.LeagueJoinRequestStatus.PENDING);
     params.put("userId", userId);
@@ -112,7 +112,20 @@ public class League extends BaseEntity {
       params.put("nameSearch", "%" + nameSearch.toLowerCase().trim() + "%");
     }
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql,
-      Sort.descending("l.totalMining", "l.xp").and("l.createdAt", Sort.Direction.Ascending), params);
+      Sort.descending("l.profit", "l.totalContributors").and("l.createdAt", Sort.Direction.Ascending), params);
+    return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(LeagueResponse.class).list(), pageable,
+      panacheQuery.count());
+  }
+
+  public static ResponsePage<LeagueResponse> findByPagingAndNameSearch(PagingParameters pageable, String nameSearch) {
+    String sql = "select l.code, l.name, l.avatar, l.totalContributors, l.profit from League l ";
+    Map<String, Object> params = new HashMap<>();
+    if (StringUtils.isNotBlank(nameSearch)) {
+      sql += " where l.nameNormalize like :nameSearch";
+      params.put("nameSearch", "%" + nameSearch.toLowerCase().trim() + "%");
+    }
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql,
+      Sort.descending("l.profit", "l.totalContributors").and("l.createdAt", Sort.Direction.Ascending), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(LeagueResponse.class).list(), pageable,
       panacheQuery.count());
   }

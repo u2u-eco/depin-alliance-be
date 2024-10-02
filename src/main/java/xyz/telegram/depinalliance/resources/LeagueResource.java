@@ -19,7 +19,10 @@ import xyz.telegram.depinalliance.entities.User;
 import xyz.telegram.depinalliance.services.LeagueService;
 import xyz.telegram.depinalliance.services.RedisService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author holden on 29-Aug-2024
@@ -36,6 +39,12 @@ public class LeagueResource extends BaseResource {
   @Path("")
   public ResponseData getLeague(PagingParameters pagingParameters, @QueryParam("name") String nameSearch) {
     return ResponseData.ok(League.findByPagingAndNameSearchAndUserId(pagingParameters, nameSearch, getTelegramId()));
+  }
+
+  @GET
+  @Path("all")
+  public ResponseData getAllLeague(PagingParameters pagingParameters, @QueryParam("name") String nameSearch) {
+    return ResponseData.ok(League.findByPagingAndNameSearch(pagingParameters, nameSearch));
   }
 
   @POST
@@ -95,21 +104,35 @@ public class LeagueResource extends BaseResource {
   @GET
   @Path("user-league")
   public ResponseData getUserLeague() throws BusinessException {
-    User user = getUser();
-    League userLeague = user.league;
-    if (userLeague == null) {
-      LeagueJoinRequest requestCheck = LeagueJoinRequest.findPendingByUser(user.id);
+    LeagueMember leagueMember = redisService.findLeagueMemberByUserId(getTelegramId());
+    if (leagueMember == null) {
+      LeagueJoinRequest requestCheck = LeagueJoinRequest.findPendingByUser(getTelegramId());
       if (requestCheck != null) {
         return ResponseData.ok(new LeagueResponse(requestCheck.league, true));
+      } else {
+        return ResponseData.ok("");
       }
     }
-    return ResponseData.ok(userLeague == null ? "" : new LeagueResponse(userLeague, user));
+    return ResponseData.ok(
+      new LeagueResponse(League.findById(leagueMember.league.id), getUser(), leagueMember.leagueRole));
+  }
+
+  @GET
+  @Path("user-league-current-rank")
+  public ResponseData getUserLeagueCurrentRank() throws BusinessException {
+    LeagueMember leagueMember = redisService.findLeagueMemberByUserId(getTelegramId());
+    if (leagueMember == null) {
+      return ResponseData.ok("");
+    }
+    return ResponseData.ok(League.find(
+      "select position from ( select id as id, row_number() over(order by profit desc, totalContributors desc, createdAt asc) as position from League) result where id = :leagueId",
+      Parameters.with("leagueId", leagueMember.league.id)).project(Long.class).firstResult());
   }
 
   @GET
   @Path("member")
   public ResponseData getMember(PagingParameters pagingParameters, @QueryParam("username") String username,
-    @QueryParam("is-ranking")  boolean isFunding) throws BusinessException {
+    @QueryParam("is-funding") boolean isFunding) throws BusinessException {
     User user = getUser();
     if (user.league == null) {
       return ResponseData.ok();
@@ -120,16 +143,18 @@ public class LeagueResource extends BaseResource {
       userAdmin.miningPowerReal);
     Map<String, Object> res = new HashMap<>();
     res.put("admin", admin);
-    LeagueMember leagueMember = LeagueMember.findByUserIdAndLeagueId(user.id,userLeague.id);
+    LeagueMember leagueMember = redisService.findLeagueMemberByUserId(user.id);
 
     List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(user.league.id, Enums.LeagueRole.ADMIN_KICK);
     if (isFunding) {
-      res.put("currentMember", new MemberLeagueResponse(user.id,user.username,user.avatar,leagueMember.pointFunding));
+      res.put("currentMember",
+        new MemberLeagueResponse(user.id, user.username, user.avatar, leagueMember.pointFunding));
       res.put("currentRank", LeagueMember.find(
         "select position from ( select user.id as id, row_number() over(order by pointFunding desc, createdAt asc) as position from LeagueMember where league.id = :leagueId) result where id = :userId",
         Parameters.with("userId", user.id).and("leagueId", userLeague.id)).project(Long.class).firstResult());
     } else {
-      res.put("currentMember", new MemberLeagueResponse(user.id,user.username,user.avatar,leagueMember.contributeProfit));
+      res.put("currentMember",
+        new MemberLeagueResponse(user.id, user.username, user.avatar, leagueMember.contributeProfit));
       res.put("currentRank", LeagueMember.find(
         "select position from ( select user.id as id, row_number() over(order by contributeProfit desc, createdAt asc) as position from LeagueMember where league.id = :leagueId) result where id = :userId",
         Parameters.with("userId", user.id).and("leagueId", userLeague.id)).project(Long.class).firstResult());
@@ -194,7 +219,6 @@ public class LeagueResource extends BaseResource {
     if (user.league == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    //    League userLeague = redisService.findLeagueById(user.league.id, true);
     List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(user.league.id, Enums.LeagueRole.ADMIN_REQUEST);
     if (!admins.contains(user.id)) {
       throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
@@ -214,12 +238,12 @@ public class LeagueResource extends BaseResource {
     if (user.league == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    League userLeague = redisService.findLeagueById(user.league.id, true);
-    if (!Objects.equals(userLeague.user.id, user.id)) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(user.league.id, Enums.LeagueRole.ADMIN_REQUEST);
+    if (!admins.contains(user.id)) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
     }
     Map<String, Object> params = new HashMap<>();
-    params.put("leagueId", userLeague.id);
+    params.put("leagueId", user.league.id);
     params.put("status", Enums.LeagueJoinRequestStatus.PENDING);
     return ResponseData.ok(LeagueJoinRequest.count("league.id = :leagueId and status = :status", params));
   }
@@ -240,5 +264,32 @@ public class LeagueResource extends BaseResource {
   @Path("role")
   public ResponseData updateRole(LeagueRoleRequest request) {
     return ResponseData.ok(leagueService.updateRole(getUser(), request));
+  }
+
+  @GET
+  @Path("detail-member/{id}")
+  public ResponseData detailMember(@PathParam("id") Long id) {
+    User user = getUser();
+    if (user.league == null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    MemberLeagueDetail leagueMember = LeagueMember.findByUserIdAndLeagueId(id, user.league.id);
+    if (leagueMember == null) {
+      throw new BusinessException(ResponseMessageConstants.LEAGUE_MEMBER_NOT_EXIST);
+    }
+    return ResponseData.ok(leagueMember);
+  }
+
+  @GET
+  @Path("detail-league/{code}")
+  public ResponseData getLeague(@PathParam("code") String code) {
+    League league = League.findByCode(code);
+    if (league == null) {
+      return ResponseData.ok();
+    }
+    return ResponseData.ok(
+      new LeagueResponse(league.name, league.avatar, league.totalContributors, league.profit, league.point, League.find(
+        "select row_number() over(order by profit desc, createdAt asc) as position from League where id = :leagueId",
+        Parameters.with("leagueId", league.id)).project(Long.class).firstResult()));
   }
 }
