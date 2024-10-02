@@ -289,7 +289,7 @@ public class LeagueResource extends BaseResource {
     }
     return ResponseData.ok(
       new LeagueResponse(league.name, league.avatar, league.totalContributors, league.profit, league.point, League.find(
-        "select row_number() over(order by profit desc, createdAt asc) as position from League where id = :leagueId",
+        "select position from ( select id as id, row_number() over(order by profit desc, totalContributors desc, createdAt asc) as position from League) result where id = :leagueId",
         Parameters.with("leagueId", league.id)).project(Long.class).firstResult()));
   }
 }
