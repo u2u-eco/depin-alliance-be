@@ -108,7 +108,7 @@ public class League extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("status", Enums.LeagueJoinRequestStatus.PENDING);
     params.put("userId", userId);
-    sql += "where l.isActive = true";
+    sql += " where l.isActive = true";
     if (StringUtils.isNotBlank(nameSearch)) {
       sql += " and l.nameNormalize like :nameSearch";
       params.put("nameSearch", "%" + nameSearch.toLowerCase().trim() + "%");
@@ -122,7 +122,7 @@ public class League extends BaseEntity {
   public static ResponsePage<LeagueResponse> findByPagingAndNameSearch(PagingParameters pageable, String nameSearch) {
     String sql = "select l.code, l.name, l.avatar, l.totalContributors, l.profit from League l ";
     Map<String, Object> params = new HashMap<>();
-    sql += "where l.isActive = true";
+    sql += " where l.isActive = true";
     if (StringUtils.isNotBlank(nameSearch)) {
       sql += " and l.nameNormalize like :nameSearch";
       params.put("nameSearch", "%" + nameSearch.toLowerCase().trim() + "%");
