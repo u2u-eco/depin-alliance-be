@@ -2860,7 +2860,7 @@ public class InitService {
         partner.orders = 29;
         partner.participants = 0;
         partner.isActive = true;
-        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/mind-ai.jpg";
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/test/mission/mind-ai.jpg";
         partner.create();
         partner.persist();
 
@@ -2973,12 +2973,12 @@ public class InitService {
         Item itemBox = Item.find("code", Enums.ItemSpecial.CYBER_BOX.name()).firstResult();
         partner = new Partner();
         partner.name = "SnakeTON";
-        partner.description = "Mind AI - Our platform offers a comprehensive crypto market analysis so users and institutions can make risk-based investments as one";
-        partner.rewards = "Up to +90,000 points";
+        partner.description = "SNAKETON - the pioneering Web3 GameFi survival platform built on Telegram and the TON Blockchain, where players can entertain themselves and securely own digital assets. SnakeTON integrates decentralized applications, including a gaming platform with real-time PvP on both mobile and PC, passive token mining and NFT minting through Snake Eggs, a Trading Bot, and SocialFi on Telegram";
+        partner.rewards = "Up to +50,000 points";
         partner.orders = 30;
         partner.participants = 0;
         partner.isActive = true;
-        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/public/mission/snake-ton.jpg";
+        partner.image = "https://depintele.s3.ap-southeast-1.amazonaws.com/test/mission/snake-ton.jpg";
         partner.create();
         partner.persist();
 
@@ -2989,7 +2989,7 @@ public class InitService {
         mission.isFake = true;
         mission.description = mission.name;
         mission.orders = 1;
-        mission.url = "https://x.com/MindAI_io";
+        mission.url = "https://t.me/snaketon_bot/Snake?startapp=1716421844";
         mission.point = new BigDecimal(10000);
         mission.xp = new BigDecimal(100);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
@@ -3018,23 +3018,6 @@ public class InitService {
         mission.orders = 2;
         mission.url = "https://t.me/SnakeTON_Game";
         mission.referId = "@SnakeTON_Game";
-        mission.point = new BigDecimal(30000);
-        mission.xp = new BigDecimal(500);
-        mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
-        mission.partner = partner;
-        mission.isActive = true;
-        mission.create();
-        mission.persist();
-
-        mission = new Mission();
-        mission.groupMission = partner.name;
-        mission.name = "Join Telegram Group";
-        mission.type = Enums.MissionType.TELEGRAM;
-        mission.isFake = true;
-        mission.description = mission.name;
-        mission.orders = 3;
-        mission.url = "https://t.me/MindAIGroup";
-        mission.referId = "@MindAIGroup";
         mission.point = new BigDecimal(30000);
         mission.xp = new BigDecimal(500);
         mission.image = "/assets/images/icons/icon-telegram-gradient.svg";
