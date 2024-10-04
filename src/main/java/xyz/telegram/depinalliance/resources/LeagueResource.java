@@ -95,6 +95,12 @@ public class LeagueResource extends BaseResource {
     return ResponseData.ok(leagueService.leaveLeague(getTelegramId()));
   }
 
+  @GET
+  @Path("leave-admin/{id}")
+  public ResponseData leaveLeagueAdmin(@PathParam("id") long id) throws BusinessException {
+    return ResponseData.ok(leagueService.leaveLeagueAdmin(getTelegramId(),id));
+  }
+
   @POST
   @Path("validate-name")
   public ResponseData validateName(LeagueRequest request) {
@@ -125,7 +131,7 @@ public class LeagueResource extends BaseResource {
       return ResponseData.ok("");
     }
     return ResponseData.ok(League.find(
-      "select position from ( select id as id, row_number() over(order by profit desc, totalContributors desc, createdAt asc) as position from League) result where id = :leagueId",
+      "select position from ( select id as id, row_number() over(order by profit desc, totalContributors desc, createdAt asc) as position from League where isActive = true) result where id = :leagueId",
       Parameters.with("leagueId", leagueMember.league.id)).project(Long.class).firstResult());
   }
 
@@ -289,7 +295,7 @@ public class LeagueResource extends BaseResource {
     }
     return ResponseData.ok(
       new LeagueResponse(league.name, league.avatar, league.totalContributors, league.profit, league.point, League.find(
-        "select position from ( select id as id, row_number() over(order by profit desc, totalContributors desc, createdAt asc) as position from League) result where id = :leagueId",
+        "select position from ( select id as id, row_number() over(order by profit desc, totalContributors desc, createdAt asc) as position from League where isActive = true) result where id = :leagueId",
         Parameters.with("leagueId", league.id)).project(Long.class).firstResult()));
   }
 }

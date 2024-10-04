@@ -156,6 +156,56 @@ public class LeagueService {
   }
 
   @Transactional
+  public boolean leaveLeagueAdmin(long userId, long assignAdmin) throws BusinessException {
+    if (userId == assignAdmin) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    LeagueMember member = redisService.findLeagueMemberByUserId(userId);
+    if (member == null) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    if (!member.isAdmin) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    League league = League.findById(member.league.id);
+    long countMember = LeagueMember.count("league.id", member.league.id);
+    LeagueMember userAssign = null;
+    if (countMember > 1) {
+      if (assignAdmin <= 0) {
+        throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+      } else {
+        userAssign = redisService.findLeagueMemberByUserId(userId);
+        if (userAssign == null || !Objects.equals(userAssign.league.id, member.league.id)) {
+          throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+        }
+      }
+    }
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("league", null);
+    params.put("joinedLeagueAt", null);
+    params.put("id", member.user.id);
+    if (!User.updateUser("league.id = :league, joinedLeagueAt = :joinedLeagueAt where id = :id", params)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
+    LeagueMemberHistory.create(member.league, member.user, member.user, Enums.LeagueMemberType.LEAVE);
+    Map<String, Object> leagueParams = new HashMap<>();
+    leagueParams.put("id", member.league.id);
+    if (userAssign != null) {
+      leagueParams.put("admin", userAssign.user.id);
+      League.updateObject("totalContributors = totalContributors - 1, user.id = :admin where id = :id", leagueParams);
+      clearLeagueMember(userAssign.user.id);
+    } else {
+      League.updateObject("totalContributors = 0 and user = null and isActive = false where id = :id", leagueParams);
+    }
+    member.delete();
+    clearLeagueMember(userId);
+    clearCacheAdmin(member.league.id);
+    clearLeague(member.league.id, league.code);
+    return true;
+  }
+
+  @Transactional
   public boolean kick(User user, long id) throws BusinessException {
     LeagueMember userKick = redisService.findLeagueMemberByUserId(id);
     if (userKick == null) {
@@ -180,7 +230,7 @@ public class LeagueService {
     LeagueMemberHistory.create(user.league, userKick.user, user, Enums.LeagueMemberType.KICK);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", user.league.id);
-    League.updateObject("totalContributors = totalContributors - 1" + " where id = :id", leagueParams);
+    League.updateObject("totalContributors = totalContributors - 1 where id = :id", leagueParams);
     userKick.delete();
     clearLeagueMember(id);
     if (StringUtils.isNotBlank(userKick.leagueRole)) {
@@ -298,7 +348,7 @@ public class LeagueService {
     LeagueMemberHistory.create(league, user, ownerUser, Enums.LeagueMemberType.JOIN);
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", league.id);
-    League.updateObject("totalContributors = totalContributors + 1" + " where id = :id", leagueParams);
+    League.updateObject("totalContributors = totalContributors + 1 where id = :id", leagueParams);
     return new LeagueResponse(league, user.code);
   }
 
@@ -440,6 +490,11 @@ public class LeagueService {
 
   public void clearLeagueMember(long userId) {
     redisService.clearCacheByPrefix("LEAGUE_MEMBER_" + userId);
+  }
+
+  public void clearLeague(long leagueId, String code) {
+    redisService.clearCacheByPrefix("LEAGUE_ID_" + leagueId);
+    redisService.clearCacheByPrefix("LEAGUE_CODE_" + code);
   }
 
   public boolean validateName(LeagueRequest request) {
