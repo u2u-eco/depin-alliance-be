@@ -10,10 +10,7 @@ import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
-import xyz.telegram.depinalliance.common.models.response.ItemResponse;
-import xyz.telegram.depinalliance.common.models.response.ResponsePage;
-import xyz.telegram.depinalliance.common.models.response.SettingResponse;
-import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
+import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
@@ -350,6 +347,25 @@ public class RedisService {
       logger.errorv(e, "Error while finding mission reward not one time " + userId + " isPartner " + isPartner);
     }
     return Mission.findByUserId(userId, isPartner);
+  }
+
+  public List<PartnerResponse> findPartner() {
+    String redisKey = "MISSION_PARTNER";
+    try {
+      RBucket<List<PartnerResponse>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 5 minutes");
+      List<PartnerResponse> object = Partner.findAllPartner();
+      if (object != null) {
+        value.setAsync(object, 5, TimeUnit.MINUTES);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return Partner.findAllPartner();
   }
 
   public List<UserMissionResponse> findMissionRewardOneTime(long userId) {

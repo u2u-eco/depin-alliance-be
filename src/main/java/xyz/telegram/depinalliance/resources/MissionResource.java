@@ -10,7 +10,6 @@ import xyz.telegram.depinalliance.common.models.response.PartnerResponse;
 import xyz.telegram.depinalliance.common.models.response.QuizResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
-import xyz.telegram.depinalliance.entities.Partner;
 import xyz.telegram.depinalliance.services.MissionService;
 import xyz.telegram.depinalliance.services.RedisService;
 
@@ -51,7 +50,7 @@ public class MissionResource extends BaseResource {
   @GET
   @Path("partner")
   public ResponseData getMissionPartner() {
-    List<PartnerResponse> partners = Partner.findAllPartner();
+    List<PartnerResponse> partners = redisService.findPartner();
     List<UserMissionResponse> userMissionsPartner = redisService.findMissionRewardNotOneTime(getTelegramId(), true);
     partners.forEach(partner -> partner.missions = userMissionsPartner.stream()
       .filter(mission -> mission.groupMission.equalsIgnoreCase(partner.name)).collect(Collectors.toList()));
