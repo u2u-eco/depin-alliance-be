@@ -293,7 +293,10 @@ public class MissionService {
         switch (check.rewardType) {
         case CYBER_BOX:
           if (check.amount > 0) {
-            event1(user, check.id);
+            for (int i = 0; i < check.amount; i++) {
+              UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name()), null));
+            }
+//            event1(user, check.id);
             return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
           }
           break;
