@@ -39,7 +39,7 @@ privateKey.pem
 publicKey.pem
 build.sh
 build-home.sh
-import-dev.sql
+import-*.sql
 TestResource.java
 sql_migrate/
 clear*.sh
