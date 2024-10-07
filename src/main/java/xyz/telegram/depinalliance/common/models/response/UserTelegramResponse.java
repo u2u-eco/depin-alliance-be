@@ -14,4 +14,6 @@ public class UserTelegramResponse {
   @JsonProperty("last_name")
   public String lastName;
   public String username;
+  @JsonProperty("is_premium")
+  public Boolean isPremium;
 }

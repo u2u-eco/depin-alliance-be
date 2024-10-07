@@ -47,6 +47,8 @@ public class League extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "level_id")
   public LeagueLevel level;
+  @Column(name = "is_active", columnDefinition = "boolean default true")
+  public boolean isActive = true;
 
   public League() {
   }
@@ -55,12 +57,11 @@ public class League extends BaseEntity {
     this.id = id;
   }
 
-  public static League createLeague(League league) {
+  public static void createLeague(League league) {
     league.create();
     league.nameNormalize = league.name.toLowerCase();
     league.code = getCodeLeague();
     league.persistAndFlush();
-    return league;
   }
 
   public static boolean updateObject(String query, Map<String, Object> params) {
@@ -90,7 +91,7 @@ public class League extends BaseEntity {
   }
 
   public static League findByCode(String code) {
-    return find("code", code).firstResult();
+    return find("code =?1 and isActive = true", code).firstResult();
   }
 
   public static long countByCode(String code) {
@@ -107,8 +108,9 @@ public class League extends BaseEntity {
     Map<String, Object> params = new HashMap<>();
     params.put("status", Enums.LeagueJoinRequestStatus.PENDING);
     params.put("userId", userId);
+    sql += " where l.isActive = true";
     if (StringUtils.isNotBlank(nameSearch)) {
-      sql += " where l.nameNormalize like :nameSearch";
+      sql += " and l.nameNormalize like :nameSearch";
       params.put("nameSearch", "%" + nameSearch.toLowerCase().trim() + "%");
     }
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql,
@@ -120,8 +122,9 @@ public class League extends BaseEntity {
   public static ResponsePage<LeagueResponse> findByPagingAndNameSearch(PagingParameters pageable, String nameSearch) {
     String sql = "select l.code, l.name, l.avatar, l.totalContributors, l.profit from League l ";
     Map<String, Object> params = new HashMap<>();
+    sql += " where l.isActive = true";
     if (StringUtils.isNotBlank(nameSearch)) {
-      sql += " where l.nameNormalize like :nameSearch";
+      sql += " and l.nameNormalize like :nameSearch";
       params.put("nameSearch", "%" + nameSearch.toLowerCase().trim() + "%");
     }
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql,

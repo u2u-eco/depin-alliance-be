@@ -5,4 +5,5 @@ package xyz.telegram.depinalliance.common.models.request;
  */
 public class TelegramInitDataRequest {
   public String initData;
+  public String refCode;
 }

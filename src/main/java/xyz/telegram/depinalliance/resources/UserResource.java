@@ -12,7 +12,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestHeader;
 import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
@@ -45,8 +44,6 @@ public class UserResource extends BaseResource {
   UserService userService;
   @Inject
   RedisService redisService;
-  @ConfigProperty(name = "telegram.validate")
-  boolean isValidate;
   @Inject
   AmazonS3Config amazonS3Config;
   @Inject
@@ -57,7 +54,7 @@ public class UserResource extends BaseResource {
   @PermitAll
   @Transactional
   public ResponseData auth(TelegramInitDataRequest request, HttpHeaders headers,
-    @Context HttpServerRequest httpServerRequest) throws Exception {
+    @Context HttpServerRequest httpServerRequest) {
     UserTelegramResponse userTelegramResponse = telegramService.validateInitData(request.initData);
     if (userTelegramResponse == null) {
       logger.error("Auth fail init data " + request.initData);
@@ -72,10 +69,19 @@ public class UserResource extends BaseResource {
         userTelegramResponse.firstName) :
       userTelegramResponse.username;
 
-    if (user == null && isValidate) {
-      return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
-    } else if (user == null) {
-      user = userService.checkStartUser(userTelegramResponse.id, username, "", "", false);
+    if (user == null) {
+      String refCode = "";
+      String league = "";
+      if (StringUtils.isNotBlank(request.refCode)) {
+        refCode = request.refCode;
+        if (StringUtils.isNotBlank(refCode) && refCode.contains("_")) {
+          String[] arrays = refCode.split("_");
+          refCode = arrays[0];
+          league = arrays[1];
+        }
+      }
+      user = userService.checkStartUser(userTelegramResponse.id, username, refCode, league,
+        userTelegramResponse.isPremium);
     }
 
     Map<String, Object> params = new HashMap<>();
@@ -89,9 +95,6 @@ public class UserResource extends BaseResource {
     String ip = Utils.getClientIpAddress(headers, httpServerRequest);
     params.put("ip", ip);
     User.updateUser(sql + "lastLoginTime = :lastLoginTime, ip = :ip where id = :id", params);
-    //    if (user.status == Enums.UserStatus.MINING) {
-    //      userService.mining(user);
-    //    }
     Map<String, Object> res = new HashMap<>();
     res.put("currentStatus", user.status);
     res.put("accessToken", jwtService.generateToken(String.valueOf(userTelegramResponse.id), username));
