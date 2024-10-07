@@ -19,5 +19,12 @@ public class GameResult extends BaseEntity {
   @JoinColumn(name = "game_daily_id")
   public GameDaily gameDaily;
   public Enums.GameType type;
+  @Column(name = "game_id")
   public long gameId;
+  @Column(name = "game_detail", columnDefinition = "text")
+  public String gameDetail;
+  @Column(name = "is_completed")
+  public boolean isCompleted = false;
+  public String latitude;
+  public String longitude;
 }

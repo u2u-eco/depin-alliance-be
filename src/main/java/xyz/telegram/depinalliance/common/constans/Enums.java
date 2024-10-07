@@ -94,4 +94,12 @@ public class Enums {
       return this.id;
     }
   }
+
+  public enum GameItemType {
+    AGENCY, TOOL, CONTINENT
+  }
+
+  public enum GameType {
+    SUDOKU
+  }
 }

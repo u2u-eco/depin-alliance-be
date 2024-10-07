@@ -14,6 +14,7 @@ public class GameDaily extends BaseEntity {
   @SequenceGenerator(name = "gameDailySequence", sequenceName = "game_daily_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gameDailySequence")
   public Long id;
+  @Column(name = "user_id")
   public Long userId;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "agency_id")

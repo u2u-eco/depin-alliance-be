@@ -15,6 +15,15 @@ public class GameItem extends PanacheEntityBase {
   @Id
   public Long id;
   public String name;
+  public String code;
   public String description;
   public Enums.GameItemType type;
+  public String image;
+
+  public GameItem() {
+  }
+
+  public GameItem(Long id) {
+    this.id = id;
+  }
 }
