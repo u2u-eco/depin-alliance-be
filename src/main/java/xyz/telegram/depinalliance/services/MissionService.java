@@ -212,7 +212,7 @@ public class MissionService {
         default:
           if (check.missionRequire.name().startsWith("INVITE_")) {
             long numberRequire = Long.parseLong(check.missionRequire.name().replace("INVITE_", ""));
-            if (User.countFriendByUser(user.id) >= numberRequire) {
+            if (user.totalFriend >= numberRequire) {
               isChecked = true;
             }
           } else if (check.missionRequire.name().startsWith("LEVEL_")) {
@@ -222,7 +222,7 @@ public class MissionService {
             }
           } else if (check.missionRequire.name().startsWith("EVENT_INVITE_")) {
             long numberRequire = Long.parseLong(check.missionRequire.name().replace("EVENT_INVITE_", ""));
-            if (User.countFriendEventByUser(user.id) >= numberRequire) {
+            if (user.totalFriend >= numberRequire) {
               isChecked = true;
             }
           }
@@ -294,9 +294,10 @@ public class MissionService {
         case CYBER_BOX:
           if (check.amount > 0) {
             for (int i = 0; i < check.amount; i++) {
-              UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name()), null));
+              UserItem.create(
+                new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name()), null));
             }
-//            event1(user, check.id);
+            //            event1(user, check.id);
             return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
           }
           break;
@@ -345,8 +346,8 @@ public class MissionService {
       }
     }
     long level = user.level.id;
-    long countFriend = -1;
-    long countFriendEvent = -1;
+    long countFriend = user.totalFriend;
+    long countFriendEvent = user.totalFriend;
     List<UserMissionResponse> userMissionProduct = redisService.findMissionRewardOneTime(user.id);
     boolean isHasMissionLevel = false;
     boolean isHasMissionInvite = false;
@@ -371,9 +372,6 @@ public class MissionService {
         if (isHasMissionInvite) {
           continue;
         }
-        if (countFriend == -1) {
-          countFriend = User.countFriendByUser(user.id);
-        }
         long numberRequire = Long.parseLong(userMission.missionRequire.name().replace("INVITE_", ""));
         for (Long r : rangeInviteLevel) {
           if (countFriend < r && numberRequire > r) {
@@ -385,9 +383,9 @@ public class MissionService {
         if (isHasMissionInviteEvent) {
           continue;
         }
-        if (countFriendEvent == -1) {
-          countFriendEvent = User.countFriendEventByUser(user.id);
-        }
+//        if (countFriendEvent == -1) {
+//          countFriendEvent = User.countFriendEventByUser(user.id);
+//        }
         long numberRequire = Long.parseLong(userMission.missionRequire.name().replace("EVENT_INVITE_", ""));
         for (Long r : rangeInviteEvent) {
           if (countFriendEvent < r && numberRequire > r) {
