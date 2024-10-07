@@ -149,14 +149,6 @@ public class UserService {
     User.updateUser(
       "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1, detectDevice = :detectDevice where id = :id",
       paramsUser);
-    if (user.league != null) {
-      Map<String, Object> leagueParams = new HashMap<>();
-      leagueParams.put("id", user.league.id);
-      //      leagueParams.put("totalMining", miningPower);
-      League.updateObject("totalContributors = totalContributors + 1 " +
-        //          ", totalMining = totalMining + :totalMining" +
-        " where id = :id", leagueParams);
-    }
     return pointUnClaimed;
   }
 
@@ -258,14 +250,6 @@ public class UserService {
     User.updateUser(
       "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1, detectDevice = :detectDevice, devicePlatform = :devicePlatform, deviceModel = :deviceModel where id = :id",
       paramsUser);
-    if (user.league != null) {
-      Map<String, Object> leagueParams = new HashMap<>();
-      leagueParams.put("id", user.league.id);
-      //      leagueParams.put("totalMining", miningPower);
-      League.updateObject("totalContributors = totalContributors + 1" +
-        //          ", totalMining = totalMining + :totalMining" +
-        " where id = :id", leagueParams);
-    }
     return Utils.stripDecimalZeros(pointUnClaimed);
   }
 
