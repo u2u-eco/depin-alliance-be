@@ -196,7 +196,7 @@ public class LeagueService {
       League.updateObject("totalContributors = totalContributors - 1, user.id = :admin where id = :id", leagueParams);
       clearLeagueMember(userAssign.user.id);
     } else {
-      League.updateObject("totalContributors = 0 and user = null and isActive = false where id = :id", leagueParams);
+      League.updateObject("totalContributors = 0, user = null, isActive = false where id = :id", leagueParams);
     }
     member.delete();
     clearLeagueMember(userId);
