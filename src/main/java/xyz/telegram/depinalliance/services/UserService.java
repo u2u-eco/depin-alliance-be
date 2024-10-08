@@ -87,7 +87,7 @@ public class UserService {
     boolean hasChange = false;
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
-    List<String> sql = Arrays.asList();
+    List<String> sql = new ArrayList<>();
     if (!user.username.equals(username)) {
       hasChange = true;
       params.put("username", username);
