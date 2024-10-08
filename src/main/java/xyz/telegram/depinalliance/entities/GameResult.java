@@ -1,4 +1,4 @@
-package xyz.telegram.depinalliance.game.entities;
+package xyz.telegram.depinalliance.entities;
 
 import jakarta.persistence.*;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -13,7 +13,7 @@ public class GameResult extends BaseEntity {
   @SequenceGenerator(name = "gameResultSequence", sequenceName = "game_result_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gameResultSequence")
   public Long id;
-  @Column
+  @Column(name = "user_id")
   public long userId;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "game_daily_id")

@@ -1,4 +1,4 @@
-package xyz.telegram.depinalliance.game.entities;
+package xyz.telegram.depinalliance.entities;
 
 import jakarta.persistence.*;
 
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
  * @author holden on 04-Oct-2024
  */
 @Entity
-@Table(name = "game_daily", uniqueConstraints = { @UniqueConstraint(columnNames = { "userId", "date", "time" }) })
+@Table(name = "game_daily", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "date", "time" }) })
 public class GameDaily extends BaseEntity {
   @Id
   @SequenceGenerator(name = "gameDailySequence", sequenceName = "game_daily_id_seq", allocationSize = 1)

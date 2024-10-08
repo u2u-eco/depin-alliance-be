@@ -11,7 +11,11 @@ import org.redisson.api.RedissonClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.*;
+import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
+import xyz.telegram.depinalliance.entities.GameDaily;
+import xyz.telegram.depinalliance.entities.GameItem;
+import xyz.telegram.depinalliance.entities.GameResult;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -52,8 +56,7 @@ public class RedisService {
       logger.errorv(e, "Error while finding system config " + config.name());
     }
     SystemConfig systemConfig = SystemConfig.findById(config.getType());
-    String valueStr = systemConfig != null ? systemConfig.value : null;
-    return valueStr;
+    return systemConfig != null ? systemConfig.value : null;
   }
 
   public Item findItemByCode(String code) {
@@ -459,6 +462,93 @@ public class RedisService {
       logger.errorv(e, "Error while finding " + redisKey);
     }
     return User.find("id = ?1", userId).project(SettingResponse.class).firstResult();
+  }
+
+  public GameDailyResponse findGameDaily(long userId) {
+    long dateTime = Utils.getNewDay().getTimeInMillis() / 1000;
+    String redisKey = "GAME_DAILY_" + userId + "_" + dateTime;
+    try {
+      RBucket<GameDailyResponse> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      GameDaily gameDaily = GameDaily.find("user.id = ?1 and date = ?2", userId, dateTime).firstResult();
+      if (gameDaily != null) {
+        GameDailyResponse gameDailyResponse = new GameDailyResponse();
+        gameDailyResponse.reward = gameDaily.reward;
+        gameDailyResponse.agency = new GameItemResponse(findGameItemById(gameDaily.agency.id));
+        gameDailyResponse.tool = new GameItemResponse(findGameItemById(gameDaily.tool.id));
+        gameDailyResponse.continent = new GameItemResponse(findGameItemById(gameDaily.continent.id));
+        gameDailyResponse.date = gameDaily.date;
+        gameDailyResponse.time = gameDaily.time;
+        gameDailyResponse.isCompleted = gameDaily.isCompleted;
+        List<GameResult> gameResults = GameResult.list("gameDaily.id", gameDaily.id);
+        gameResults.forEach(gameResult -> gameDailyResponse.results.add(new GameResultResponse(gameResult)));
+        value.setAsync(gameDailyResponse, 1, TimeUnit.DAYS);
+        return gameDailyResponse;
+      }
+
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return null;
+  }
+
+  public GameItem findGameItemByCode(String code) {
+    String redisKey = "GAME_ITEM_CODE_" + code;
+    try {
+      RBucket<GameItem> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      GameItem object = GameItem.find("code = ?1", code).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return GameItem.find("code = ?1", code).firstResult();
+  }
+
+  public GameItem findGameItemById(long id) {
+    String redisKey = "GAME_ITEM_ID_" + id;
+    try {
+      RBucket<GameItem> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      GameItem object = GameItem.find("id = ?1", id).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return GameItem.find("id = ?1", id).firstResult();
+  }
+
+  public List<GameItemResponse> findListGameItemByType(Enums.GameItemType type) {
+    String redisKey = "GAME_ITEM_LIST_TYPE_" + type;
+    try {
+      RBucket<List<GameItemResponse>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      List<GameItemResponse> object = GameItem.find("type = ?1", type).project(GameItemResponse.class).list();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return GameItem.find("type = ?1", type).project(GameItemResponse.class).list();
   }
 
   public void clearCacheByPrefix(String prefix) {

@@ -1,4 +1,4 @@
-package xyz.telegram.depinalliance.game.entities;
+package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
