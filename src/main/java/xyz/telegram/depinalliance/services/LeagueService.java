@@ -143,10 +143,13 @@ public class LeagueService {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     LeagueMemberHistory.create(member.league, member.user, member.user, Enums.LeagueMemberType.LEAVE);
-
     Map<String, Object> leagueParams = new HashMap<>();
     leagueParams.put("id", member.league.id);
-    League.updateObject("totalContributors = totalContributors - 1 where id = :id", leagueParams);
+    leagueParams.put("userId", userId);
+    if (!League.updateObject("totalContributors = totalContributors - 1 where id = :id and user.id != :userId",
+      leagueParams)) {
+      throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
+    }
     member.delete();
     clearCacheLeagueMember(userId);
     if (StringUtils.isNotBlank(member.leagueRole)) {
@@ -210,7 +213,9 @@ public class LeagueService {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
     } else {
-      if (!League.updateObject("totalContributors = 0, user = null, isActive = false where id = :id", leagueParams)) {
+      if (!League.updateObject(
+        "totalContributors = 0, user = null, isActive = false where id = :id and totalContributors = 1",
+        leagueParams)) {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
     }
@@ -233,7 +238,8 @@ public class LeagueService {
     }
     user.league = redisService.findLeagueById(user.league.id, true);
     List<Long> admins = redisService.findListAdminLeagueByRoleAndLeague(user.league.id, Enums.LeagueRole.ADMIN_KICK);
-    if (!admins.contains(user.id) || id == user.league.user.id) {
+    if (!admins.contains(user.id) || id == user.league.user.id || (StringUtils.isNotBlank(
+      userKick.leagueRole) && !Objects.equals(user.league.user.id, user.id))) {
       throw new BusinessException(ResponseMessageConstants.LEAGUE_ROLE_INVALID);
     }
 
