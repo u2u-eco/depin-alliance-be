@@ -305,6 +305,16 @@ public class MissionService {
               Mission.update("rewardType = null where id = ?1", check.id);
             }
           }
+        case FLASHBACK:
+          int b = new Random().nextInt(1000);
+          if (b < (redisService.getSystemConfigInt(Enums.Config.RANDOM_PERCENT_FLASHBACK))) {
+            if (Event.updateTotalUsdt(new BigDecimal(1L), Enums.EventId.FLASHBACK.getId())) {
+              UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.FLASHBACK.name()), null));
+              return new MissionRewardResponse(1L, "Flashback Ticket", check.rewardImage);
+            } else {
+              Mission.update("rewardType = null where id = ?1", check.id);
+            }
+          }
           break;
         }
       }
