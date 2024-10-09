@@ -58,12 +58,6 @@ public class MissionService {
     }
 
     if (today - user.lastCheckIn == 86400) {
-      //      long day = ((today - user.startCheckIn) / 86400);
-      //      if (day == dailyCheckins.size()) {
-      //        calendar.setTimeInMillis(today * 1000);
-      //      } else {
-      //        calendar.setTimeInMillis(user.startCheckIn * 1000);
-      //      }
       if (dayCheckin >= 4) {
         calendar.add(Calendar.DATE, -3);
       } else {
@@ -252,16 +246,6 @@ public class MissionService {
     return false;
   }
 
-  public void event1(User user, long missionId) throws BusinessException {
-    EventMission eventMission = EventMission.findByEventAndMission(Enums.EventId.CYBER_BOX.getId(), missionId);
-    if (eventMission == null) {
-      return;
-    }
-    for (int i = 0; i < eventMission.number; i++) {
-      UserItem.create(new UserItem(user, eventMission.item, null));
-    }
-  }
-
   @Transactional
   public MissionRewardResponse claim(User user, long missionId) throws BusinessException {
     UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
@@ -297,7 +281,6 @@ public class MissionService {
               UserItem.create(
                 new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.CYBER_BOX.name()), null));
             }
-            //            event1(user, check.id);
             return new MissionRewardResponse(check.amount, check.rewardName, check.rewardImage);
           }
           break;
@@ -318,6 +301,16 @@ public class MissionService {
             if (Event.updateTotalUsdt(new BigDecimal(1L), Enums.EventId.TIMPI.getId())) {
               UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.NTMPI.name()), null));
               return new MissionRewardResponse(1L, "NTMPI", check.rewardImage);
+            } else {
+              Mission.update("rewardType = null where id = ?1", check.id);
+            }
+          }
+        case FLASHBACK:
+          int b = new Random().nextInt(1000);
+          if (b < (redisService.getSystemConfigInt(Enums.Config.RANDOM_PERCENT_FLASHBACK))) {
+            if (Event.updateTotalUsdt(new BigDecimal(1L), Enums.EventId.FLASHBACK.getId())) {
+              UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.FLASHBACK.name()), null));
+              return new MissionRewardResponse(1L, "Flashback Ticket", check.rewardImage);
             } else {
               Mission.update("rewardType = null where id = ?1", check.id);
             }
@@ -383,9 +376,6 @@ public class MissionService {
         if (isHasMissionInviteEvent) {
           continue;
         }
-//        if (countFriendEvent == -1) {
-//          countFriendEvent = User.countFriendEventByUser(user.id);
-//        }
         long numberRequire = Long.parseLong(userMission.missionRequire.name().replace("EVENT_INVITE_", ""));
         for (Long r : rangeInviteEvent) {
           if (countFriendEvent < r && numberRequire > r) {

@@ -60,7 +60,7 @@ public class UserResource extends BaseResource {
       logger.error("Auth fail init data " + request.initData);
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
     }
-    User user = User.findById(userTelegramResponse.id);
+    //    User user = User.findById(userTelegramResponse.id);
     String username = StringUtils.isBlank(userTelegramResponse.username) ?
       (StringUtils.isBlank(userTelegramResponse.firstName) ?
         (StringUtils.isBlank(userTelegramResponse.lastName) ?
@@ -69,20 +69,20 @@ public class UserResource extends BaseResource {
         userTelegramResponse.firstName) :
       userTelegramResponse.username;
 
-    if (user == null) {
-      String refCode = "";
-      String league = "";
-      if (StringUtils.isNotBlank(request.refCode)) {
-        refCode = request.refCode;
-        if (StringUtils.isNotBlank(refCode) && refCode.contains("_")) {
-          String[] arrays = refCode.split("_");
-          refCode = arrays[0];
-          league = arrays[1];
-        }
+    //    if (user == null) {
+    String refCode = "";
+    String league = "";
+    if (StringUtils.isNotBlank(request.refCode)) {
+      refCode = request.refCode;
+      if (StringUtils.isNotBlank(refCode) && refCode.contains("_")) {
+        String[] arrays = refCode.split("_");
+        refCode = arrays[0];
+        league = arrays[1];
       }
-      user = userService.checkStartUser(userTelegramResponse.id, username, refCode, league,
-        userTelegramResponse.isPremium);
     }
+    User user = userService.checkStartUser(userTelegramResponse.id, username, refCode, league,
+      userTelegramResponse.isPremium);
+    //    }
 
     Map<String, Object> params = new HashMap<>();
     params.put("id", user.id);

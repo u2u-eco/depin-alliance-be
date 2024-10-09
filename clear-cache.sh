@@ -1,1 +1,0 @@
-redis-cli -h depinalliance-prod-cluster.aomjgd.0001.apse1.cache.amazonaws.com -p 6379 -n 0 KEYS "MISSION_REWARD_NOT_ONE_TIME_*_true" | xargs redis-cli -h depinalliance-prod-cluster.aomjgd.0001.apse1.cache.amazonaws.com -p 6379 -n 0 DEL
