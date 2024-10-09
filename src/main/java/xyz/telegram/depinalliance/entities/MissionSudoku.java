@@ -10,8 +10,8 @@ import jakarta.persistence.Table;
  * @author holden on 04-Oct-2024
  */
 @Entity
-@Table(name = "game_sudoku")
-public class GameSudoku extends PanacheEntityBase {
+@Table(name = "mission_sudoku")
+public class MissionSudoku extends PanacheEntityBase {
   @Id
   public Long id;
   public String mission;

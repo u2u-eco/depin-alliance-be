@@ -131,7 +131,12 @@ public class SudokuGenerator {
     List<String> lst = new ArrayList<>();
     for (int row = 0; row < SIZE; row++) {
       for (int col = 0; col < SIZE; col++) {
-        lst.add(board[row][col] + "");
+        if (board[row][col] != 0) {
+          lst.add(board[row][col] + "");
+        } else {
+          lst.add(".");
+        }
+
       }
     }
     return lst;
@@ -139,13 +144,13 @@ public class SudokuGenerator {
 
   public static void main(String[] args) {
 
-    for (int i = 1; i <= 1000; i++) {
+    for (int i = 1; i <= 1; i++) {
       SudokuGenerator generator = new SudokuGenerator();
       int[][] board = generator.generateSudoku();
       String insert = "(" + i + ",";
       List<String> lst = generator.printBoard(board);
       insert += "'" + String.join("", lst) + "',";
-      generator.removeDigits(board, 40);
+      generator.removeDigits(board, 15);
       lst = generator.printBoard(board);
       insert += "'" + String.join("", lst) + "'";
       insert += "),";

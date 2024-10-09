@@ -40,6 +40,10 @@ public class Utils {
     return new Random().nextInt(max - min) + min;
   }
 
+  public static long getRandomNumber(long min, long max) {
+    return new Random().nextLong(max - min) + min;
+  }
+
   public static String printLogStackTrace(Exception e) {
     StringWriter errors = new StringWriter();
     e.printStackTrace(new PrintWriter(errors));

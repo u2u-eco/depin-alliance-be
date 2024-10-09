@@ -95,11 +95,11 @@ public class Enums {
     }
   }
 
-  public enum GameItemType {
+  public enum MissionItemType {
     AGENCY, TOOL, CONTINENT
   }
 
-  public enum GameType {
+  public enum MissionDailyType {
     SUDOKU
   }
 }

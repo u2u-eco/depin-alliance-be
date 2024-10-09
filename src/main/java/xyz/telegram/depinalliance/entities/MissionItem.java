@@ -10,20 +10,20 @@ import xyz.telegram.depinalliance.common.constans.Enums;
  * @author holden on 04-Oct-2024
  */
 @Entity
-@Table(name = "game_items")
-public class GameItem extends PanacheEntityBase {
+@Table(name = "mission_items")
+public class MissionItem extends PanacheEntityBase {
   @Id
   public Long id;
   public String name;
   public String code;
   public String description;
-  public Enums.GameItemType type;
+  public Enums.MissionItemType type;
   public String image;
 
-  public GameItem() {
+  public MissionItem() {
   }
 
-  public GameItem(Long id) {
+  public MissionItem(Long id) {
     this.id = id;
   }
 }

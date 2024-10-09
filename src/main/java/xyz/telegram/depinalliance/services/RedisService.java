@@ -13,9 +13,6 @@ import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
-import xyz.telegram.depinalliance.entities.GameDaily;
-import xyz.telegram.depinalliance.entities.GameItem;
-import xyz.telegram.depinalliance.entities.GameResult;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -464,45 +461,68 @@ public class RedisService {
     return User.find("id = ?1", userId).project(SettingResponse.class).firstResult();
   }
 
-  public GameDailyResponse findGameDaily(long userId) {
+  public MissionDailyResponse findMissionDaily(long userId) {
     long dateTime = Utils.getNewDay().getTimeInMillis() / 1000;
-    String redisKey = "GAME_DAILY_" + userId + "_" + dateTime;
+    String redisKey = "MISSION_DAILY_" + userId + "_" + dateTime;
     try {
-      RBucket<GameDailyResponse> value = redissonClient.getBucket(redisKey);
+      RBucket<MissionDailyResponse> value = redissonClient.getBucket(redisKey);
       if (value.isExists()) {
         return value.get();
       }
-      GameDaily gameDaily = GameDaily.find("user.id = ?1 and date = ?2", userId, dateTime).firstResult();
-      if (gameDaily != null) {
-        GameDailyResponse gameDailyResponse = new GameDailyResponse();
-        gameDailyResponse.reward = gameDaily.reward;
-        gameDailyResponse.agency = new GameItemResponse(findGameItemById(gameDaily.agency.id));
-        gameDailyResponse.tool = new GameItemResponse(findGameItemById(gameDaily.tool.id));
-        gameDailyResponse.continent = new GameItemResponse(findGameItemById(gameDaily.continent.id));
-        gameDailyResponse.date = gameDaily.date;
-        gameDailyResponse.time = gameDaily.time;
-        gameDailyResponse.isCompleted = gameDaily.isCompleted;
-        List<GameResult> gameResults = GameResult.list("gameDaily.id", gameDaily.id);
-        gameResults.forEach(gameResult -> gameDailyResponse.results.add(new GameResultResponse(gameResult)));
-        value.setAsync(gameDailyResponse, 1, TimeUnit.DAYS);
-        return gameDailyResponse;
+      MissionDaily missionDaily = MissionDaily.find("user.id = ?1 and date = ?2", userId, dateTime).firstResult();
+      if (missionDaily != null) {
+        MissionDailyResponse missionDailyResponse = new MissionDailyResponse();
+        missionDailyResponse.id = missionDaily.id;
+        if (missionDaily.numberMissionCompleted < 5) {
+          MissionReward missionReward = findMissionRewardById(missionDaily.numberMissionCompleted + 1);
+          missionDailyResponse.currentRewardPoint = missionReward.point;
+        }
+        missionDailyResponse.numberMissionCompleted = missionDaily.numberMissionCompleted;
+        missionDailyResponse.agency = new MissionItemResponse(findMissionItemById(missionDaily.agency.id));
+        missionDailyResponse.tool = new MissionItemResponse(findMissionItemById(missionDaily.tool.id));
+        missionDailyResponse.continent = new MissionItemResponse(findMissionItemById(missionDaily.continent.id));
+        missionDailyResponse.date = missionDaily.date;
+        missionDailyResponse.time = missionDaily.time;
+        missionDailyResponse.dailyReward = new BigDecimal("1000000");
+        missionDailyResponse.isCompleted = missionDaily.isCompleted;
+        missionDailyResponse.results.add(
+          new MissionResultResponse(1L, missionDaily.mission1Type, missionDaily.mission1IsCompleted,
+            missionDaily.mission1Detail, missionDaily.mission1Latitude, missionDaily.mission1Longitude,
+            missionDaily.mission1LocationName, missionDaily.mission1CreatedAt, missionDaily.mission1EndedAt));
+        missionDailyResponse.results.add(
+          new MissionResultResponse(2L, missionDaily.mission2Type, missionDaily.mission2IsCompleted,
+            missionDaily.mission2Detail, missionDaily.mission2Latitude, missionDaily.mission2Longitude,
+            missionDaily.mission2LocationName, missionDaily.mission2CreatedAt, missionDaily.mission2EndedAt));
+        missionDailyResponse.results.add(
+          new MissionResultResponse(3L, missionDaily.mission3Type, missionDaily.mission3IsCompleted,
+            missionDaily.mission3Detail, missionDaily.mission3Latitude, missionDaily.mission3Longitude,
+            missionDaily.mission3LocationName, missionDaily.mission3CreatedAt, missionDaily.mission3EndedAt));
+        missionDailyResponse.results.add(
+          new MissionResultResponse(4L, missionDaily.mission4Type, missionDaily.mission4IsCompleted,
+            missionDaily.mission4Detail, missionDaily.mission4Latitude, missionDaily.mission4Longitude,
+            missionDaily.mission4LocationName, missionDaily.mission4CreatedAt, missionDaily.mission4EndedAt));
+        missionDailyResponse.results.add(
+          new MissionResultResponse(5L, missionDaily.mission5Type, missionDaily.mission5IsCompleted,
+            missionDaily.mission5Detail, missionDaily.mission5Latitude, missionDaily.mission5Longitude,
+            missionDaily.mission5LocationName, missionDaily.mission5CreatedAt, missionDaily.mission5EndedAt));
+        value.setAsync(missionDailyResponse, 1, TimeUnit.DAYS);
+        return missionDailyResponse;
       }
-
     } catch (Exception e) {
       logger.errorv(e, "Error while finding " + redisKey);
     }
     return null;
   }
 
-  public GameItem findGameItemByCode(String code) {
-    String redisKey = "GAME_ITEM_CODE_" + code;
+  public MissionItem findMissionItemByCode(String code) {
+    String redisKey = "MISSION_ITEM_CODE_" + code;
     try {
-      RBucket<GameItem> value = redissonClient.getBucket(redisKey);
+      RBucket<MissionItem> value = redissonClient.getBucket(redisKey);
       if (value.isExists()) {
         return value.get();
       }
       logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
-      GameItem object = GameItem.find("code = ?1", code).firstResult();
+      MissionItem object = MissionItem.find("code = ?1", code).firstResult();
       if (object != null) {
         value.setAsync(object, 1, TimeUnit.DAYS);
       }
@@ -510,18 +530,18 @@ public class RedisService {
     } catch (Exception e) {
       logger.errorv(e, "Error while finding " + redisKey);
     }
-    return GameItem.find("code = ?1", code).firstResult();
+    return MissionItem.find("code = ?1", code).firstResult();
   }
 
-  public GameItem findGameItemById(long id) {
-    String redisKey = "GAME_ITEM_ID_" + id;
+  public MissionItem findMissionItemById(long id) {
+    String redisKey = "MISSION_ITEM_ID_" + id;
     try {
-      RBucket<GameItem> value = redissonClient.getBucket(redisKey);
+      RBucket<MissionItem> value = redissonClient.getBucket(redisKey);
       if (value.isExists()) {
         return value.get();
       }
       logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
-      GameItem object = GameItem.find("id = ?1", id).firstResult();
+      MissionItem object = MissionItem.find("id = ?1", id).firstResult();
       if (object != null) {
         value.setAsync(object, 1, TimeUnit.DAYS);
       }
@@ -529,18 +549,54 @@ public class RedisService {
     } catch (Exception e) {
       logger.errorv(e, "Error while finding " + redisKey);
     }
-    return GameItem.find("id = ?1", id).firstResult();
+    return MissionItem.find("id = ?1", id).firstResult();
   }
 
-  public List<GameItemResponse> findListGameItemByType(Enums.GameItemType type) {
+  public MissionSudoku findMissionSudokuById(long id) {
+    String redisKey = "MISSION_SUDOKU_ID_" + id;
+    try {
+      RBucket<MissionSudoku> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      MissionSudoku object = MissionSudoku.find("id = ?1", id).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return MissionSudoku.find("id = ?1", id).firstResult();
+  }
+
+  public Long findMaxMissionSudoku() {
+    String redisKey = "MAX_MISSION_SUDOKU";
+    try {
+      RBucket<Long> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      Long object = MissionSudoku.count();
+      value.setAsync(object, 1, TimeUnit.DAYS);
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return MissionSudoku.count();
+  }
+
+  public List<MissionItemResponse> findListGameItemByType(Enums.MissionItemType type) {
     String redisKey = "GAME_ITEM_LIST_TYPE_" + type;
     try {
-      RBucket<List<GameItemResponse>> value = redissonClient.getBucket(redisKey);
+      RBucket<List<MissionItemResponse>> value = redissonClient.getBucket(redisKey);
       if (value.isExists()) {
         return value.get();
       }
       logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
-      List<GameItemResponse> object = GameItem.find("type = ?1", type).project(GameItemResponse.class).list();
+      List<MissionItemResponse> object = MissionItem.find("type = ?1", type).project(MissionItemResponse.class).list();
       if (object != null) {
         value.setAsync(object, 1, TimeUnit.DAYS);
       }
@@ -548,7 +604,53 @@ public class RedisService {
     } catch (Exception e) {
       logger.errorv(e, "Error while finding " + redisKey);
     }
-    return GameItem.find("type = ?1", type).project(GameItemResponse.class).list();
+    return MissionItem.find("type = ?1", type).project(MissionItemResponse.class).list();
+  }
+
+  public MissionReward findMissionRewardById(long id) {
+    String redisKey = "MISSION_REWARD_" + id;
+    try {
+      RBucket<MissionReward> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      MissionReward object = MissionReward.find("id = ?1", id).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return MissionReward.find("id = ?1", id).firstResult();
+  }
+
+  public MissionDailyCombo findMissionDailyComboToday() {
+    long dateTime = Utils.getNewDay().getTimeInMillis() / 1000;
+    String redisKey = "MISSION_DAILY_COMBO_" + dateTime;
+    try {
+      RBucket<MissionDailyCombo> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      MissionDailyCombo object = MissionDailyCombo.find("id = ?1", dateTime).firstResult();
+      if (object == null) {
+        object = new MissionDailyCombo();
+        object.id = dateTime;
+        object.point = new BigDecimal("1000000");
+        object.agency = new MissionItem(Utils.getRandomNumber(0L, 6L));
+        object.tool = new MissionItem(Utils.getRandomNumber(6L, 12L));
+        object.continent = new MissionItem(Utils.getRandomNumber(6L, 12L));
+        object.persist();
+      }
+      value.setAsync(object, 1, TimeUnit.DAYS);
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return MissionDailyCombo.find("id = ?1", dateTime).firstResult();
   }
 
   public void clearCacheByPrefix(String prefix) {
