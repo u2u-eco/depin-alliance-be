@@ -3,6 +3,7 @@ package xyz.telegram.depinalliance.services;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
@@ -31,6 +32,8 @@ public class MissionService {
   RedisService redisService;
   @RestClient
   MiniTonClient miniTonClient;
+  @Inject
+  TwitterService twitterService;
 
   public List<DailyCheckinResponse> getListOfDailyCheckin(User user) {
     List<DailyCheckin> dailyCheckins;
@@ -180,6 +183,12 @@ public class MissionService {
       case TELEGRAM:
         isChecked = telegramService.verifyJoinChannel(check.referId, user.id.toString());
         break;
+      case TWITTER:
+        UserSocial userSocial = redisService.findUserSocial(user.id);
+        if (userSocial == null || StringUtils.isBlank(userSocial.twitterUsername)) {
+          throw new BusinessException(ResponseMessageConstants.USER_MUST_LINK_TWITTER);
+        }
+        isChecked = twitterService.isUserFollowing(String.valueOf(userSocial.twitterUid), check.referId);
       case PLAY_MINI_TON:
         try {
           isChecked = miniTonClient.verify(user.id);
@@ -309,7 +318,8 @@ public class MissionService {
           int b = new Random().nextInt(1000);
           if (b < (redisService.getSystemConfigInt(Enums.Config.RANDOM_PERCENT_FLASHBACK))) {
             if (Event.updateTotalUsdt(new BigDecimal(1L), Enums.EventId.FLASHBACK.getId())) {
-              UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.FLASHBACK.name()), null));
+              UserItem.create(
+                new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.FLASHBACK.name()), null));
               return new MissionRewardResponse(1L, "Flashback Ticket", check.rewardImage);
             } else {
               Mission.update("rewardType = null where id = ?1", check.id);

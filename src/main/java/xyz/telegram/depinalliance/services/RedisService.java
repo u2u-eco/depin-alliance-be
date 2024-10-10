@@ -52,8 +52,7 @@ public class RedisService {
       logger.errorv(e, "Error while finding system config " + config.name());
     }
     SystemConfig systemConfig = SystemConfig.findById(config.getType());
-    String valueStr = systemConfig != null ? systemConfig.value : null;
-    return valueStr;
+    return systemConfig != null ? systemConfig.value : null;
   }
 
   public Item findItemByCode(String code) {
@@ -318,10 +317,8 @@ public class RedisService {
         return value.get();
       }
       logger.info("Get from db and set cache daily checkin count ");
-      Long object = DailyCheckin.count();
-      if (object != null) {
-        value.setAsync(object);
-      }
+      long object = DailyCheckin.count();
+      value.setAsync(object);
       return object;
     } catch (Exception e) {
       logger.errorv(e, "Error while finding daily count ");
@@ -388,18 +385,12 @@ public class RedisService {
   }
 
   public void clearMissionUser(String type, long userId) {
-    String redisKey = "";
-    switch (type.toUpperCase()) {
-    case "REWARD":
-      redisKey = "MISSION_REWARD_NOT_ONE_TIME_" + userId + "_false";
-      break;
-    case "REWARD_ONE_TIME":
-      redisKey = "MISSION_REWARD_ONE_TIME_" + userId;
-      break;
-    case "PARTNER":
-      redisKey = "MISSION_REWARD_NOT_ONE_TIME_" + userId + "_true";
-      break;
-    }
+    String redisKey = switch (type.toUpperCase()) {
+      case "REWARD" -> "MISSION_REWARD_NOT_ONE_TIME_" + userId + "_false";
+      case "REWARD_ONE_TIME" -> "MISSION_REWARD_ONE_TIME_" + userId;
+      case "PARTNER" -> "MISSION_REWARD_NOT_ONE_TIME_" + userId + "_true";
+      default -> "";
+    };
     RBucket<List<UserMissionResponse>> value = redissonClient.getBucket(redisKey);
     if (value.isExists()) {
       value.deleteAsync();
@@ -459,6 +450,25 @@ public class RedisService {
       logger.errorv(e, "Error while finding " + redisKey);
     }
     return User.find("id = ?1", userId).project(SettingResponse.class).firstResult();
+  }
+
+  public UserSocial findUserSocial(long userId) {
+    String redisKey = "USER_SOCIAL_" + userId;
+    try {
+      RBucket<UserSocial> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      UserSocial object = UserSocial.findById(userId);
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.HOURS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return UserSocial.findById(userId);
   }
 
   public void clearCacheByPrefix(String prefix) {
