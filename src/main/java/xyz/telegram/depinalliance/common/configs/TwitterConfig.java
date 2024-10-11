@@ -13,6 +13,8 @@ public interface TwitterConfig {
 
   String callbackUrl();
 
+  String redirectUrl();
+
   String rapidapiHost();
 
   String rapidapiKey();

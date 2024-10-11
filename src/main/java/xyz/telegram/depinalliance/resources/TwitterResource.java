@@ -8,6 +8,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import twitter4j.User;
 import twitter4j.auth.RequestToken;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
@@ -17,8 +18,6 @@ import xyz.telegram.depinalliance.entities.UserSocial;
 import xyz.telegram.depinalliance.services.RedisService;
 import xyz.telegram.depinalliance.services.TwitterService;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +32,8 @@ public class TwitterResource extends BaseResource {
   RedisService redisService;
   @Inject
   TwitterService twitterService;
+  @ConfigProperty(name = "twitter.redirect-url")
+  String redirectUrl;
 
   @GET
   @Path("/info")
@@ -52,7 +53,10 @@ public class TwitterResource extends BaseResource {
   public ResponseData<?> login() throws Exception {
     UserSocial userSocial = redisService.findUserSocial(getTelegramId());
     if (userSocial != null && userSocial.twitterUid != null && userSocial.twitterUid > 0) {
-      throw new BusinessException(ResponseMessageConstants.USER_LINKED_TELEGRAM);
+      UserSocialResponse userSocialResponse = new UserSocialResponse();
+      userSocialResponse.twitterName = userSocial.twitterName;
+      userSocialResponse.twitterUsername = userSocial.twitterUsername;
+      return ResponseData.ok(userSocialResponse);
     }
     RequestToken requestToken = twitterService.getRequestToken();
     if (userSocial != null) {
@@ -68,14 +72,6 @@ public class TwitterResource extends BaseResource {
     }
     redisService.clearCacheByPrefix("USER_SOCIAL_" + getTelegramId());
     return ResponseData.ok(requestToken.getAuthorizationURL());
-  }
-
-  @GET
-  @Path("test")
-  @PermitAll
-  public Response test() throws MalformedURLException, URISyntaxException {
-    URL url = new URL("https://t.me/HoldenDepinBot/");
-    return Response.temporaryRedirect(url.toURI()).build();
   }
 
   @GET
@@ -110,7 +106,7 @@ public class TwitterResource extends BaseResource {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     redisService.clearCacheByPrefix("USER_SOCIAL_" + userSocial.userId);
-    URL url = new URL("https://t.me/HoldenDepinBot/holden?startapp=twitter");
+    URL url = new URL(redirectUrl);
     return Response.temporaryRedirect(url.toURI()).build();
   }
 }

@@ -184,11 +184,19 @@ public class MissionService {
         isChecked = telegramService.verifyJoinChannel(check.referId, user.id.toString());
         break;
       case TWITTER:
+      case RETWEETS:
+      case TWEET_REPLIES:
         UserSocial userSocial = redisService.findUserSocial(user.id);
         if (userSocial == null || StringUtils.isBlank(userSocial.twitterUsername)) {
           throw new BusinessException(ResponseMessageConstants.USER_MUST_LINK_TWITTER);
         }
-        isChecked = twitterService.isUserFollowing(String.valueOf(userSocial.twitterUid), check.referId);
+        isChecked = switch (check.type) {
+          case TWITTER -> twitterService.isUserFollowing(String.valueOf(userSocial.twitterUid), check.referId);
+          case RETWEETS -> twitterService.isUserRetweets(String.valueOf(userSocial.twitterUid), check.referId);
+          case TWEET_REPLIES -> twitterService.isUserReplies(String.valueOf(userSocial.twitterUid), check.referId);
+          default -> false;
+        };
+        break;
       case PLAY_MINI_TON:
         try {
           isChecked = miniTonClient.verify(user.id);

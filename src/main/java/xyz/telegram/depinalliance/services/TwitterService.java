@@ -11,6 +11,8 @@ import twitter4j.User;
 import twitter4j.auth.RequestToken;
 import xyz.telegram.depinalliance.common.configs.TwitterConfig;
 import xyz.telegram.depinalliance.common.models.response.TwitterFollowResponse;
+import xyz.telegram.depinalliance.common.models.response.TwitterRepliesResponse;
+import xyz.telegram.depinalliance.common.models.response.TwitterRetweetsResponse;
 
 /**
  * @author holden on 10-Oct-2024
@@ -59,6 +61,62 @@ public class TwitterService {
         TwitterFollowResponse.TwitterUser userFollowing = res.results.stream()
           .filter(user -> user.userId.equalsIgnoreCase(followingUserId)).findFirst().orElse(null);
         if (userFollowing != null) {
+          return true;
+        }
+      }
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public synchronized boolean isUserRetweets(String userId, String tweetId) {
+    try {
+      String continuationToken = "";
+      while (true) {
+        TwitterRetweetsResponse res = StringUtils.isBlank(continuationToken) ?
+          twitterClient.getRetweets(tweetId) :
+          twitterClient.getRetweetsContinuation(tweetId, continuationToken);
+        Thread.sleep(twitterConfig.rapidapiSleep());
+        if (StringUtils.isNotBlank(res.continuationToken)) {
+          continuationToken = res.continuationToken;
+        }
+        if (res.retweets == null || res.retweets.isEmpty()) {
+          return false;
+        }
+
+        TwitterRetweetsResponse.TwitterRetweets userRetweet = res.retweets.stream()
+          .filter(user -> user.userId.equalsIgnoreCase(userId)).findFirst().orElse(null);
+        if (userRetweet != null) {
+          return true;
+        }
+      }
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public synchronized boolean isUserReplies(String userId, String tweetId) {
+    try {
+      String continuationToken = "";
+      while (true) {
+        TwitterRepliesResponse res = StringUtils.isBlank(continuationToken) ?
+          twitterClient.getReplies(tweetId) :
+          twitterClient.getRepliesContinuation(tweetId, continuationToken);
+        Thread.sleep(twitterConfig.rapidapiSleep());
+        if (StringUtils.isNotBlank(res.continuationToken)) {
+          continuationToken = res.continuationToken;
+        }
+        if (res.replies == null || res.replies.isEmpty()) {
+          return false;
+        }
+
+        res.replies.forEach(replies -> {
+          System.out.println(
+            "Username " + replies.user.username + " userId " + replies.user.userId + " reply at " + replies.creationDate);
+        });
+        TwitterRepliesResponse.TwitterReplies userRetweet = res.replies.stream()
+          .filter(replies -> replies.user.userId.equalsIgnoreCase(userId)).findFirst().orElse(null);
+        if (userRetweet != null) {
           return true;
         }
       }
