@@ -31,12 +31,12 @@ public class ScheduleMissionTwitter {
   RedisService redisService;
 
   @Scheduled(every = "${expr.every.twitter}", identity = "task-twitter")
-//      @Scheduled(cron = "00 19 15 * * ?", identity = "task-twitter")
+    //      @Scheduled(cron = "00 19 15 * * ?", identity = "task-twitter")
   void schedule() {
     //verify follow
     long currentTime = Utils.getCalendar().getTimeInMillis();
     long timeValidate = currentTime - twitterConfig.verifyTime();
-    List<Mission> missions = Mission.findByMissionTwitter(List.of(Enums.MissionType.FOLLOW_TWITTER));
+    List<Mission> missions = redisService.findListMissionFollowTwitter();
     for (Mission mission : missions) {
       List<UserMission> userMissions = UserMission.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
         mission.id, Enums.MissionStatus.VERIFYING, timeValidate).list();
