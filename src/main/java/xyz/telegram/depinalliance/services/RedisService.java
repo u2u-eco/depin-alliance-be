@@ -11,6 +11,7 @@ import org.redisson.api.RedissonClient;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.*;
+import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
@@ -488,6 +489,26 @@ public class RedisService {
       logger.errorv(e, "Error while finding " + redisKey);
     }
     return Mission.findByMissionType(missionType);
+  }
+
+  public List<MissionDaily> findMissionDaily() {
+    long currentDay = Utils.getNewDay().getTimeInMillis() / 1000;
+    String redisKey = "MISSION_DAILY_" + currentDay;
+    try {
+      RBucket<List<MissionDaily>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      List<MissionDaily> object = MissionDaily.find("date = ?1", Sort.ascending("orders"), currentDay).list();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return MissionDaily.find("date = ?1", Sort.ascending("orders"), currentDay).list();
   }
 
   public void clearCacheByPrefix(String prefix) {

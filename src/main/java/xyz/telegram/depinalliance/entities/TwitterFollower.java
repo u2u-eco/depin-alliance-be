@@ -7,7 +7,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "twitter_followers")
-public class TwitterFollower {
+public class TwitterFollower extends BaseEntity {
   @Id
   @SequenceGenerator(name = "twitterFollowerSequence", sequenceName = "twitter_follower_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "twitterFollowerSequence")
@@ -16,4 +16,6 @@ public class TwitterFollower {
   public String twitterId;
   @Column(name = "user_id")
   public String userId;
+  @Column(name = "continuation_token")
+  public String continuationToken;
 }
