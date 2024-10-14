@@ -5,11 +5,9 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.FriendResponse;
-import xyz.telegram.depinalliance.common.models.response.MemberLeagueResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 
 import java.math.BigDecimal;
@@ -74,6 +72,7 @@ public class User extends BaseEntity {
   public long timeStartMining = 0L;
   @Column(name = "last_login_time")
   public long lastLoginTime = 0L;
+  public String ip;
   @Column(name = "first_login_time")
   public Long firstLoginTime = 0L;
   @Column(name = "start_check_in")
@@ -103,6 +102,12 @@ public class User extends BaseEntity {
   public Boolean isPremium;
   @Column(name = "ref_percent_claim", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
   public BigDecimal refPercentClaim = BigDecimal.ZERO;
+  @Column(name = "enable_notification", columnDefinition = "boolean default true")
+  public boolean enableNotification = true;
+  @Column(name = "enable_music_theme", columnDefinition = "boolean default true")
+  public boolean enableMusicTheme = true;
+  @Column(name = "enable_sound_effect", columnDefinition = "boolean default true")
+  public boolean enableSoundEffect = true;
 
   public User(Long id) {
     this.id = id;
@@ -154,6 +159,22 @@ public class User extends BaseEntity {
     }
     return updateUser(sql + "point = point + :point where id = :id and point + :point >= 0", params);
   }
+
+//  public static boolean updatePointFundingLeague(long id, BigDecimal point) {
+//    Map<String, Object> params = new HashMap<>();
+//    params.put("id", id);
+//    params.put("point", point);
+//    String sql = "pointUsed = pointUsed + :point, point = point - :point, leaguePointFunding = leaguePointFunding + :point  where id = :id and point - :point >= 0";
+//    return updateUser(sql, params);
+//  }
+//
+//  public static boolean updateLeagueContributeProfit(long id, BigDecimal profit) {
+//    Map<String, Object> params = new HashMap<>();
+//    params.put("id", id);
+//    params.put("profit", profit);
+//    String sql = "leagueContributeProfit = leagueContributeProfit + :profit where id = :id and leagueContributeProfit + :profit >= 0";
+//    return updateUser(sql, params);
+//  }
 
   public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
     Map<String, Object> params = new HashMap<>();
@@ -233,7 +254,7 @@ public class User extends BaseEntity {
       panacheQuery.count());
   }
 
-  public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
+  /*public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
     long leagueId, String username, long adminUserId) {
     String sql = "league.id = :leagueId and id != :adminUserId";
     Map<String, Object> params = new HashMap<>();
@@ -246,7 +267,7 @@ public class User extends BaseEntity {
     PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(MemberLeagueResponse.class).list(),
       pageable, panacheQuery.count());
-  }
+  }*/
 
   public static long countFriendByUser(long userId) {
     return count("ref.id =?1", userId);

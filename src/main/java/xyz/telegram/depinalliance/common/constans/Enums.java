@@ -8,7 +8,8 @@ public class Enums {
   public enum Config {
     POINT_REF(1), CPU_SLOT(2), GPU_SLOT(3), RAM_SLOT(4), STORAGE_SLOT(5), CPU_DEFAULT(6), GPU_DEFAULT(7), RAM_DEFAULT(
       8), STORAGE_DEFAULT(9), AVATAR_DEFAULT(10), AVATAR_LIST(11), MAX_MINING_POWER_DEFAULT(12), REF_POINT_CLAIM(
-      13), ROOT_POINT_CLAIM(14), POINT_BUY_DEVICE(15), BONUS_REWARD_DEFAULT(16);
+      13), ROOT_POINT_CLAIM(14), POINT_BUY_DEVICE(15), BONUS_REWARD_DEFAULT(16), RANDOM_PERCENT_TIMPI(
+      17), RANDOM_PERCENT_FLASHBACK(18);
     private final int type;
 
     Config(int type) {
@@ -29,11 +30,11 @@ public class Enums {
   }
 
   public enum ItemSpecial {
-    CYBER_BOX, USDT_0_001, USDT_0_002, USDT_0_1, USDT_0_5, USDT_1
+    CYBER_BOX, OPEN_MESH, NTMPI, FLASHBACK
   }
 
   public enum MissionType {
-    TELEGRAM, TWITTER, QUIZ, ON_TIME_IN_APP, SHARE_STORY, DOWNLOAD_APP, URL, PLAY_MINI_TON
+    TELEGRAM, TWITTER, QUIZ, ON_TIME_IN_APP, SHARE_STORY, DOWNLOAD_APP, URL, PLAY_MINI_TON, RETWEETS, TWEET_REPLIES, CONNECT_X, FOLLOW_TWITTER
   }
 
   public enum MissionRequire {
@@ -41,7 +42,11 @@ public class Enums {
   }
 
   public enum MissionStatus {
-    VERIFIED, CLAIMED, NOT_VERIFIED
+    VERIFIED, CLAIMED, NOT_VERIFIED, VERIFYING
+  }
+
+  public enum MissionRewardType {
+    CYBER_BOX, OPEN_MESH, TIMPI, FLASHBACK
   }
 
   public enum FolderImage {
@@ -67,6 +72,27 @@ public class Enums {
   }
 
   public enum LeagueMemberType {
-    CREATE, JOIN, KICK, LEAVE, UP_TO_MOD
+    CREATE, JOIN, KICK, LEAVE, TURN_ON_ADMIN_REQUEST, TURN_OFF_ADMIN_REQUEST, TURN_ON_ADMIN_KICK, TURN_OFF_ADMIN_KICK, CHANGE_ADMIN
+  }
+
+  public enum LeagueRole {
+    ADMIN_REQUEST, ADMIN_KICK
+  }
+
+  public enum UserSettings {
+    NOTIFICATION, MUSIC_THEME, SOUND_EFFECT
+  }
+
+  public enum EventId {
+    CYBER_BOX(1), OPEN_MESH(2), TIMPI(3), FLASHBACK(4);
+    private final long id;
+
+    EventId(long id) {
+      this.id = id;
+    }
+
+    public long getId() {
+      return this.id;
+    }
   }
 }

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import io.vertx.core.http.HttpServerRequest;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
@@ -20,6 +22,9 @@ import java.util.*;
  */
 public class Utils {
   private static final ModelMapper modelMapper;
+  private static final String[] IP_HEADER_CANDIDATES = { "cf-connecting-ip", "X-Forwarded-For", "Proxy-Client-IP",
+    "WL-Proxy-Client-IP", "HTTP_X_FORWARDED_FOR", "HTTP_X_FORWARDED", "HTTP_X_CLUSTER_CLIENT_IP", "HTTP_CLIENT_IP",
+    "HTTP_FORWARDED_FOR", "HTTP_FORWARDED", "HTTP_VIA", "REMOTE_ADDR" };
   private static ObjectMapper rawMapper;
 
   static {
@@ -55,10 +60,7 @@ public class Utils {
   }
 
   public static boolean validateAmountBigDecimal(BigDecimal amount) {
-    if (amount == null || amount == BigDecimal.ZERO || amount.compareTo(BigDecimal.ZERO) <= 0) {
-      return false;
-    }
-    return true;
+    return amount != null && amount != BigDecimal.ZERO && amount.compareTo(BigDecimal.ZERO) > 0;
   }
 
   public static <T> T toObject(String jsonString, Class<T> t) {
@@ -97,5 +99,15 @@ public class Utils {
     } catch (JsonParseException e) {
       throw e;
     }
+  }
+
+  public static String getClientIpAddress(HttpHeaders headers, HttpServerRequest httpServerRequest) {
+    for (String header : IP_HEADER_CANDIDATES) {
+      String ip = headers.getHeaderString(header);
+      if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+        return ip;
+      }
+    }
+    return httpServerRequest.remoteAddress().hostAddress();
   }
 }

@@ -2,6 +2,7 @@ package xyz.telegram.depinalliance.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Parameters;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -9,6 +10,7 @@ import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
 import xyz.telegram.depinalliance.common.models.response.UserItemResponse;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,10 @@ public class UserItem extends BaseEntity {
   public UserItem() {
   }
 
+  public UserItem(Long id) {
+    this.id = id;
+  }
+
   public static ResponsePage<UserItemResponse> findByUserIdAndType(PagingParameters pageable, long userId,
     String type) {
     String sqlSelect = "select i.name, i.code, i.type, i.miningPower, i.image, i.price, count(1), i.isCanSell, i.isCanOpen, i.isCanClaim ";
@@ -65,20 +71,22 @@ public class UserItem extends BaseEntity {
 
   public static ResponsePage<UserItemResponse> findByUserIdAndIndexAndType(PagingParameters pageable, long userId,
     Long index, String type) {
-    String sql = "select ui.id, i.name, i.code, i.type, i.miningPower, i.image, i.price from UserItem ui inner join Item i on item.id = i.id left join UserDevice ud on ud.id= ui.userDevice.id where ui.user.id = :userId and isActive = true";
+    String sqlSelect = "select ui.id, i.name, i.code, i.type, i.miningPower, i.image, i.price from UserItem ui inner join Item i on item.id = i.id ";
+    String sqlWhere = " where ui.user.id = :userId and isActive = true";
     Map<String, Object> params = new HashMap<>();
     params.put("userId", userId);
     if (StringUtils.isNotBlank(type)) {
-      sql += " and item.type = :type";
+      sqlWhere += " and item.type = :type";
       params.put("type", Enums.ItemType.valueOf(type.toUpperCase()));
     }
     if (index != null && index > 0) {
-      sql += " and userDevice.index = :index";
+      sqlWhere += " and userDevice.index = :index";
       params.put("index", index);
     } else {
-      sql += " and userDevice is null";
+      sqlWhere += " and userDevice is null";
+      //      sqlSelect += " left join UserDevice ud on ud.id= ui.userDevice.id";
     }
-    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
+    PanacheQuery<PanacheEntityBase> panacheQuery = find(sqlSelect + sqlWhere, pageable.getSort(), params);
     return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(UserItemResponse.class).list(), pageable,
       panacheQuery.count());
   }
@@ -89,6 +97,26 @@ public class UserItem extends BaseEntity {
     params.put("userId", userId);
     params.put("itemId", itemId);
     return find(sql, params).page(0, number).project(Long.class).list();
+  }
+
+  public static ResponsePage<UserItemResponse> findItemNotHasDeviceAndNotSpecial(PagingParameters pageable,
+    long userId) {
+    String sqlSelect = "select i.name, i.code, i.type, i.miningPower, i.image, i.price, count(1) ";
+    String sqlFrom = " from UserItem ui inner join Item i on item.id = i.id ";
+    String sqlWhere = " where user.id = :userId and isActive = true and userDevice is null and i.type != :type";
+    Map<String, Object> params = new HashMap<>();
+    params.put("userId", userId);
+    params.put("type", Enums.ItemType.SPECIAL);
+    String sqlGroup = " group by i.name, i.code, i.type, i.miningPower, i.image, i.price";
+    return new ResponsePage<>(
+      find(sqlSelect + sqlFrom + sqlWhere + sqlGroup, pageable.getSort(), params).page(pageable.getPage())
+        .project(UserItemResponse.class).list(), pageable,
+      find("select count(distinct i.id) " + sqlFrom + sqlWhere, params).project(Long.class).firstResult());
+  }
+
+  public static BigDecimal sumMiningPowerByIds(List<Long> ids) {
+    return find("select sum(item.miningPower) from UserItem where id in (:ids)", Parameters.with("ids", ids)).project(
+      BigDecimal.class).firstResult();
   }
 
   public static int updateObject(String query, Map<String, Object> params) {

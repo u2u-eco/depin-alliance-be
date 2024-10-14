@@ -272,6 +272,9 @@ public class DeviceService {
     }
     Item removeItem = redisService.findItemById(userItemRemove.item.id);
     Item addItem = redisService.findItemById(userItemAdd.item.id);
+    if (removeItem.type!= addItem.type) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
     String query = "totalMiningPower = totalMiningPower - :miningPowerOld + :miningPowerNew where id =:id";
     long userDeviceId = userItemRemove.userDevice.id;
     Map<String, Object> params = new HashMap<>();
@@ -403,7 +406,7 @@ public class DeviceService {
       eventItemHistory.userItem = userItem;
       ItemBoxOpenResponse response = eventTable(user, eventBoxPoint.rewardTable);
       eventItemHistory.reward = response.toString();
-      eventItemHistory.event = new Event(1L);
+      eventItemHistory.event = new Event(Enums.EventId.CYBER_BOX.getId());
       eventItemHistory.persist();
       rs.add(response);
     }
@@ -427,7 +430,7 @@ public class DeviceService {
         Item item = redisService.findItemById(eventTableReward.item.id);
         return new ItemBoxOpenResponse(item.type.name(), item.name, Utils.stripDecimalZeros(item.price));
       case USDT:
-        if (Event.updateTotalUsdt(eventTableReward.amount, 1L)) {
+        if (Event.updateTotalUsdt(eventTableReward.amount, Enums.EventId.CYBER_BOX.getId())) {
           UserItem.create(new UserItem(user, eventTableReward.item, null));
           return new ItemBoxOpenResponse("USDT", Utils.stripDecimalZeros(eventTableReward.amount).toString(),
             Utils.stripDecimalZeros(eventTableReward.amount));

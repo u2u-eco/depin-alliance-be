@@ -11,7 +11,9 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.request.DeviceInfo;
+import xyz.telegram.depinalliance.common.models.request.SettingRequest;
 import xyz.telegram.depinalliance.common.models.response.ClaimResponse;
+import xyz.telegram.depinalliance.common.models.response.SettingResponse;
 import xyz.telegram.depinalliance.common.models.response.UserSkillResponse;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
@@ -51,10 +53,6 @@ public class UserService {
           BigDecimal pointRef = new BigDecimal(
             Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_REF)));
           user.pointRef = pointRef;
-          if (StringUtils.isNotBlank(league)) {
-            //            user.league = ref.league;
-            refCode += " request league " + league;
-          }
           Map<String, Object> params = new HashMap<>();
           params.put("id", ref.id);
           params.put("point", pointRef);
@@ -65,6 +63,11 @@ public class UserService {
       }
       user.ref = ref;
       User.createUser(user);
+      if (StringUtils.isNotBlank(league) && StringUtils.isNotBlank(refCode) && ref != null && ref.league != null) {
+        refCode += " request league " + league;
+        leagueService.joinLeague(user, ref.league.code);
+      }
+
       UserDevice userDevice = new UserDevice();
       userDevice.user = user;
       userDevice.name = "Device " + 1;
@@ -84,7 +87,7 @@ public class UserService {
     boolean hasChange = false;
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
-    List<String> sql = Arrays.asList();
+    List<String> sql = new ArrayList<>();
     if (!user.username.equals(username)) {
       hasChange = true;
       params.put("username", username);
@@ -146,14 +149,6 @@ public class UserService {
     User.updateUser(
       "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1, detectDevice = :detectDevice where id = :id",
       paramsUser);
-    if (user.league != null) {
-      Map<String, Object> leagueParams = new HashMap<>();
-      leagueParams.put("id", user.league.id);
-      //      leagueParams.put("totalMining", miningPower);
-      League.updateObject("totalContributors = totalContributors + 1 " +
-        //          ", totalMining = totalMining + :totalMining" +
-        " where id = :id", leagueParams);
-    }
     return pointUnClaimed;
   }
 
@@ -255,14 +250,6 @@ public class UserService {
     User.updateUser(
       "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1, detectDevice = :detectDevice, devicePlatform = :devicePlatform, deviceModel = :deviceModel where id = :id",
       paramsUser);
-    if (user.league != null) {
-      Map<String, Object> leagueParams = new HashMap<>();
-      leagueParams.put("id", user.league.id);
-      //      leagueParams.put("totalMining", miningPower);
-      League.updateObject("totalContributors = totalContributors + 1" +
-        //          ", totalMining = totalMining + :totalMining" +
-        " where id = :id", leagueParams);
-    }
     return Utils.stripDecimalZeros(pointUnClaimed);
   }
 
@@ -518,6 +505,40 @@ public class UserService {
       }
     }
     HistoryUpgradeSkill.update("status=1 where id = :id", Parameters.with("id", his.id));
+  }
+
+  @Transactional
+  public boolean setting(long userId, SettingRequest request) {
+    SettingResponse settingResponse = redisService.findSettingUserById(userId);
+    Enums.UserSettings settings = Enums.UserSettings.valueOf(request.setting);
+    boolean currentSetting = false;
+    String sql = " where id = :id";
+    switch (settings) {
+    case NOTIFICATION:
+      currentSetting = settingResponse.enableNotification;
+      sql = "enableNotification = :setting " + sql + " and enableNotification = :currentSetting";
+      break;
+    case MUSIC_THEME:
+      currentSetting = settingResponse.enableMusicTheme;
+      sql = "enableMusicTheme = :setting " + sql + " and enableMusicTheme = :currentSetting";
+      break;
+    case SOUND_EFFECT:
+      currentSetting = settingResponse.enableSoundEffect;
+      sql = "enableSoundEffect = :setting " + sql + " and enableSoundEffect = :currentSetting";
+      break;
+    }
+    if (request.enable == currentSetting) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("id", userId);
+    params.put("setting", request.enable);
+    params.put("currentSetting", currentSetting);
+    if (User.updateUser(sql, params)) {
+      redisService.clearCacheByPrefix("SETTING_USER_" + userId);
+      return true;
+    }
+    throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
   }
 
   public void updateLevelByExp(long userId) {

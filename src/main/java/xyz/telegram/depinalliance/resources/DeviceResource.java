@@ -4,10 +4,10 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import xyz.telegram.depinalliance.common.models.request.*;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
-import xyz.telegram.depinalliance.entities.Item;
 import xyz.telegram.depinalliance.entities.UserDevice;
 import xyz.telegram.depinalliance.entities.UserItem;
 import xyz.telegram.depinalliance.services.DeviceService;
+import xyz.telegram.depinalliance.services.RedisService;
 
 /**
  * @author holden on 26-Aug-2024
@@ -17,12 +17,14 @@ public class DeviceResource extends BaseResource {
 
   @Inject
   DeviceService deviceService;
+  @Inject
+  RedisService redisService;
 
   @Path("item")
   @GET
   public ResponseData getDeviceItem(@QueryParam("type") String type, PagingParameters pagingParameters) {
     pagingParameters.setSortByDefault("price");
-    return ResponseData.ok(Item.findByTypeAndPaging(pagingParameters, type));
+    return ResponseData.ok(redisService.findListItemInShop(pagingParameters, type));
   }
 
   @Path("user-device")
@@ -52,6 +54,14 @@ public class DeviceResource extends BaseResource {
     PagingParameters pagingParameters) {
     pagingParameters.setSortByDefault("price");
     return ResponseData.ok(UserItem.findByUserIdAndIndexAndType(pagingParameters, getTelegramId(), index, type));
+  }
+
+  @Path("user-device-item-contribute")
+  @GET
+  public ResponseData getUserDeviceItemContribute(PagingParameters pagingParameters) {
+    pagingParameters.setSortByDefault("price");
+    pagingParameters.sortAscending = true;
+    return ResponseData.ok(UserItem.findItemNotHasDeviceAndNotSpecial(pagingParameters, getTelegramId()));
   }
 
   @Path("buy-item")

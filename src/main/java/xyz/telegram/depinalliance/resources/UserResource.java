@@ -1,6 +1,7 @@
 package xyz.telegram.depinalliance.resources;
 
 import io.quarkus.panache.common.Sort;
+import io.vertx.core.http.HttpServerRequest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -8,18 +9,16 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestHeader;
 import xyz.telegram.depinalliance.common.configs.AmazonS3Config;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
-import xyz.telegram.depinalliance.common.models.request.AvatarRequest;
-import xyz.telegram.depinalliance.common.models.request.PagingParameters;
-import xyz.telegram.depinalliance.common.models.request.SkillUpgradeRequest;
-import xyz.telegram.depinalliance.common.models.request.TelegramInitDataRequest;
+import xyz.telegram.depinalliance.common.models.request.*;
 import xyz.telegram.depinalliance.common.models.response.*;
 import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
@@ -45,8 +44,6 @@ public class UserResource extends BaseResource {
   UserService userService;
   @Inject
   RedisService redisService;
-  @ConfigProperty(name = "telegram.validate")
-  boolean isValidate;
   @Inject
   AmazonS3Config amazonS3Config;
   @Inject
@@ -56,13 +53,14 @@ public class UserResource extends BaseResource {
   @Path("auth")
   @PermitAll
   @Transactional
-  public ResponseData auth(TelegramInitDataRequest request) throws Exception {
+  public ResponseData auth(TelegramInitDataRequest request, HttpHeaders headers,
+    @Context HttpServerRequest httpServerRequest) {
     UserTelegramResponse userTelegramResponse = telegramService.validateInitData(request.initData);
     if (userTelegramResponse == null) {
       logger.error("Auth fail init data " + request.initData);
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
     }
-    User user = User.findById(userTelegramResponse.id);
+    //    User user = User.findById(userTelegramResponse.id);
     String username = StringUtils.isBlank(userTelegramResponse.username) ?
       (StringUtils.isBlank(userTelegramResponse.firstName) ?
         (StringUtils.isBlank(userTelegramResponse.lastName) ?
@@ -71,11 +69,20 @@ public class UserResource extends BaseResource {
         userTelegramResponse.firstName) :
       userTelegramResponse.username;
 
-    if (user == null && isValidate) {
-      return ResponseData.error(ResponseMessageConstants.NOT_FOUND);
-    } else if (user == null) {
-      user = userService.checkStartUser(userTelegramResponse.id, username, "", "", false);
+    //    if (user == null) {
+    String refCode = "";
+    String league = "";
+    if (StringUtils.isNotBlank(request.refCode)) {
+      refCode = request.refCode;
+      if (StringUtils.isNotBlank(refCode) && refCode.contains("_")) {
+        String[] arrays = refCode.split("_");
+        refCode = arrays[0];
+        league = arrays[1];
+      }
     }
+    User user = userService.checkStartUser(userTelegramResponse.id, username, refCode, league,
+      userTelegramResponse.isPremium);
+    //    }
 
     Map<String, Object> params = new HashMap<>();
     params.put("id", user.id);
@@ -85,11 +92,9 @@ public class UserResource extends BaseResource {
       sql = "username = :username,";
       params.put("username", username);
     }
-
-    User.updateUser(sql + "lastLoginTime = :lastLoginTime where id = :id", params);
-    if (user.status == Enums.UserStatus.MINING) {
-      userService.mining(user);
-    }
+    String ip = Utils.getClientIpAddress(headers, httpServerRequest);
+    params.put("ip", ip);
+    User.updateUser(sql + "lastLoginTime = :lastLoginTime, ip = :ip where id = :id", params);
     Map<String, Object> res = new HashMap<>();
     res.put("currentStatus", user.status);
     res.put("accessToken", jwtService.generateToken(String.valueOf(userTelegramResponse.id), username));
@@ -141,6 +146,18 @@ public class UserResource extends BaseResource {
       Objects.requireNonNull(redisService.findConfigByKey(Enums.Config.POINT_BUY_DEVICE)));
     systemConfigResponse.urlImage = amazonS3Config.awsUrl();
     return ResponseData.ok(systemConfigResponse);
+  }
+
+  @GET
+  @Path("settings")
+  public ResponseData settings() throws BusinessException {
+    return ResponseData.ok(redisService.findSettingUserById(getTelegramId()));
+  }
+
+  @POST
+  @Path("settings")
+  public ResponseData settings(SettingRequest request) throws BusinessException {
+    return ResponseData.ok(userService.setting(getTelegramId(), request));
   }
 
   @GET
@@ -312,7 +329,7 @@ public class UserResource extends BaseResource {
   @Path("next-level")
   public ResponseData nextLevel() {
     User user = getUser();
-    List<Level> levels = Level.find("id > ?1", Sort.ascending("id"), user.level.id).page(0, 2).list();
+    List<Level> levels = redisService.findNextLevel(user.level.id);
     BigDecimal maxMiningPower = BigDecimal.ZERO;
     List<LevelResponse> levelResponses = new ArrayList<>();
     for (int i = 0; i < levels.size(); i++) {
@@ -329,4 +346,5 @@ public class UserResource extends BaseResource {
     }
     return ResponseData.ok(levelResponses);
   }
+
 }
