@@ -61,4 +61,19 @@ public interface TwitterClient {
   @ClientHeaderParam(name = "x-rapidapi-key", value = "${twitter.rapidapi-key}")
   TwitterRepliesResponse getRepliesContinuation(@QueryParam("tweet_id") String tweetId,
     @QueryParam("continuation_token") String continuationToken);
+
+  @GET
+  @Path("/user/followers/continuation")
+  @ClientQueryParam(name = "limit", value = "100")
+  @ClientHeaderParam(name = "x-rapidapi-host", value = "${twitter.rapidapi-host}")
+  @ClientHeaderParam(name = "x-rapidapi-key", value = "${twitter.rapidapi-key}")
+  TwitterFollowResponse getFollowerContinuation(@QueryParam("user_id") String userId,
+    @QueryParam("continuation_token") String continuationToken);
+
+  @GET
+  @Path("/user/followers")
+  @ClientQueryParam(name = "limit", value = "100")
+  @ClientHeaderParam(name = "x-rapidapi-host", value = "${twitter.rapidapi-host}")
+  @ClientHeaderParam(name = "x-rapidapi-key", value = "${twitter.rapidapi-key}")
+  TwitterFollowResponse getFollower(@QueryParam("user_id") String userId);
 }

@@ -143,7 +143,7 @@ public class MissionService {
   }
 
   @Transactional
-  public boolean verify(User user, long missionId, List<QuizResponse> answerArrays) {
+  public String verify(User user, long missionId, List<QuizResponse> answerArrays) {
     UserMissionResponse check = Mission.findByUserIdAndMissionId(user.id, missionId);
     if (check == null) {
       throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
@@ -177,26 +177,41 @@ public class MissionService {
             });
           });
         } catch (Exception e) {
-          return false;
+          return "false";
         }
         break;
       case TELEGRAM:
         isChecked = telegramService.verifyJoinChannel(check.referId, user.id.toString());
         break;
-      case TWITTER:
+      case FOLLOW_TWITTER:
       case RETWEETS:
       case TWEET_REPLIES:
         UserSocial userSocial = redisService.findUserSocial(user.id);
         if (userSocial == null || StringUtils.isBlank(userSocial.twitterUsername)) {
           throw new BusinessException(ResponseMessageConstants.USER_MUST_LINK_TWITTER);
         }
-        isChecked = switch (check.type) {
-          case TWITTER -> twitterService.isUserFollowing(String.valueOf(userSocial.twitterUid), check.referId);
-          case RETWEETS -> twitterService.isUserRetweets(String.valueOf(userSocial.twitterUid), check.referId);
-          case TWEET_REPLIES -> twitterService.isUserReplies(String.valueOf(userSocial.twitterUid), check.referId);
-          default -> false;
-        };
-        break;
+        UserMission userMission = new UserMission();
+        userMission.mission = new Mission(check.id);
+        userMission.user = user;
+        userMission.status = Enums.MissionStatus.VERIFYING;
+        UserMission.create(userMission);
+        if (check.partnerId != null) {
+          Partner.updateParticipants(check.partnerId);
+          redisService.clearMissionUser("PARTNER", user.id);
+        } else {
+          if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+            redisService.clearMissionUser("REWARD_ONE_TIME", user.id);
+          } else {
+            redisService.clearMissionUser("REWARD", user.id);
+          }
+        }
+        return "verifying";
+      //        isChecked = switch (check.type) {
+      //          case TWITTER -> twitterService.isUserFollowing(String.valueOf(userSocial.twitterUid), check.referId);
+      //          case RETWEETS -> twitterService.isUserRetweets(String.valueOf(userSocial.twitterUid), check.referId);
+      //          case TWEET_REPLIES -> twitterService.isUserReplies(String.valueOf(userSocial.twitterUid), check.referId);
+      //          default -> false;
+      //        };
       case PLAY_MINI_TON:
         try {
           isChecked = miniTonClient.verify(user.id);
@@ -258,9 +273,9 @@ public class MissionService {
           redisService.clearMissionUser("REWARD", user.id);
         }
       }
-      return true;
+      return "true";
     }
-    return false;
+    return "false";
   }
 
   @Transactional

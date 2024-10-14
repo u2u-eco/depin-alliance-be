@@ -6,31 +6,25 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author holden on 26-Aug-2024
  */
 @Entity
-@Table(name = "missions")
-public class Mission extends BaseEntity {
+@Table(name = "mission_daily")
+public class MissionDaily extends BaseEntity {
   @Id
   @SequenceGenerator(name = "missionSequence", sequenceName = "mission_id_seq", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "missionSequence")
   public Long id;
   @Column(name = "group_mission")
   public String groupMission;
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "partner_id")
-  public Partner partner;
   public String image;
   public String name;
   @Column(columnDefinition = "text")
   public String description;
   public Enums.MissionType type;
-  @Column(name = "mission_require")
-  public Enums.MissionRequire missionRequire;
   public String url;
   public int orders = 0;
   @Column(name = "is_fake")
@@ -50,25 +44,19 @@ public class Mission extends BaseEntity {
   @Column(name = "reward_image")
   public String rewardImage;
 
-  public Mission(Long id) {
+  public MissionDaily(Long id) {
     this.id = id;
   }
 
-  public Mission() {
+  public MissionDaily() {
   }
 
-  public static Mission findByMissionRequire(Enums.MissionRequire missionRequire) {
+  public static MissionDaily findByMissionRequire(Enums.MissionRequire missionRequire) {
     return find("missionRequire = ?1 and isActive = true", missionRequire).firstResult();
   }
 
-  public static Mission findByMissionType(Enums.MissionType missionType) {
+  public static MissionDaily findByMissionType(Enums.MissionType missionType) {
     return find("type = ?1 and isActive = true", missionType).firstResult();
-  }
-
-  public static List<Mission> findByMissionTwitter() {
-    List<Enums.MissionType> types = Arrays.asList(Enums.MissionType.FOLLOW_TWITTER, Enums.MissionType.RETWEETS,
-      Enums.MissionType.TWEET_REPLIES);
-    return find("type in (?1) and isActive = true and isFake = false", types).list();
   }
 
   public static List<UserMissionResponse> findByUserId(long userId, boolean isPartner) {

@@ -11,9 +11,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import twitter4j.User;
 import twitter4j.auth.RequestToken;
+import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.exceptions.BusinessException;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
+import xyz.telegram.depinalliance.entities.Mission;
+import xyz.telegram.depinalliance.entities.UserMission;
 import xyz.telegram.depinalliance.entities.UserSocial;
 import xyz.telegram.depinalliance.services.RedisService;
 import xyz.telegram.depinalliance.services.TwitterService;
@@ -106,6 +109,18 @@ public class TwitterResource extends BaseResource {
       throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
     }
     redisService.clearCacheByPrefix("USER_SOCIAL_" + userSocial.userId);
+    try {
+      Mission mission = redisService.findMissionByType(Enums.MissionType.CONNECT_X);
+      if (mission != null) {
+        UserMission userMission = new UserMission();
+        userMission.mission = mission;
+        userMission.user = new xyz.telegram.depinalliance.entities.User(userSocial.userId);
+        userMission.status = Enums.MissionStatus.VERIFIED;
+        UserMission.create(userMission);
+        redisService.clearMissionUser("REWARD", userSocial.userId);
+      }
+    } catch (Exception e) {
+    }
     URL url = new URL(redirectUrl);
     return Response.temporaryRedirect(url.toURI()).build();
   }

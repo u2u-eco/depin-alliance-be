@@ -471,6 +471,25 @@ public class RedisService {
     return UserSocial.findById(userId);
   }
 
+  public Mission findMissionByType(Enums.MissionType missionType) {
+    String redisKey = "MISSION_TYPE" + missionType.name();
+    try {
+      RBucket<Mission> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      Mission object = Mission.findByMissionType(missionType);
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return Mission.findByMissionType(missionType);
+  }
+
   public void clearCacheByPrefix(String prefix) {
     redissonClient.getKeys().deleteByPattern(prefix + "*");
   }
