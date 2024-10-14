@@ -44,9 +44,9 @@ public class TwitterService {
   }
 
   public synchronized boolean isUserFollowing(String userId, String followingUserId) {
-    try {
-      String continuationToken = "";
-      while (true) {
+    String continuationToken = "";
+    while (true) {
+      try {
         TwitterFollowResponse res = StringUtils.isBlank(continuationToken) ?
           twitterClient.getFollowing(userId) :
           twitterClient.getFollowingContinuation(userId, continuationToken);
@@ -63,9 +63,9 @@ public class TwitterService {
         if (userFollowing != null) {
           return true;
         }
+      } catch (Exception e) {
+        return false;
       }
-    } catch (Exception e) {
-      return false;
     }
   }
 

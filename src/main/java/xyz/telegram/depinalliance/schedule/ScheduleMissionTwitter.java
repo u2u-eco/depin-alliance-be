@@ -1,118 +1,82 @@
 package xyz.telegram.depinalliance.schedule;
 
-import io.quarkus.panache.common.Sort;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
-import xyz.telegram.depinalliance.common.models.response.TwitterFollowResponse;
-import xyz.telegram.depinalliance.common.models.response.TwitterRetweetsResponse;
-import xyz.telegram.depinalliance.entities.TwitterFollower;
-import xyz.telegram.depinalliance.entities.TwitterRetweet;
-import xyz.telegram.depinalliance.services.TwitterClient;
+import xyz.telegram.depinalliance.common.configs.TwitterConfig;
+import xyz.telegram.depinalliance.common.constans.Enums;
+import xyz.telegram.depinalliance.common.utils.Utils;
+import xyz.telegram.depinalliance.entities.Mission;
+import xyz.telegram.depinalliance.entities.Partner;
+import xyz.telegram.depinalliance.entities.UserMission;
+import xyz.telegram.depinalliance.entities.UserSocial;
+import xyz.telegram.depinalliance.services.RedisService;
+import xyz.telegram.depinalliance.services.TwitterService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 public class ScheduleMissionTwitter {
   @Inject
   Logger logger;
-  @RestClient
-  TwitterClient twitterClient;
+  @Inject
+  TwitterService twitterService;
+  @Inject
+  TwitterConfig twitterConfig;
+  @Inject
+  RedisService redisService;
 
-  //  @Scheduled(cron = "${expr.every.twitter}", identity = "task-twitter")
-  @Scheduled(cron = "00 47 11 * * ?", identity = "task-twitter")
+  @Scheduled(every = "${expr.every.twitter}", identity = "task-twitter")
+//      @Scheduled(cron = "00 19 15 * * ?", identity = "task-twitter")
   void schedule() {
-    //    crawlFollowers("1577973357773225984");
-    crawlRetweet("1844328764903391596");
-  }
-
-  public void crawlFollowers(String twitterId) {
-    TwitterFollower twitterFollower = TwitterFollower.find("twitterId = ?1 ", Sort.descending("createdAt"), twitterId)
-      .firstResult();
-    String continuationToken = "";
-    if (twitterFollower != null) {
-      continuationToken = twitterFollower.continuationToken;
-    }
-    while (true) {
-      try {
-        TwitterFollowResponse res = StringUtils.isBlank(continuationToken) ?
-          twitterClient.getFollower(twitterId) :
-          twitterClient.getFollowerContinuation(twitterId, continuationToken);
-        if (StringUtils.isNotBlank(res.continuationToken)) {
-          continuationToken = res.continuationToken;
+    //verify follow
+    long currentTime = Utils.getCalendar().getTimeInMillis();
+    long timeValidate = currentTime - twitterConfig.verifyTime();
+    List<Mission> missions = Mission.findByMissionTwitter(List.of(Enums.MissionType.FOLLOW_TWITTER));
+    for (Mission mission : missions) {
+      List<UserMission> userMissions = UserMission.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
+        mission.id, Enums.MissionStatus.VERIFYING, timeValidate).list();
+      System.out.println(userMissions.size());
+      for (UserMission userMission : userMissions) {
+        boolean isVerify = false;
+        try {
+          UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+          switch (mission.type) {
+          case FOLLOW_TWITTER:
+            isVerify = twitterService.isUserFollowing(userSocial.twitterUid.toString(), mission.referId);
+            break;
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
         }
-        if (res.results == null || res.results.isEmpty()) {
-          break;
-        }
-        createTwitterFollower(res.results, twitterId, continuationToken);
-      } catch (Exception e) {
-        logger.error("Error follower " + continuationToken, e);
-      }
-    }
-  }
-
-  public void crawlRetweet(String tweetId) {
-    TwitterRetweet twitterRetweet = TwitterRetweet.find("tweetId = ?1 ", Sort.descending("createdAt"), tweetId)
-      .firstResult();
-    String continuationToken = "";
-    if (twitterRetweet != null) {
-      continuationToken = twitterRetweet.continuationToken;
-    }
-    while (true) {
-      try {
-        TwitterRetweetsResponse res = StringUtils.isBlank(continuationToken) ?
-          twitterClient.getRetweets(tweetId) :
-          twitterClient.getRetweetsContinuation(tweetId, continuationToken);
-        if (StringUtils.isNotBlank(res.continuationToken)) {
-          continuationToken = res.continuationToken;
-        }
-        if (res.retweets == null || res.retweets.isEmpty()) {
-          break;
-        }
-        createTwitterRetweet(res.retweets, tweetId, continuationToken);
-      } catch (Exception e) {
-        logger.error("Error Retweet " + continuationToken, e);
+        updateUserMission(isVerify, userMission.id, mission.partner, userMission.user.id);
       }
     }
   }
 
   @Transactional
-  public void createTwitterFollower(List<TwitterFollowResponse.TwitterUser> results, String twitterId,
-    String continuationToken) {
-    for (TwitterFollowResponse.TwitterUser user : results) {
-      try {
-        TwitterFollower twitterFollower = new TwitterFollower();
-        twitterFollower.twitterId = twitterId;
-        twitterFollower.userId = user.userId;
-        twitterFollower.continuationToken = continuationToken;
-        twitterFollower.create();
-        twitterFollower.persistAndFlush();
-      } catch (Exception e) {
-        logger.error("Error save " + twitterId + " " + continuationToken, e);
-      }
+  public void updateUserMission(boolean isVerify, long userMissionId, Partner partnerId, long userId) {
+    if (!isVerify) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("id", userMissionId);
+      params.put("status", Enums.MissionStatus.VERIFYING);
+      UserMission.updateObject("status = null where id = :id and status = :status", params);
+    } else {
+      Map<String, Object> params = new HashMap<>();
+      params.put("id", userMissionId);
+      params.put("statusNew", Enums.MissionStatus.VERIFIED);
+      params.put("statusOld", Enums.MissionStatus.VERIFYING);
+      UserMission.updateObject("status = :statusNew where id = :id and status = :statusOld", params);
     }
-    logger.info("Save success Follower continuationToken " + continuationToken);
-  }
 
-  @Transactional
-  public void createTwitterRetweet(List<TwitterRetweetsResponse.TwitterRetweets> retweets, String tweetId,
-    String continuationToken) {
-    for (TwitterRetweetsResponse.TwitterRetweets retweet : retweets) {
-      try {
-        TwitterRetweet twitterRetweet = new TwitterRetweet();
-        twitterRetweet.tweetId = tweetId;
-        twitterRetweet.userId = retweet.userId;
-        twitterRetweet.continuationToken = continuationToken;
-        twitterRetweet.create();
-        twitterRetweet.persistAndFlush();
-      } catch (Exception e) {
-        logger.error("Error save " + tweetId + " " + continuationToken, e);
-      }
+    if (partnerId != null) {
+      redisService.clearMissionUser("PARTNER", userId);
+    } else {
+      redisService.clearMissionUser("REWARD", userId);
     }
-    logger.info("Save success Retweet continuationToken " + continuationToken);
   }
 }

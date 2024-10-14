@@ -65,10 +65,8 @@ public class Mission extends BaseEntity {
     return find("type = ?1 and isActive = true", missionType).firstResult();
   }
 
-  public static List<Mission> findByMissionTwitter() {
-    List<Enums.MissionType> types = Arrays.asList(Enums.MissionType.FOLLOW_TWITTER, Enums.MissionType.RETWEETS,
-      Enums.MissionType.TWEET_REPLIES);
-    return find("type in (?1) and isActive = true and isFake = false", types).list();
+  public static List<Mission> findByMissionTwitter(List<Enums.MissionType> types) {
+    return find("type in (?1) and isActive = true and isFake = false and referId is not null", types).list();
   }
 
   public static List<UserMissionResponse> findByUserId(long userId, boolean isPartner) {
@@ -89,7 +87,7 @@ public class Mission extends BaseEntity {
 
   public static UserMissionResponse findByUserIdAndMissionId(long userId, long missionId) {
     return find(
-      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire, m.amount, m.referId, m.partner.id, m.rewardType, m.rewardImage from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2 and m.isActive = true",
+      "select m.id, m.groupMission, m.name, m.image, m.description, m.type, m.url, m.point, m.xp, um.status, m.isFake, m.missionRequire, m.amount, m.referId, m.partner.id, m.rewardType, m.rewardImage, um.id from Mission m left join UserMission um on m.id = um.mission.id and um.user.id =?1 where m.id = ?2 and m.isActive = true",
       Sort.ascending("m.orders"), userId, missionId).project(UserMissionResponse.class).firstResult();
   }
 }

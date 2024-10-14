@@ -190,19 +190,28 @@ public class MissionService {
         if (userSocial == null || StringUtils.isBlank(userSocial.twitterUsername)) {
           throw new BusinessException(ResponseMessageConstants.USER_MUST_LINK_TWITTER);
         }
-        UserMission userMission = new UserMission();
-        userMission.mission = new Mission(check.id);
-        userMission.user = user;
-        userMission.status = Enums.MissionStatus.VERIFYING;
-        UserMission.create(userMission);
-        if (check.partnerId != null) {
-          Partner.updateParticipants(check.partnerId);
-          redisService.clearMissionUser("PARTNER", user.id);
+        if (check.userMissionId != null && check.userMissionId > 0) {
+          Map<String, Object> params = new HashMap<>();
+          params.put("id", check.userMissionId);
+          params.put("status", Enums.MissionStatus.VERIFYING);
+          params.put("updatedAt", Utils.getCalendar().getTimeInMillis());
+          UserMission.updateObject("status = :status, updatedAt = :updatedAt where id = :id and status is null",
+            params);
         } else {
-          if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
-            redisService.clearMissionUser("REWARD_ONE_TIME", user.id);
+          UserMission userMission = new UserMission();
+          userMission.mission = new Mission(check.id);
+          userMission.user = user;
+          userMission.status = Enums.MissionStatus.VERIFYING;
+          UserMission.create(userMission);
+          if (check.partnerId != null) {
+            Partner.updateParticipants(check.partnerId);
+            redisService.clearMissionUser("PARTNER", user.id);
           } else {
-            redisService.clearMissionUser("REWARD", user.id);
+            if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+              redisService.clearMissionUser("REWARD_ONE_TIME", user.id);
+            } else {
+              redisService.clearMissionUser("REWARD", user.id);
+            }
           }
         }
         return "verifying";

@@ -511,6 +511,26 @@ public class RedisService {
     return MissionDaily.find("date = ?1", Sort.ascending("orders"), currentDay).list();
   }
 
+//  public List<UserMissionResponse> findUserMissionDaily(long userId) {
+//    long currentDay = Utils.getNewDay().getTimeInMillis() / 1000;
+//    String redisKey = "MISSION_DAILY_" + currentDay;
+//    try {
+//      RBucket<List<MissionDaily>> value = redissonClient.getBucket(redisKey);
+//      if (value.isExists()) {
+//        return value.get();
+//      }
+//      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+//      List<MissionDaily> object = MissionDaily.find("date = ?1", Sort.ascending("orders"), currentDay).list();
+//      if (object != null) {
+//        value.setAsync(object, 1, TimeUnit.DAYS);
+//      }
+//      return object;
+//    } catch (Exception e) {
+//      logger.errorv(e, "Error while finding " + redisKey);
+//    }
+//    return MissionDaily.find("date = ?1", Sort.ascending("orders"), currentDay).list();
+//  }
+
   public void clearCacheByPrefix(String prefix) {
     redissonClient.getKeys().deleteByPattern(prefix + "*");
   }

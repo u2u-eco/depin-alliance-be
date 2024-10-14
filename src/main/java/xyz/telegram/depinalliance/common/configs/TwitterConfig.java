@@ -14,6 +14,7 @@ public interface TwitterConfig {
   String callbackUrl();
 
   String redirectUrl();
+  long verifyTime();
 
   String rapidapiHost();
 
