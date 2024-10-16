@@ -80,4 +80,26 @@ public class MissionResource extends BaseResource {
       return ResponseData.ok(missionService.claim(getUser(), missionId));
     }
   }
+
+  @GET
+  @Path("daily")
+  public ResponseData<?> getMissionDaily() {
+    return ResponseData.ok(redisService.findUserMissionDaily(getTelegramId()));
+  }
+
+  @GET
+  @Path("verify-task-daily/{id}")
+  public ResponseData<?> verifyTaskDaily(@PathParam("id") Long missionId) {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(missionService.verifyMissionDaily(getTelegramId(), missionId, null));
+    }
+  }
+
+  @GET
+  @Path("claim-task-daily/{id}")
+  public ResponseData<?> claimTaskDaily(@PathParam("id") Long missionId) throws BusinessException {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(missionService.claimMissionDaily(getTelegramId(), missionId));
+    }
+  }
 }

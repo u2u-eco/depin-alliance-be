@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.ws.rs.core.HttpHeaders;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
@@ -113,5 +114,9 @@ public class Utils {
       }
     }
     return httpServerRequest.remoteAddress().hostAddress();
+  }
+
+  public static String generateRandomString(int numberCharacter) {
+    return RandomStringUtils.randomAlphanumeric(numberCharacter);
   }
 }
