@@ -303,7 +303,7 @@ public class MissionService {
       User.updatePointAndXpUser(user.id, check.point, check.xp);
       if (check.xp != null && check.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);
-        leagueService.updateXp(user, check.xp);
+        //        leagueService.updateXp(user, check.xp);
       }
       if (check.partnerId != null) {
         redisService.clearMissionUser("PARTNER", user.id);
@@ -439,5 +439,94 @@ public class MissionService {
     }
     return groupMissions;
 
+  }
+
+  @Transactional
+  public String verifyMissionDaily(Long userId, long missionId, List<QuizResponse> answerArrays) {
+    long currentDate = Utils.getNewDay().getTimeInMillis() / 1000;
+    MissionDaily missionDaily = redisService.findMissionDailyById(missionId);
+    if (missionDaily == null || missionDaily.date != currentDate) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    UserMissionDaily userMissionDaily = UserMissionDaily.find("user.id = ?1 and mission.id =?2", userId, missionId)
+      .firstResult();
+    if (userMissionDaily != null && userMissionDaily.status != null && userMissionDaily.status != Enums.MissionStatus.NOT_VERIFIED) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+
+    boolean isChecked = false;
+    if (missionDaily.isFake) {
+      isChecked = true;
+    } else {
+      switch (missionDaily.type) {
+      case LIKE_TWITTER:
+      case FOLLOW_TWITTER:
+      case RETWEETS:
+      case TWEET_REPLIES:
+        UserSocial userSocial = redisService.findUserSocial(userId);
+        if (userSocial == null || StringUtils.isBlank(userSocial.twitterUsername)) {
+          throw new BusinessException(ResponseMessageConstants.USER_MUST_LINK_TWITTER);
+        }
+        if (userMissionDaily != null && userMissionDaily.id > 0) {
+          Map<String, Object> params = new HashMap<>();
+          params.put("id", userMissionDaily.id);
+          params.put("status", Enums.MissionStatus.VERIFYING);
+          params.put("updatedAt", Utils.getCalendar().getTimeInMillis());
+          UserMissionDaily.updateObject("status = :status, updatedAt = :updatedAt where id = :id and status is null",
+            params);
+        } else {
+          userMissionDaily = new UserMissionDaily();
+          userMissionDaily.mission = missionDaily;
+          userMissionDaily.user = new User(userId);
+          userMissionDaily.status = Enums.MissionStatus.VERIFYING;
+          userMissionDaily.twitterUid = userSocial.twitterUid;
+          UserMissionDaily.create(userMissionDaily);
+          redisService.clearMissionDaily(userId, currentDate);
+        }
+        return "verifying";
+      default:
+        break;
+      }
+    }
+    if (isChecked) {
+      userMissionDaily = new UserMissionDaily();
+      userMissionDaily.mission = missionDaily;
+      userMissionDaily.user = new User(userId);
+      userMissionDaily.status = Enums.MissionStatus.VERIFYING;
+      UserMissionDaily.create(userMissionDaily);
+      redisService.clearMissionDaily(userId, currentDate);
+      return "true";
+    }
+    return "false";
+  }
+
+  @Transactional
+  public MissionRewardResponse claimMissionDaily(long userId, long missionId) throws BusinessException {
+    long currentDate = Utils.getNewDay().getTimeInMillis() / 1000;
+    MissionDaily missionDaily = redisService.findMissionDailyById(missionId);
+    if (missionDaily == null || missionDaily.date != currentDate) {
+      throw new BusinessException(ResponseMessageConstants.NOT_FOUND);
+    }
+    UserMissionDaily userMissionDaily = UserMissionDaily.find("user.id = ?1 and mission.id =?2", userId, missionId)
+      .firstResult();
+    if (userMissionDaily == null || userMissionDaily.status != Enums.MissionStatus.VERIFIED) {
+      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+    }
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("missionId", missionId);
+    params.put("userId", userId);
+    params.put("statusNew", Enums.MissionStatus.CLAIMED);
+    params.put("statusOld", Enums.MissionStatus.VERIFIED);
+    if (UserMissionDaily.updateObject(
+      "status = :statusNew where user.id = :userId and mission.id = :missionId and status = :statusOld", params)) {
+      User.updatePointAndXpUser(userId, missionDaily.point, missionDaily.xp);
+      if (missionDaily.xp != null && missionDaily.xp.compareTo(BigDecimal.ZERO) > 0) {
+        userService.updateLevelByExp(userId);
+      }
+      redisService.clearMissionDaily(userId, currentDate);
+      return null;
+    }
+    throw new BusinessException(ResponseMessageConstants.MISSION_CLAIM_ERROR);
   }
 }

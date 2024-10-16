@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 @Table(name = "mission_daily")
 public class MissionDaily extends BaseEntity {
   @Id
-  @SequenceGenerator(name = "missionSequence", sequenceName = "mission_id_seq", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "missionSequence")
+  @SequenceGenerator(name = "missionDailySequence", sequenceName = "mission_daily_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "missionDailySequence")
   public Long id;
   public String image;
   public String name;
@@ -39,6 +39,8 @@ public class MissionDaily extends BaseEntity {
   @Column(name = "reward_image")
   public String rewardImage;
   public Long date;
+  @Column(name = "time_start")
+  public Long timeStart;
 
   public MissionDaily(Long id) {
     this.id = id;

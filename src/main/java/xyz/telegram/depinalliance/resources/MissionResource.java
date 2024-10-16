@@ -10,12 +10,9 @@ import xyz.telegram.depinalliance.common.models.response.PartnerResponse;
 import xyz.telegram.depinalliance.common.models.response.QuizResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
 import xyz.telegram.depinalliance.common.models.response.UserMissionResponse;
-import xyz.telegram.depinalliance.entities.MissionDaily;
-import xyz.telegram.depinalliance.entities.UserMissionDaily;
 import xyz.telegram.depinalliance.services.MissionService;
 import xyz.telegram.depinalliance.services.RedisService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,25 +58,6 @@ public class MissionResource extends BaseResource {
   }
 
   @GET
-  @Path("daily")
-  public ResponseData<?> getMissionDaily() {
-    List<MissionDaily> missionDaily = redisService.findMissionDaily();
-    List<Long> missionIds = missionDaily.stream().map(mission -> mission.id).toList();
-    List<UserMissionDaily> userMissionDailies = UserMissionDaily.list("mission.id in (?1)", missionIds);
-    List<UserMissionResponse> userMissions = new ArrayList<>();
-    missionDaily.forEach(mission -> {
-      UserMissionDaily userMissionDaily = userMissionDailies.stream()
-        .filter(userMission -> userMission.mission.id.equals(mission.id)).findFirst().orElse(null);
-      UserMissionResponse userMissionResponse = new UserMissionResponse(mission.id, "Mission Daily", mission.name,
-        mission.image, mission.description, mission.type, mission.url, mission.point, mission.xp,
-        userMissionDaily != null ? userMissionDaily.status : null, mission.isFake, null, mission.amount,
-        mission.referId, null, mission.rewardType, mission.rewardImage);
-      userMissions.add(userMissionResponse);
-    });
-    return ResponseData.ok(userMissions);
-  }
-
-  @GET
   @Path("verify-task/{id}")
   public ResponseData verifyTask(@PathParam("id") Long missionId) {
     synchronized (getTelegramId().toString().intern()) {
@@ -100,6 +78,28 @@ public class MissionResource extends BaseResource {
   public ResponseData claimTask(@PathParam("id") Long missionId) throws BusinessException {
     synchronized (getTelegramId().toString().intern()) {
       return ResponseData.ok(missionService.claim(getUser(), missionId));
+    }
+  }
+
+  @GET
+  @Path("daily")
+  public ResponseData<?> getMissionDaily() {
+    return ResponseData.ok(redisService.findUserMissionDaily(getTelegramId()));
+  }
+
+  @GET
+  @Path("verify-task-daily/{id}")
+  public ResponseData<?> verifyTaskDaily(@PathParam("id") Long missionId) {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(missionService.verifyMissionDaily(getTelegramId(), missionId, null));
+    }
+  }
+
+  @GET
+  @Path("claim-task-daily/{id}")
+  public ResponseData<?> claimTaskDaily(@PathParam("id") Long missionId) throws BusinessException {
+    synchronized (getTelegramId().toString().intern()) {
+      return ResponseData.ok(missionService.claimMissionDaily(getTelegramId(), missionId));
     }
   }
 }
