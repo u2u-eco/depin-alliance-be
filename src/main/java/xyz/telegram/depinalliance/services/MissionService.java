@@ -481,8 +481,8 @@ public class MissionService {
           userMissionDaily.status = Enums.MissionStatus.VERIFYING;
           userMissionDaily.twitterUid = userSocial.twitterUid;
           UserMissionDaily.create(userMissionDaily);
-          redisService.clearMissionDaily(userId, currentDate);
         }
+        redisService.clearMissionDaily(userId, currentDate);
         return "verifying";
       default:
         break;
