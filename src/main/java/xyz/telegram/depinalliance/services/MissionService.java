@@ -203,15 +203,15 @@ public class MissionService {
           userMission.user = user;
           userMission.status = Enums.MissionStatus.VERIFYING;
           UserMission.create(userMission);
-          if (check.partnerId != null) {
-            Partner.updateParticipants(check.partnerId);
-            redisService.clearMissionUser("PARTNER", user.id);
+        }
+        if (check.partnerId != null) {
+          Partner.updateParticipants(check.partnerId);
+          redisService.clearMissionUser("PARTNER", user.id);
+        } else {
+          if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
+            redisService.clearMissionUser("REWARD_ONE_TIME", user.id);
           } else {
-            if (check.type == Enums.MissionType.ON_TIME_IN_APP) {
-              redisService.clearMissionUser("REWARD_ONE_TIME", user.id);
-            } else {
-              redisService.clearMissionUser("REWARD", user.id);
-            }
+            redisService.clearMissionUser("REWARD", user.id);
           }
         }
         return "verifying";
@@ -481,8 +481,8 @@ public class MissionService {
           userMissionDaily.status = Enums.MissionStatus.VERIFYING;
           userMissionDaily.twitterUid = userSocial.twitterUid;
           UserMissionDaily.create(userMissionDaily);
-          redisService.clearMissionDaily(userId, currentDate);
         }
+        redisService.clearMissionDaily(userId, currentDate);
         return "verifying";
       default:
         break;
