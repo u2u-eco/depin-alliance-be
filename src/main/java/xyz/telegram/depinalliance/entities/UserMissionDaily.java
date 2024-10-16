@@ -19,6 +19,8 @@ public class UserMissionDaily extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   public User user;
+  @Column(name = "twitter_uid")
+  public Long twitterUid;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "mission_id")
   public MissionDaily mission;

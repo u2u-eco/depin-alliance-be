@@ -7,6 +7,7 @@ import io.smallrye.config.ConfigMapping;
  */
 @ConfigMapping(prefix = "twitter")
 public interface TwitterConfig {
+  String clientId();
   String apiKey();
 
   String apiSecretKey();
@@ -14,6 +15,7 @@ public interface TwitterConfig {
   String callbackUrl();
 
   String redirectUrl();
+
   long verifyTime();
 
   String rapidapiHost();
