@@ -2,7 +2,7 @@ package xyz.telegram.depinalliance.common.models.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import xyz.telegram.depinalliance.common.constans.Enums;
-import xyz.telegram.depinalliance.entities.MissionItem;
+import xyz.telegram.depinalliance.entities.WorldMapItem;
 
 /**
  * @author holden on 07-Oct-2024
@@ -24,7 +24,7 @@ public class MissionItemResponse {
     this.image = image;
   }
 
-  public MissionItemResponse(MissionItem item) {
+  public MissionItemResponse(WorldMapItem item) {
     this.id = item.id;
     this.name = item.name;
     this.code = item.code;

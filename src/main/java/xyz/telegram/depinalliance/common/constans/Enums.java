@@ -100,7 +100,7 @@ public class Enums {
     AGENCY, TOOL, CONTINENT
   }
 
-  public enum MissionDailyType {
+  public enum WorldMapType {
     SUDOKU
   }
 }

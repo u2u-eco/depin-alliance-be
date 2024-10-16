@@ -22,12 +22,12 @@ import java.util.Objects;
  * @author holden on 09-Oct-2024
  */
 @ApplicationScoped
-public class MissionDailyService {
+public class WorldMapService {
 
   @Inject
   RedisService redisService;
 
-  @Transactional
+ /* @Transactional
   public void newMissionDaily(long userId, MissionDailyRequest request) {
     if (request == null || StringUtils.isBlank(request.agency) || StringUtils.isBlank(
       request.continent) || StringUtils.isBlank(request.tool)) {
@@ -37,45 +37,45 @@ public class MissionDailyService {
     if (response != null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    MissionItem itemAgency = redisService.findMissionItemByCode(request.agency);
+    WorldMapItem itemAgency = redisService.findMissionItemByCode(request.agency);
     if (itemAgency == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    MissionItem itemContinent = redisService.findMissionItemByCode(request.continent);
+    WorldMapItem itemContinent = redisService.findMissionItemByCode(request.continent);
     if (itemContinent == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
-    MissionItem itemTool = redisService.findMissionItemByCode(request.tool);
+    WorldMapItem itemTool = redisService.findMissionItemByCode(request.tool);
     if (itemTool == null) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
 
-    MissionDaily missionDaily = new MissionDaily();
-    missionDaily.user = new User(userId);
-    missionDaily.date = Utils.getNewDay().getTimeInMillis() / 1000;
-    missionDaily.time = 1;
-    missionDaily.create();
-    missionDaily.agency = itemAgency;
-    missionDaily.tool = itemTool;
-    missionDaily.continent = itemContinent;
+    WorldMap worldMap = new WorldMap();
+    worldMap.user = new User(userId);
+    worldMap.date = Utils.getNewDay().getTimeInMillis() / 1000;
+    worldMap.time = 1;
+    worldMap.create();
+    worldMap.agency = itemAgency;
+    worldMap.tool = itemTool;
+    worldMap.continent = itemContinent;
 
     //mission 1
-    missionDaily.mission1Type = Enums.MissionDailyType.SUDOKU;
-    missionDaily.mission1Title = "Play sudoku";
+    worldMap.mission1Type = Enums.MissionDailyType.SUDOKU;
+    worldMap.mission1Title = "Play sudoku";
 
     //mission 2
-    missionDaily.mission2Type = Enums.MissionDailyType.SUDOKU;
-    missionDaily.mission2Title = "Play sudoku";
+    worldMap.mission2Type = Enums.MissionDailyType.SUDOKU;
+    worldMap.mission2Title = "Play sudoku";
     //mission 3
-    missionDaily.mission3Type = Enums.MissionDailyType.SUDOKU;
-    missionDaily.mission3Title = "Play sudoku";
+    worldMap.mission3Type = Enums.MissionDailyType.SUDOKU;
+    worldMap.mission3Title = "Play sudoku";
     //mission 4
-    missionDaily.mission4Type = Enums.MissionDailyType.SUDOKU;
-    missionDaily.mission4Title = "Play sudoku";
+    worldMap.mission4Type = Enums.MissionDailyType.SUDOKU;
+    worldMap.mission4Title = "Play sudoku";
     //mission 5
-    missionDaily.mission5Type = Enums.MissionDailyType.SUDOKU;
-    missionDaily.mission5Title = "Play sudoku";
-    missionDaily.persist();
+    worldMap.mission5Type = Enums.MissionDailyType.SUDOKU;
+    worldMap.mission5Title = "Play sudoku";
+    worldMap.persist();
   }
 
   @Transactional
@@ -99,7 +99,7 @@ public class MissionDailyService {
     parameters.and("id", response.id);
     parameters.and("userId", userId);
     parameters.and("createdAt", Utils.getCalendar().getTimeInMillis() / 1000);
-    if (MissionDaily.update(sql, parameters) == 1) {
+    if (WorldMap.update(sql, parameters) == 1) {
       return res;
     }
     throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
@@ -148,19 +148,19 @@ public class MissionDailyService {
         nextTime = 0;
       }
       parameters.and("nextTimePlay", nextTime);
-      MissionDailyCombo missionDailyCombo = redisService.findMissionDailyComboToday();
-      if (Objects.equals(response.agency.id, missionDailyCombo.agency.id) && Objects.equals(response.tool.id,
-        missionDailyCombo.tool.id) || Objects.equals(response.continent.id, missionDailyCombo.continent.id)) {
-        totalPointWin = totalPointWin.add(missionDailyCombo.point);
+      WorldMapDailyCombo worldMapDailyCombo = redisService.findMissionDailyComboToday();
+      if (Objects.equals(response.agency.id, worldMapDailyCombo.agency.id) && Objects.equals(response.tool.id,
+        worldMapDailyCombo.tool.id) || Objects.equals(response.continent.id, worldMapDailyCombo.continent.id)) {
+        totalPointWin = totalPointWin.add(worldMapDailyCombo.point);
         sql+= ", winDailyCombo = true";
       }
     }
     sql += " where id = :id and user.id = :userId and mission\" + number + \"IsCompleted = false and numberMissionCompleted + 1 <= 5 and isCompleted = false";
-    if (MissionDaily.update(sql, parameters) == 1) {
+    if (WorldMap.update(sql, parameters) == 1) {
       User.updatePointUser(userId, totalPointWin);
       return true;
     }
     throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
-  }
+  }*/
 
 }

@@ -10,21 +10,21 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
 import xyz.telegram.depinalliance.common.models.request.MissionDailyRequest;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
-import xyz.telegram.depinalliance.services.MissionDailyService;
+import xyz.telegram.depinalliance.services.WorldMapService;
 import xyz.telegram.depinalliance.services.RedisService;
 
 /**
  * @author holden on 04-Oct-2024
  */
 @Path("/mission-daily")
-public class MissionDailyResource extends BaseResource {
+public class WorldMapResource extends BaseResource {
 
   @Inject
   RedisService redisService;
   @Inject
-  MissionDailyService missionDailyService;
+  WorldMapService worldMapService;
 
-  @GET
+  /*@GET
   @Path("")
   public ResponseData<?> missionDaily() {
     return ResponseData.ok(redisService.findMissionDaily(getTelegramId()));
@@ -33,7 +33,7 @@ public class MissionDailyResource extends BaseResource {
   @POST
   @Path("new-mission-daily")
   public ResponseData<?> newMissionDaily(MissionDailyRequest request) {
-    missionDailyService.newMissionDaily(getTelegramId(), request);
+    worldMapService.newMissionDaily(getTelegramId(), request);
     clearMissionDaily(getTelegramId());
     return ResponseData.ok(redisService.findMissionDaily(getTelegramId()));
   }
@@ -41,7 +41,7 @@ public class MissionDailyResource extends BaseResource {
   @GET
   @Path("mission-daily-start/{number}")
   public ResponseData<?> missionDailyStart(@PathParam("number") int number) {
-    Object res = missionDailyService.missionDailyStart(getTelegramId(), number);
+    Object res = worldMapService.missionDailyStart(getTelegramId(), number);
     clearMissionDaily(getTelegramId());
     return ResponseData.ok(res);
   }
@@ -54,7 +54,7 @@ public class MissionDailyResource extends BaseResource {
     }
     Enums.MissionItemType missionItemType = Enums.MissionItemType.valueOf(type.toUpperCase());
     return ResponseData.ok(redisService.findListGameItemByType(missionItemType));
-  }
+  }*/
 
   public void clearMissionDaily(long userId) {
     redisService.clearCacheByPrefix("MISSION_DAILY_" + userId);
