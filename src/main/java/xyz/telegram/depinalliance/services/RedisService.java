@@ -582,8 +582,8 @@ public class RedisService {
   }
 
   public MissionDaily findMissionDailyByType(Enums.MissionType type) {
-    String redisKey = "MISSION_DAILY_TYPE_" + type.name();
     long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
+    String redisKey = "MISSION_DAILY_TYPE_" + type.name() + "_" + currentDate;
     try {
       RBucket<MissionDaily> value = redissonClient.getBucket(redisKey);
       if (value.isExists()) {
