@@ -22,5 +22,4 @@ public class WorldMapDailyCombo extends PanacheEntityBase {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "continent_id")
   public WorldMapItem continent;
-  public BigDecimal point;
 }

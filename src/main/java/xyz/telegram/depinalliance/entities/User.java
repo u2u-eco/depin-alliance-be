@@ -160,22 +160,6 @@ public class User extends BaseEntity {
     return updateUser(sql + "point = point + :point where id = :id and point + :point >= 0", params);
   }
 
-//  public static boolean updatePointFundingLeague(long id, BigDecimal point) {
-//    Map<String, Object> params = new HashMap<>();
-//    params.put("id", id);
-//    params.put("point", point);
-//    String sql = "pointUsed = pointUsed + :point, point = point - :point, leaguePointFunding = leaguePointFunding + :point  where id = :id and point - :point >= 0";
-//    return updateUser(sql, params);
-//  }
-//
-//  public static boolean updateLeagueContributeProfit(long id, BigDecimal profit) {
-//    Map<String, Object> params = new HashMap<>();
-//    params.put("id", id);
-//    params.put("profit", profit);
-//    String sql = "leagueContributeProfit = leagueContributeProfit + :profit where id = :id and leagueContributeProfit + :profit >= 0";
-//    return updateUser(sql, params);
-//  }
-
   public static boolean updatePointSkillAndPoint(long id, BigDecimal pointSkill, BigDecimal point) {
     Map<String, Object> params = new HashMap<>();
     params.put("id", id);
@@ -254,26 +238,7 @@ public class User extends BaseEntity {
       panacheQuery.count());
   }
 
-  /*public static ResponsePage<MemberLeagueResponse> findMemberLeagueByLeagueAndUserName(PagingParameters pageable,
-    long leagueId, String username, long adminUserId) {
-    String sql = "league.id = :leagueId and id != :adminUserId";
-    Map<String, Object> params = new HashMap<>();
-    params.put("leagueId", leagueId);
-    params.put("adminUserId", adminUserId);
-    if (StringUtils.isNotBlank(username)) {
-      params.put("username", "%" + username.toLowerCase().trim() + "%");
-      sql += " and lower(username) like :username";
-    }
-    PanacheQuery<PanacheEntityBase> panacheQuery = find(sql, pageable.getSort(), params);
-    return new ResponsePage<>(panacheQuery.page(pageable.getPage()).project(MemberLeagueResponse.class).list(),
-      pageable, panacheQuery.count());
-  }*/
-
-  public static long countFriendByUser(long userId) {
-    return count("ref.id =?1", userId);
-  }
-
-  public static long countFriendEventByUser(long userId) {
-    return count("ref.id =?1", userId);
+  public static BigDecimal findMiningPowerReal(long userId) {
+    return find("select miningPowerReal from User where id = ?1", userId).project(BigDecimal.class).firstResult();
   }
 }

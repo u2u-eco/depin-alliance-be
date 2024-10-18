@@ -6,7 +6,7 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 /**
  * @author holden on 04-Oct-2024
  */
-public class MissionResultResponse {
+public class WorldMapResultResponse {
   public Long id;
   public Enums.WorldMapType type;
   public boolean isCompleted;
@@ -17,7 +17,7 @@ public class MissionResultResponse {
   public Long createdAt;
   public Long updatedAt;
 
-  public MissionResultResponse(Long id, Enums.WorldMapType type, boolean isCompleted, String gameDetail,
+  public WorldMapResultResponse(Long id, Enums.WorldMapType type, boolean isCompleted, String gameDetail,
     String location, String locationName, Long createdAt, Long updatedAt) {
     this.id = id;
     this.type = type;

@@ -17,7 +17,7 @@ public class WorldMapItem extends PanacheEntityBase {
   public String name;
   public String code;
   public String description;
-  public Enums.MissionItemType type;
+  public Enums.WorldMapItemType type;
   public String image;
 
   public WorldMapItem() {
@@ -25,5 +25,15 @@ public class WorldMapItem extends PanacheEntityBase {
 
   public WorldMapItem(Long id) {
     this.id = id;
+  }
+
+  public WorldMapItem(Long id, String name, String code, String description, Enums.WorldMapItemType type,
+    String image) {
+    this.id = id;
+    this.name = name;
+    this.code = code;
+    this.description = description;
+    this.type = type;
+    this.image = image;
   }
 }

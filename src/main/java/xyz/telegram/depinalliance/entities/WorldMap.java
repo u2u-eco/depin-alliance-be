@@ -33,8 +33,12 @@ public class WorldMap extends BaseEntity {
   public long time;
   @Column(name = "next_time_play")
   public long nextTimePlay;
-  @Column(name = "win_daily_combo", columnDefinition = "boolean false")
+  @Column(name = "win_daily_combo", columnDefinition = "boolean default false")
   public boolean winDailyCombo = false;
+  @Column(name = "win_daily_combo_reward")
+  public BigDecimal winDailyComboReward;
+  @Column(name = "win_daily_combo_tier")
+  public Long winDailyComboTier;
   @Column(name = "number_mission_completed")
   public int numberMissionCompleted = 0;
 
@@ -56,6 +60,19 @@ public class WorldMap extends BaseEntity {
   public Long mission1EndedAt;
   @Column(name = "mission_1_reward")
   public BigDecimal mission1Reward;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_1_agency_id")
+  public WorldMapItem mission1Agency;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_1_tool_id")
+  public WorldMapItem mission1Tool;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_1_continent_id")
+  public WorldMapItem mission1Continent;
+  @Column(name = "mission_1_mining_power", scale = 18, precision = 29)
+  public BigDecimal mission1MiningPower = BigDecimal.ZERO;
+  @Column(name = "mission_1_tier")
+  public Long mission1Tier;
 
   @Column(name = "mission_2_type")
   public Enums.WorldMapType mission2Type;
@@ -67,8 +84,6 @@ public class WorldMap extends BaseEntity {
   public boolean mission2IsCompleted = false;
   @Column(name = "mission_2_location")
   public String mission2Location;
-  @Column(name = "mission_2_longitude")
-  public String mission2Longitude;
   @Column(name = "mission_2_location_name")
   public String mission2LocationName;
   @Column(name = "mission_2_created_at")
@@ -77,6 +92,19 @@ public class WorldMap extends BaseEntity {
   public Long mission2EndedAt;
   @Column(name = "mission_2_reward")
   public BigDecimal mission2Reward;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_2_agency_id")
+  public WorldMapItem mission2Agency;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_2_tool_id")
+  public WorldMapItem mission2Tool;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_2_continent_id")
+  public WorldMapItem mission2Continent;
+  @Column(name = "mission_2_mining_power", scale = 18, precision = 29)
+  public BigDecimal mission2MiningPower = BigDecimal.ZERO;
+  @Column(name = "mission_2_tier")
+  public Long mission2Tier;
 
   @Column(name = "mission_3_type")
   public Enums.WorldMapType mission3Type;
@@ -88,8 +116,6 @@ public class WorldMap extends BaseEntity {
   public boolean mission3IsCompleted = false;
   @Column(name = "mission_3_location")
   public String mission3Location;
-  @Column(name = "mission_3_longitude")
-  public String mission3Longitude;
   @Column(name = "mission_3_location_name")
   public String mission3LocationName;
   @Column(name = "mission_3_created_at")
@@ -98,6 +124,19 @@ public class WorldMap extends BaseEntity {
   public Long mission3EndedAt;
   @Column(name = "mission_3_reward")
   public BigDecimal mission3Reward;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_3_agency_id")
+  public WorldMapItem mission3Agency;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_3_tool_id")
+  public WorldMapItem mission3Tool;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_3_continent_id")
+  public WorldMapItem mission3Continent;
+  @Column(name = "mission_3_mining_power", scale = 18, precision = 29)
+  public BigDecimal mission3MiningPower = BigDecimal.ZERO;
+  @Column(name = "mission_3_tier")
+  public Long mission3Tier;
 
   @Column(name = "mission_4_type")
   public Enums.WorldMapType mission4Type;
@@ -109,8 +148,6 @@ public class WorldMap extends BaseEntity {
   public boolean mission4IsCompleted = false;
   @Column(name = "mission_4_location")
   public String mission4Location;
-  @Column(name = "mission_4_longitude")
-  public String mission4Longitude;
   @Column(name = "mission_4_location_name")
   public String mission4LocationName;
   @Column(name = "mission_4_created_at")
@@ -119,6 +156,19 @@ public class WorldMap extends BaseEntity {
   public Long mission4EndedAt;
   @Column(name = "mission_4_reward")
   public BigDecimal mission4Reward;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_4_agency_id")
+  public WorldMapItem mission4Agency;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_4_tool_id")
+  public WorldMapItem mission4Tool;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_4_continent_id")
+  public WorldMapItem mission4Continent;
+  @Column(name = "mission_4_mining_power", scale = 18, precision = 29)
+  public BigDecimal mission4MiningPower = BigDecimal.ZERO;
+  @Column(name = "mission_4_tier")
+  public Long mission4Tier;
 
   @Column(name = "mission_5_type")
   public Enums.WorldMapType mission5Type;
@@ -130,8 +180,6 @@ public class WorldMap extends BaseEntity {
   public boolean mission5IsCompleted = false;
   @Column(name = "mission_5_location")
   public String mission5Location;
-  @Column(name = "mission_5_longitude")
-  public String mission5Longitude;
   @Column(name = "mission_5_location_name")
   public String mission5LocationName;
   @Column(name = "mission_5_created_at")
@@ -140,4 +188,17 @@ public class WorldMap extends BaseEntity {
   public Long mission5EndedAt;
   @Column(name = "mission_5_reward")
   public BigDecimal mission5Reward;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_5_agency_id")
+  public WorldMapItem mission5Agency;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_5_tool_id")
+  public WorldMapItem mission5Tool;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "mission_5_continent_id")
+  public WorldMapItem mission5Continent;
+  @Column(name = "mission_5_mining_power", scale = 18, precision = 29)
+  public BigDecimal mission5MiningPower = BigDecimal.ZERO;
+  @Column(name = "mission_5_tier")
+  public Long mission5Tier;
 }

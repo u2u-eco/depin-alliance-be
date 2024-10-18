@@ -1,22 +1,19 @@
 package xyz.telegram.depinalliance.resources;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.*;
 import org.apache.commons.lang3.StringUtils;
 import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.constans.ResponseMessageConstants;
-import xyz.telegram.depinalliance.common.models.request.MissionDailyRequest;
+import xyz.telegram.depinalliance.common.models.request.WorldMapRequest;
 import xyz.telegram.depinalliance.common.models.response.ResponseData;
-import xyz.telegram.depinalliance.services.WorldMapService;
 import xyz.telegram.depinalliance.services.RedisService;
+import xyz.telegram.depinalliance.services.WorldMapService;
 
 /**
  * @author holden on 04-Oct-2024
  */
-@Path("/mission-daily")
+@Path("/world-map")
 public class WorldMapResource extends BaseResource {
 
   @Inject
@@ -24,39 +21,51 @@ public class WorldMapResource extends BaseResource {
   @Inject
   WorldMapService worldMapService;
 
-  /*@GET
+  @GET
   @Path("")
-  public ResponseData<?> missionDaily() {
-    return ResponseData.ok(redisService.findMissionDaily(getTelegramId()));
+  public ResponseData<?> worldMap() {
+    return ResponseData.ok(redisService.findWorldMap(getTelegramId()));
   }
 
   @POST
-  @Path("new-mission-daily")
-  public ResponseData<?> newMissionDaily(MissionDailyRequest request) {
-    worldMapService.newMissionDaily(getTelegramId(), request);
-    clearMissionDaily(getTelegramId());
-    return ResponseData.ok(redisService.findMissionDaily(getTelegramId()));
+  @Path("")
+  public ResponseData<?> newWorldMap(WorldMapRequest request) {
+    worldMapService.newWorldMap(getTelegramId(), request);
+    redisService.clearWorldMap(getTelegramId());
+    return ResponseData.ok(redisService.findWorldMap(getTelegramId()));
+  }
+
+  @PUT
+  @Path("")
+  public ResponseData<?> changeItem(WorldMapRequest request) {
+    worldMapService.changeItem(getTelegramId(), request);
+    return ResponseData.ok(redisService.findWorldMap(getTelegramId()));
   }
 
   @GET
-  @Path("mission-daily-start/{number}")
-  public ResponseData<?> missionDailyStart(@PathParam("number") int number) {
-    Object res = worldMapService.missionDailyStart(getTelegramId(), number);
-    clearMissionDaily(getTelegramId());
+  @Path("start/{number}")
+  public ResponseData<?> worldMapStart(@PathParam("number") int number) {
+    Object res = worldMapService.worldMapStart(getTelegramId(), number);
+    redisService.clearWorldMap(getTelegramId());
+    return ResponseData.ok(res);
+  }
+
+  @POST
+  @Path("end/{number}")
+  public ResponseData<?> worldMapEnd(@PathParam("number") int number, Object object) {
+    Object res = worldMapService.worldMapComplete(getTelegramId(), number, object);
+    redisService.clearWorldMap(getTelegramId());
     return ResponseData.ok(res);
   }
 
   @GET
-  @Path("mission-item/{type}")
-  public ResponseData<?> missionItemList(@PathParam("type") String type) {
+  @Path("item/{type}")
+  public ResponseData<?> worldMapItem(@PathParam("type") String type) {
     if (StringUtils.isBlank(type)) {
       return ResponseData.error(ResponseMessageConstants.DATA_INVALID);
     }
-    Enums.MissionItemType missionItemType = Enums.MissionItemType.valueOf(type.toUpperCase());
-    return ResponseData.ok(redisService.findListGameItemByType(missionItemType));
-  }*/
-
-  public void clearMissionDaily(long userId) {
-    redisService.clearCacheByPrefix("MISSION_DAILY_" + userId);
+    Enums.WorldMapItemType worldMapItemType = Enums.WorldMapItemType.valueOf(type.toUpperCase());
+    return ResponseData.ok(redisService.findWorldMapItemByType(worldMapItemType));
   }
+
 }
