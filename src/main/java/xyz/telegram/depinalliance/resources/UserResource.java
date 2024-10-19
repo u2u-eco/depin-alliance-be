@@ -57,7 +57,7 @@ public class UserResource extends BaseResource {
     @Context HttpServerRequest httpServerRequest) {
     UserTelegramResponse userTelegramResponse = telegramService.validateInitData(request.initData);
     if (userTelegramResponse == null) {
-      logger.error("Auth fail init data " + request.initData);
+//      logger.error("Auth fail init data " + request.initData);
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
     }
     //    User user = User.findById(userTelegramResponse.id);
