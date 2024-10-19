@@ -11,7 +11,9 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 import xyz.telegram.depinalliance.services.RedisService;
 import xyz.telegram.depinalliance.services.TwitterService;
+import xyz.telegram.depinalliance.services.UserService;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @ApplicationScoped
@@ -24,6 +26,8 @@ public class ScheduleMissionTwitter {
   TwitterConfig twitterConfig;
   @Inject
   RedisService redisService;
+  @Inject
+  UserService userService;
 
   @Scheduled(every = "${expr.every.twitter}", identity = "task-twitter")
   void schedule() {
@@ -104,6 +108,26 @@ public class ScheduleMissionTwitter {
     }
   }
 
+  @Scheduled(cron = "${expr.twitter-claim-old}", identity = "task-twitter-claim")
+  void scheduleClaimOldMission() {
+    //claim
+    Calendar date = Utils.getNewDay();
+    date.add(Calendar.DAY_OF_MONTH, -1);
+    List<MissionDaily> missionDailies = MissionDaily.find("date <= ?1", date.getTimeInMillis() / 1000).list();
+    missionDailies.forEach(missionDaily -> {
+      List<UserMissionDaily> userMissionDailies = UserMissionDaily.list("mission.id = ?1 and status = ?2",
+        missionDaily.id, Enums.MissionStatus.VERIFIED);
+      userMissionDailies.forEach(userMissionDaily -> {
+        try {
+          claimUserMissionDaily(missionDaily, userMissionDaily.user.id);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      });
+    });
+
+  }
+
   @Transactional
   public void updateUserMission(boolean isVerify, long userMissionId, Partner partnerId, long userId) {
     if (!isVerify) {
@@ -141,5 +165,22 @@ public class ScheduleMissionTwitter {
       UserMissionDaily.updateObject("status = :statusNew where id = :id and status = :statusOld", params);
     }
     redisService.clearMissionDaily(userId, currentDate);
+  }
+
+  @Transactional
+  public void claimUserMissionDaily(MissionDaily missionDaily, long userId) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("missionId", missionDaily.id);
+    params.put("userId", userId);
+    params.put("statusNew", Enums.MissionStatus.CLAIMED);
+    params.put("statusOld", Enums.MissionStatus.VERIFIED);
+    if (UserMissionDaily.updateObject(
+      "status = :statusNew where user.id = :userId and mission.id = :missionId and status = :statusOld", params)) {
+      User.updatePointAndXpUser(userId, missionDaily.point, missionDaily.xp);
+      if (missionDaily.xp != null && missionDaily.xp.compareTo(BigDecimal.ZERO) > 0) {
+        userService.updateLevelByExp(userId);
+      }
+      redisService.clearMissionDaily(userId, missionDaily.date);
+    }
   }
 }
