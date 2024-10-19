@@ -253,6 +253,8 @@ public class TwitterResource extends BaseResource {
       } else {
         throw new BusinessException(ResponseMessageConstants.HAS_ERROR);
       }
+    } catch (BusinessException e) {
+      throw e;
     } catch (Exception e) {
       if (client != null) {
         client.close();
