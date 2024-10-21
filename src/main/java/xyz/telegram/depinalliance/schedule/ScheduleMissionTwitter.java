@@ -39,6 +39,10 @@ public class ScheduleMissionTwitter {
       List<UserMission> userMissions = UserMission.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
         mission.id, Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
       for (UserMission userMission : userMissions) {
+        userMission = UserMission.findById(userMission.id);
+        if (userMission.status != Enums.MissionStatus.VERIFYING) {
+          break;
+        }
         boolean isVerify = false;
         try {
           UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
@@ -88,6 +92,10 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
         timeValidate).page(0, 60).list();
       for (UserMissionDaily userMission : userMissions) {
+        userMission = UserMission.findById(userMission.id);
+        if (userMission.status != Enums.MissionStatus.VERIFYING) {
+          break;
+        }
         boolean isVerify = false;
         if (Objects.equals(userMission.mission.id, missionPost.id)) {
           isVerify = twitterService.isUserRetweet(userMission.twitterUid.toString(), missionPost.referId,
@@ -115,6 +123,10 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
         timeValidate).page(0, 60).list();
       for (UserMissionDaily userMission : userMissions) {
+        userMission = UserMission.findById(userMission.id);
+        if (userMission.status != Enums.MissionStatus.VERIFYING) {
+          break;
+        }
         boolean isVerify = false;
         if (Objects.equals(userMission.mission.id, missionReply.id)) {
           isVerify = twitterService.isUserReply(userMission.twitterUid.toString(), missionReply.referId,
