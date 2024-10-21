@@ -7,7 +7,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TwitterUserResponse {
-  public String id;
-  public String username;
-  public String name;
+  public TwitterUser data;
+
+  public static class TwitterUser {
+    public String id;
+    public String username;
+    public String name;
+  }
 }

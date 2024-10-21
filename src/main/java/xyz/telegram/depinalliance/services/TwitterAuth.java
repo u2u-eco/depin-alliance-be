@@ -20,6 +20,5 @@ public interface TwitterAuth {
 
   @GET
   @Path("users/me")
-  @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
-  Response getUserInfo(@NotBody String token);
+  Response getInfo(@HeaderParam("Authorization") String authorization);
 }

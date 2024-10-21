@@ -37,7 +37,7 @@ public class ScheduleMissionTwitter {
     List<Mission> missions = redisService.findListMissionFollowTwitter();
     for (Mission mission : missions) {
       List<UserMission> userMissions = UserMission.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
-        mission.id, Enums.MissionStatus.VERIFYING, timeValidate).list();
+        mission.id, Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
       for (UserMission userMission : userMissions) {
         boolean isVerify = false;
         try {
@@ -72,36 +72,54 @@ public class ScheduleMissionTwitter {
     }
   }
 
-  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-post-reply")
-  void schedulePostReplyDaily() {
+  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-post")
+  void schedulePostDaily() {
     //verify Post Reply
     long currentTime = Utils.getCalendar().getTimeInMillis();
     long timeValidate = currentTime - twitterConfig.verifyTime();
     long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
-    MissionDaily missionReply = redisService.findMissionDailyByType(Enums.MissionType.TWEET_REPLIES);
     MissionDaily missionPost = redisService.findMissionDailyByType(Enums.MissionType.RETWEETS);
     List<Long> missionId = new ArrayList<>();
-    if (missionReply != null) {
-      missionId.add(missionReply.id);
-    }
     if (missionPost != null) {
       missionId.add(missionPost.id);
     }
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
-        timeValidate).list();
-
+        timeValidate).page(0, 60).list();
       for (UserMissionDaily userMission : userMissions) {
         boolean isVerify = false;
-        if (missionReply != null && Objects.equals(userMission.mission.id, missionReply.id)) {
-          isVerify = twitterService.isUserReply(userMission.twitterUid.toString(), missionReply.referId,
-            missionReply.timeStart);
-          logger.info("Verify reply " + isVerify + " user " + userMission.twitterUid + " " + missionReply.referId);
-        } else if (missionPost != null && Objects.equals(userMission.mission.id, missionPost.id)) {
+        if (Objects.equals(userMission.mission.id, missionPost.id)) {
           isVerify = twitterService.isUserRetweet(userMission.twitterUid.toString(), missionPost.referId,
             missionPost.timeStart);
           logger.info("Verify retweet " + isVerify + " user " + userMission.twitterUid + " " + missionPost.referId);
+        }
+        updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
+      }
+    }
+  }
+
+  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-reply")
+  void scheduleReplyDaily() {
+    //verify Post Reply
+    long currentTime = Utils.getCalendar().getTimeInMillis();
+    long timeValidate = currentTime - twitterConfig.verifyTime();
+    long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
+    MissionDaily missionReply = redisService.findMissionDailyByType(Enums.MissionType.TWEET_REPLIES);
+    List<Long> missionId = new ArrayList<>();
+    if (missionReply != null) {
+      missionId.add(missionReply.id);
+    }
+    if (!missionId.isEmpty()) {
+      List<UserMissionDaily> userMissions = UserMissionDaily.find(
+        "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
+        timeValidate).page(0, 60).list();
+      for (UserMissionDaily userMission : userMissions) {
+        boolean isVerify = false;
+        if (Objects.equals(userMission.mission.id, missionReply.id)) {
+          isVerify = twitterService.isUserReply(userMission.twitterUid.toString(), missionReply.referId,
+            missionReply.timeStart);
+          logger.info("Verify reply " + isVerify + " user " + userMission.twitterUid + " " + missionReply.referId);
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
       }
