@@ -92,7 +92,7 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
         timeValidate).page(0, 60).list();
       for (UserMissionDaily userMission : userMissions) {
-        userMission = UserMission.findById(userMission.id);
+        userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
           break;
         }
@@ -123,7 +123,7 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
         timeValidate).page(0, 60).list();
       for (UserMissionDaily userMission : userMissions) {
-        userMission = UserMission.findById(userMission.id);
+        userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
           break;
         }
