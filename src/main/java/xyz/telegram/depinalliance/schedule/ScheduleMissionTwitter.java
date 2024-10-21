@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.schedule;
 
+import io.quarkus.panache.common.Sort;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -37,7 +38,7 @@ public class ScheduleMissionTwitter {
     List<Mission> missions = redisService.findListMissionFollowTwitter();
     for (Mission mission : missions) {
       List<UserMission> userMissions = UserMission.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
-        mission.id, Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
+        Sort.ascending("updatedAt"), mission.id, Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
       for (UserMission userMission : userMissions) {
         userMission = UserMission.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
@@ -69,7 +70,7 @@ public class ScheduleMissionTwitter {
     MissionDaily mission = redisService.findMissionDailyByType(Enums.MissionType.LIKE_TWITTER);
     if (mission != null) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
-        mission.id, Enums.MissionStatus.VERIFYING, timeValidate).list();
+        Sort.ascending("updatedAt"), mission.id, Enums.MissionStatus.VERIFYING, timeValidate).list();
       for (UserMissionDaily userMission : userMissions) {
         updateUserMissionDaily(true, userMission.id, userMission.user.id, currentDate);
       }
@@ -89,8 +90,8 @@ public class ScheduleMissionTwitter {
     }
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
-        "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
-        timeValidate).page(0, 60).list();
+        "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
+        Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
       for (UserMissionDaily userMission : userMissions) {
         userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
@@ -120,8 +121,8 @@ public class ScheduleMissionTwitter {
     }
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
-        "mission.id in (?1) and status = ?2 and updatedAt <= ?3", missionId, Enums.MissionStatus.VERIFYING,
-        timeValidate).page(0, 60).list();
+        "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
+        Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
       for (UserMissionDaily userMission : userMissions) {
         userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
