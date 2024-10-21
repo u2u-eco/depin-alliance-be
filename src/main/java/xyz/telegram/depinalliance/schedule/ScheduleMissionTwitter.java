@@ -38,7 +38,7 @@ public class ScheduleMissionTwitter {
     List<Mission> missions = redisService.findListMissionFollowTwitter();
     for (Mission mission : missions) {
       List<UserMission> userMissions = UserMission.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
-        Sort.ascending("updatedAt"), mission.id, Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
+        Sort.ascending("updatedAt"), mission.id, Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMission userMission : userMissions) {
         userMission = UserMission.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
@@ -91,7 +91,7 @@ public class ScheduleMissionTwitter {
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
-        Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
+        Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
         userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
@@ -122,7 +122,7 @@ public class ScheduleMissionTwitter {
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
-        Enums.MissionStatus.VERIFYING, timeValidate).page(0, 60).list();
+        Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
         userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
