@@ -102,6 +102,6 @@ public class Enums {
   }
 
   public enum WorldMapType {
-    SUDOKU
+    SUDOKU, PUZZLE, MONSTER, SOLVE_MATH
   }
 }
