@@ -232,7 +232,8 @@ public class WorldMapService {
     long tier = worldMapTier.id;
     parameters.and("tier", tier);
     BigDecimal baseReward = new BigDecimal(
-      redisService.findConfigByKey(Enums.Config.WORLD_MAP_BASE_REWARD_POINT)).multiply(new BigDecimal(tier));
+      redisService.findConfigByKey(Enums.Config.WORLD_MAP_BASE_REWARD_POINT)).multiply(
+      new BigDecimal(1 + 0.2 * response.numberMissionCompleted)).multiply(new BigDecimal(tier));
     BigDecimal winComboReward = BigDecimal.ZERO;
     WorldMapDailyCombo worldMapDailyCombo = redisService.findMWorldMapDailyComboToday();
     BigDecimal percentBonus = BigDecimal.ZERO;
