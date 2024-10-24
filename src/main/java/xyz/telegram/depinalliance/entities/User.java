@@ -108,6 +108,14 @@ public class User extends BaseEntity {
   public boolean enableMusicTheme = true;
   @Column(name = "enable_sound_effect", columnDefinition = "boolean default true")
   public boolean enableSoundEffect = true;
+  @Column(name = "address_evm")
+  public String addressEvm;
+  @Column(name = "address_ton")
+  public String addressTon;
+  @Column(name = "connect_by_evm")
+  public String connectByEvm;
+  @Column(name = "connect_by_ton")
+  public String connectByTon;
 
   public User(Long id) {
     this.id = id;
