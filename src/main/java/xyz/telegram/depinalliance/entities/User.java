@@ -116,6 +116,10 @@ public class User extends BaseEntity {
   public String connectByEvm;
   @Column(name = "connect_by_ton")
   public String connectByTon;
+  @Column(name = "skip_tutorial_main" , columnDefinition = "boolean default false")
+  public Boolean skipTutorialMain;
+  @Column(name = "skip_tutorial_world_map" , columnDefinition = "boolean default false")
+  public Boolean skipTutorialWorldMap;
 
   public User(Long id) {
     this.id = id;

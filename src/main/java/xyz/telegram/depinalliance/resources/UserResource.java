@@ -104,7 +104,7 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("info")
-  public ResponseData info() throws BusinessException {
+  public ResponseData<?> info() throws BusinessException {
     User user = getUser();
     UserInfoResponse userInfoResponse = new UserInfoResponse();
     userInfoResponse.avatar = user.avatar;
@@ -134,6 +134,8 @@ public class UserResource extends BaseResource {
     userInfoResponse.detectDevice = user.detectDevice;
     userInfoResponse.devicePlatform = user.devicePlatform;
     userInfoResponse.currentTime = Utils.getCalendar().getTimeInMillis() / 1000;
+    userInfoResponse.skipTutorialMain = user.skipTutorialMain;
+    userInfoResponse.skipTutorialWorldMap = user.skipTutorialWorldMap;
     return ResponseData.ok(userInfoResponse);
   }
 
