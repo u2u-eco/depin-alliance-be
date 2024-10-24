@@ -10,7 +10,8 @@ public class Enums {
       8), STORAGE_DEFAULT(9), AVATAR_DEFAULT(10), AVATAR_LIST(11), MAX_MINING_POWER_DEFAULT(12), REF_POINT_CLAIM(
       13), ROOT_POINT_CLAIM(14), POINT_BUY_DEVICE(15), BONUS_REWARD_DEFAULT(16), RANDOM_PERCENT_TIMPI(
       17), RANDOM_PERCENT_FLASHBACK(18), WORLD_MAP_BASE_REWARD_POINT(19), WORLD_MAP_DAILY_COMBO_POINT(
-      20), WORLD_MAP_BONUS_CONTINENT_PERCENT(21), WORLD_MAP_BONUS_AGENCY_PERCENT(22), WORLD_MAP_BONUS_TOOL_PERCENT(23);
+      20), WORLD_MAP_BONUS_CONTINENT_PERCENT(21), WORLD_MAP_BONUS_AGENCY_PERCENT(22), WORLD_MAP_BONUS_TOOL_PERCENT(
+      23), RANDOM_PERCENT_VENTURE_MIND_AI(24);
     private final int type;
 
     Config(int type) {
@@ -31,7 +32,7 @@ public class Enums {
   }
 
   public enum ItemSpecial {
-    CYBER_BOX, OPEN_MESH, NTMPI, FLASHBACK
+    CYBER_BOX, OPEN_MESH, NTMPI, FLASHBACK, USDT_5
   }
 
   public enum MissionType {
@@ -47,7 +48,7 @@ public class Enums {
   }
 
   public enum MissionRewardType {
-    CYBER_BOX, OPEN_MESH, TIMPI, FLASHBACK
+    CYBER_BOX, OPEN_MESH, TIMPI, FLASHBACK, VENTURE_MIND_AI
   }
 
   public enum FolderImage {
@@ -85,7 +86,7 @@ public class Enums {
   }
 
   public enum EventId {
-    CYBER_BOX(1), OPEN_MESH(2), TIMPI(3), FLASHBACK(4);
+    CYBER_BOX(1), OPEN_MESH(2), TIMPI(3), FLASHBACK(4), VENTURE_MIND_AI(5);
     private final long id;
 
     EventId(long id) {
