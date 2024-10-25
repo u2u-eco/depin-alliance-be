@@ -211,7 +211,7 @@ public class ScheduleMissionTwitter {
       if (missionDaily.xp != null && missionDaily.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(userId);
       }
-      redisService.clearMissionDaily(userId, missionDaily.date);
+//      redisService.clearMissionDaily(userId, missionDaily.date);
     }
   }
 }
