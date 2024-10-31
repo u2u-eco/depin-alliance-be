@@ -68,7 +68,7 @@ public class DeviceResource extends BaseResource {
   @POST
   public ResponseData buyItem(BuyItemRequest request) throws Exception {
     synchronized (getTelegramId().toString().intern()) {
-      return ResponseData.ok(deviceService.buyItem(getUser(), request));
+      return ResponseData.ok(deviceService.buyItem(getTelegramId(), request));
     }
   }
 

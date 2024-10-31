@@ -31,7 +31,8 @@ public class DeviceService {
   UserService userService;
 
   @Transactional
-  public boolean buyItem(User user, BuyItemRequest request) throws Exception {
+  public boolean buyItem(long userId, BuyItemRequest request) throws Exception {
+    User user = User.findById(userId);
     if (request == null || StringUtils.isBlank(request.code) || request.number < 1) {
       throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
     }
