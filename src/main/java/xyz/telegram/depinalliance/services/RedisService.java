@@ -16,6 +16,9 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -550,6 +553,14 @@ public class RedisService {
       missionDaily.forEach(mission -> {
         UserMissionDaily userMissionDaily = userMissionDailies.stream()
           .filter(userMission -> userMission.mission.id.equals(mission.id)).findFirst().orElse(null);
+        if (mission.type == Enums.MissionType.TWEET_REPLIES) {
+          List<TwitterRepliesDailyText> lst = findListTwitterRepliesDailyText();
+          if (lst != null) {
+            Random rand = new Random();
+            TwitterRepliesDailyText randomElement = lst.get(rand.nextInt(lst.size()));
+            mission.url = mission.url.replace("{text}", randomElement.text);
+          }
+        }
         UserMissionResponse userMissionResponse = new UserMissionResponse(mission.id, "Mission Daily", mission.name,
           mission.image, mission.description, mission.type, mission.url, mission.point, mission.xp,
           userMissionDaily != null ? userMissionDaily.status : null, mission.isFake, null, mission.amount,
@@ -606,6 +617,25 @@ public class RedisService {
   public void clearMissionDaily(long userId, long date) {
     String redisKey = "MISSION_DAILY_" + userId + "_" + date;
     redissonClient.getKeys().deleteByPattern(redisKey + "*");
+  }
+
+  public List<TwitterRepliesDailyText> findListTwitterRepliesDailyText() {
+    String redisKey = "LIST_TWITTER_REPLIES_DAILY_TEXT";
+    try {
+      RBucket<List<TwitterRepliesDailyText>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      List<TwitterRepliesDailyText> object = TwitterRepliesDailyText.listAll();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return TwitterRepliesDailyText.listAll();
   }
 
   public void clearCacheByPrefix(String prefix) {
