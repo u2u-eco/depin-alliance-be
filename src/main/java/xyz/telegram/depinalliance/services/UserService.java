@@ -298,7 +298,7 @@ public class UserService {
         return new ClaimResponse(BigDecimal.ZERO, BigDecimal.ZERO);
       }
       mining(user);
-//      user = User.findById(user.id);
+      user = User.findById(user.id);
       Long userRefId;
       BigDecimal refPointClaim = BigDecimal.ZERO;
       if (user.ref != null) {
