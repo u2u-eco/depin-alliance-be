@@ -37,20 +37,8 @@ public class BotService extends TelegramLongPollingBot {
           InlineKeyboardButton.builder().text("Join Community").url("https://t.me/DePIN_App").build())).keyboardRow(
         Collections.singletonList(InlineKeyboardButton.builder().text("Follow X").url("https://x.com/DePINApp").build()))
       .build();
-    StringBuilder messageBuilder = new StringBuilder();
-    messageBuilder.append("<b>Welcome to DePIN Alliance!</b> \uD83D\uDEA9\n\n");
-    messageBuilder.append(
-      "The Odyssey of Decentralists for those who dare to challenge the current state and embrace the future of decentralized innovation.\n\n");
-    messageBuilder.append("\uD83D\uDE80 <b>How to Get Started:</b>\n\n");
-    messageBuilder.append("1️⃣ Access the telegram bot: https://t.me/").append(botName).append("\n");
-    messageBuilder.append("2️⃣ Click \"Get Started\" to verify your device.\n");
-    messageBuilder.append("3️⃣ Start mining to earn additional points.\n");
-    messageBuilder.append("4️⃣ Explore more Challenges and Rewards.\n");
-    messageBuilder.append("5️⃣ Invite friends to join this adventure together.\n\n");
-    messageBuilder.append(
-      "\uD83D\uDCCC The device verification process will not affect your device and all data is securely stored locally on your device.\n\n");
-    messageBuilder.append("\uD83D\uDC49 Click the play and start your journey with DePIN Alliance today!");
-    this.messageStr = messageBuilder.toString();
+    String messageBuilder = "<b>Welcome to DePIN Alliance!</b> \uD83D\uDEA9\n\n" + "The Odyssey of Decentralists for those who dare to challenge the current state and embrace the future of decentralized innovation.\n\n" + "\uD83D\uDE80 <b>How to Get Started:</b>\n\n" + "1️⃣ Access the telegram bot: https://t.me/" + botName + "\n" + "2️⃣ Click \"Get Started\" to verify your device.\n" + "3️⃣ Start mining to earn additional points.\n" + "4️⃣ Explore more Challenges and Rewards.\n" + "5️⃣ Invite friends to join this adventure together.\n\n" + "\uD83D\uDCCC The device verification process will not affect your device and all data is securely stored locally on your device.\n\n" + "\uD83D\uDC49 Click the play and start your journey with DePIN Alliance today!";
+    this.messageStr = messageBuilder;
     this.userService = userService;
   }
 

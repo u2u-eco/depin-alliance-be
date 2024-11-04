@@ -23,6 +23,8 @@ public class TelegramService {
 
   @ConfigProperty(name = "telegram.token")
   String botToken;
+  @ConfigProperty(name = "telegram.token-2")
+  String botToken2;
   @ConfigProperty(name = "telegram.token.verify")
   String botTokenVerify;
   @ConfigProperty(name = "telegram.validate")
@@ -83,7 +85,11 @@ public class TelegramService {
       byte[] hmacSecret = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, botTokenData).hmac(botToken);
       String calculatedHash = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, hmacSecret).hmacHex(
         dataCheckString.toString());
-
+      if (calculatedHash.equals(receivedHash)) {
+        return Utils.toObject(userStr, UserTelegramResponse.class);
+      }
+      hmacSecret = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, botTokenData).hmac(botToken2);
+      calculatedHash = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, hmacSecret).hmacHex(dataCheckString.toString());
       return calculatedHash.equals(receivedHash) ? Utils.toObject(userStr, UserTelegramResponse.class) : null;
     } catch (Exception e) {
       return null;

@@ -174,7 +174,7 @@ public class UserService {
         //        pointUnClaimed = DevicePoint.find("select min(point) from DevicePoint").project(BigDecimal.class).firstResult();
       } else if (deviceInfo.platform.equalsIgnoreCase("IOS")) {
         String model = deviceInfo.detectedModel.trim().toLowerCase();
-        List<String> models = Arrays.asList(model.split(","));
+        String[] models = model.split(",");
         Set<String> modelsFinal = new HashSet<>();
         for (String modelName : models) {
           modelsFinal.add(modelName.trim().toLowerCase());
