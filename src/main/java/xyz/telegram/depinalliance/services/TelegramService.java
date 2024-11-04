@@ -73,7 +73,7 @@ public class TelegramService {
 
     StringBuilder dataCheckString = new StringBuilder();
     for (Map.Entry<String, String> entry : params.entrySet()) {
-      if (dataCheckString.length() > 0) {
+      if (!dataCheckString.isEmpty()) {
         dataCheckString.append("\n");
       }
       dataCheckString.append(entry.getKey()).append("=").append(entry.getValue());

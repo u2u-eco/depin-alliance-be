@@ -16,5 +16,4 @@ public interface TelegramClient {
   @Path("/bot{token}/getChatMember")
   TelegramResponse getChatMember(@PathParam("token") String token, @QueryParam("chat_id") String chatId,
     @QueryParam("user_id") String userId);
-
 }
