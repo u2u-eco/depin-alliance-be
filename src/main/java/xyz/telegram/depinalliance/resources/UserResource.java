@@ -371,4 +371,11 @@ public class UserResource extends BaseResource {
     return ResponseData.ok();
   }
 
+  @GET
+  @Path("skip-tutorial-world-map")
+  @Transactional
+  public ResponseData<?> skipTutorialWorldMap() {
+    User.update("skipTutorialWorldMap = true where id = ?1", getTelegramId());
+    return ResponseData.ok();
+  }
 }
