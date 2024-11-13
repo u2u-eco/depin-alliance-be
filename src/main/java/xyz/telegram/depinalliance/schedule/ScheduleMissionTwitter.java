@@ -1,10 +1,14 @@
 package xyz.telegram.depinalliance.schedule;
 
 import io.quarkus.panache.common.Sort;
+import io.quarkus.runtime.StartupEvent;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import xyz.telegram.depinalliance.common.configs.TwitterConfig;
 import xyz.telegram.depinalliance.common.constans.Enums;
@@ -29,9 +33,83 @@ public class ScheduleMissionTwitter {
   RedisService redisService;
   @Inject
   UserService userService;
+  @ConfigProperty(name = "expr.every.twitter")
+  String scheduleTwitterFollow;
+  @ConfigProperty(name = "expr.every.twitter-like")
+  String scheduleTwitterLike;
+  @ConfigProperty(name = "expr.every.twitter-post-reply")
+  String scheduleTwitterPostReply;
 
-  @Scheduled(every = "${expr.every.twitter}", identity = "task-twitter")
-  void schedule() {
+  void onStart(@Observes StartupEvent event) {
+    if (StringUtils.isNotBlank(scheduleTwitterFollow) && !"disabled".equals(scheduleTwitterFollow)) {
+      new Thread(() -> {
+        while (true) {
+          try {
+            scheduleFollow();
+          } catch (Exception ignored) {
+          } finally {
+            try {
+              Thread.sleep(10000);
+            } catch (InterruptedException ignored) {
+            }
+          }
+
+        }
+      }).start();
+    }
+
+    if (StringUtils.isNotBlank(scheduleTwitterLike) && !"disabled".equals(scheduleTwitterLike)) {
+      new Thread(() -> {
+        while (true) {
+          try {
+            scheduleLikeDaily();
+          } catch (Exception ignored) {
+          } finally {
+            try {
+              Thread.sleep(10000);
+            } catch (InterruptedException ignored) {
+            }
+          }
+
+        }
+      }).start();
+    }
+
+    if (StringUtils.isNotBlank(scheduleTwitterPostReply) && !"disabled".equals(scheduleTwitterPostReply)) {
+      new Thread(() -> {
+        while (true) {
+          try {
+            schedulePostDaily();
+          } catch (Exception ignored) {
+          } finally {
+            try {
+              Thread.sleep(10000);
+            } catch (InterruptedException ignored) {
+            }
+          }
+
+        }
+      }).start();
+
+      new Thread(() -> {
+        while (true) {
+          try {
+            scheduleReplyDaily();
+          } catch (Exception ignored) {
+          } finally {
+            try {
+              Thread.sleep(10000);
+            } catch (InterruptedException ignored) {
+            }
+          }
+
+        }
+      }).start();
+    }
+  }
+
+  //  @Scheduled(every = "${expr.every.twitter}", identity = "task-twitter")
+  void scheduleFollow() {
     //verify follow
     long currentTime = Utils.getCalendar().getTimeInMillis();
     long timeValidate = currentTime - twitterConfig.verifyTime();
@@ -61,7 +139,7 @@ public class ScheduleMissionTwitter {
     }
   }
 
-  @Scheduled(every = "${expr.every.twitter-like}", identity = "task-twitter-like")
+//  @Scheduled(every = "${expr.every.twitter-like}", identity = "task-twitter-like")
   void scheduleLikeDaily() {
     //verify Like
     long currentTime = Utils.getCalendar().getTimeInMillis();
@@ -77,7 +155,7 @@ public class ScheduleMissionTwitter {
     }
   }
 
-  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-post")
+//  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-post")
   void schedulePostDaily() {
     //verify Post Reply
     long currentTime = Utils.getCalendar().getTimeInMillis();
@@ -108,7 +186,7 @@ public class ScheduleMissionTwitter {
     }
   }
 
-  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-reply")
+//  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-reply")
   void scheduleReplyDaily() {
     //verify Post Reply
     long currentTime = Utils.getCalendar().getTimeInMillis();
