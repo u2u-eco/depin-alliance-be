@@ -358,6 +358,18 @@ public class MissionService {
             }
           }
           break;
+        case VENTURE_MIND_AI:
+          int c = new Random().nextInt(1000);
+          if (c < (redisService.getSystemConfigInt(Enums.Config.RANDOM_PERCENT_VENTURE_MIND_AI))) {
+            if (Event.updateTotalUsdt(new BigDecimal(1L), Enums.EventId.VENTURE_MIND_AI.getId())) {
+              UserItem.create(
+                new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.USDT_5.name()), null));
+              return new MissionRewardResponse(1L, "5 $USDT", check.rewardImage);
+            } else {
+              Mission.update("rewardType = null where id = ?1", check.id);
+            }
+          }
+          break;
         }
       }
       return null;

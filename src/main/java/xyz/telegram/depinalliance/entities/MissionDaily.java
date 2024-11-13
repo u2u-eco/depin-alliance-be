@@ -6,10 +6,10 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import java.math.BigDecimal;
 
 /**
- * @author holden on 26-Aug-2024
+ * @author holden on 04-Oct-2024
  */
 @Entity
-@Table(name = "mission_daily")
+@Table(name = "mission_daily", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "date", "time" }) })
 public class MissionDaily extends BaseEntity {
   @Id
   @SequenceGenerator(name = "missionDailySequence", sequenceName = "mission_daily_id_seq", allocationSize = 1)
@@ -48,5 +48,4 @@ public class MissionDaily extends BaseEntity {
 
   public MissionDaily() {
   }
-
 }

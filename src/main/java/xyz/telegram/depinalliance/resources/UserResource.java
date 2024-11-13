@@ -1,5 +1,6 @@
 package xyz.telegram.depinalliance.resources;
 
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.annotation.security.PermitAll;
@@ -57,7 +58,7 @@ public class UserResource extends BaseResource {
     @Context HttpServerRequest httpServerRequest) {
     UserTelegramResponse userTelegramResponse = telegramService.validateInitData(request.initData);
     if (userTelegramResponse == null) {
-//      logger.error("Auth fail init data " + request.initData);
+      //      logger.error("Auth fail init data " + request.initData);
       return ResponseData.error(ResponseMessageConstants.HAS_ERROR);
     }
     //    User user = User.findById(userTelegramResponse.id);
@@ -103,7 +104,7 @@ public class UserResource extends BaseResource {
 
   @GET
   @Path("info")
-  public ResponseData info() throws BusinessException {
+  public ResponseData<?> info() throws BusinessException {
     User user = getUser();
     UserInfoResponse userInfoResponse = new UserInfoResponse();
     userInfoResponse.avatar = user.avatar;
@@ -133,6 +134,8 @@ public class UserResource extends BaseResource {
     userInfoResponse.detectDevice = user.detectDevice;
     userInfoResponse.devicePlatform = user.devicePlatform;
     userInfoResponse.currentTime = Utils.getCalendar().getTimeInMillis() / 1000;
+    userInfoResponse.skipTutorialMain = user.skipTutorialMain;
+    userInfoResponse.skipTutorialWorldMap = user.skipTutorialWorldMap;
     return ResponseData.ok(userInfoResponse);
   }
 
@@ -347,4 +350,32 @@ public class UserResource extends BaseResource {
     return ResponseData.ok(levelResponses);
   }
 
+  @POST
+  @Path("connect-wallet")
+  @Transactional
+  public ResponseData<?> connectWallet(ConnectWalletRequest request) throws Exception {
+    if (request != null && StringUtils.isNotBlank(request.address) && StringUtils.isNotBlank(request.type)) {
+      Parameters parameters = new Parameters();
+      parameters.and("id", getTelegramId());
+      parameters.and("address", request.address);
+      parameters.and("connectFrom", request.connectFrom);
+      String sql = "";
+      if (request.type.equalsIgnoreCase("EVM")) {
+        sql += "addressEvm = :address , connectByEvm = :connectFrom ";
+      } else if (request.type.equalsIgnoreCase("TON")) {
+        sql += "addressTon = :address , connectByTon = :connectFrom ";
+      }
+      sql += " where id = :id";
+      User.update(sql, parameters);
+    }
+    return ResponseData.ok();
+  }
+
+  @GET
+  @Path("skip-tutorial-world-map")
+  @Transactional
+  public ResponseData<?> skipTutorialWorldMap() {
+    User.update("skipTutorialWorldMap = true where id = ?1", getTelegramId());
+    return ResponseData.ok();
+  }
 }

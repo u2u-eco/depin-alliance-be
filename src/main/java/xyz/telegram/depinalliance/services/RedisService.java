@@ -4,6 +4,7 @@ import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.redisson.api.RBucket;
@@ -15,9 +16,13 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -548,6 +553,14 @@ public class RedisService {
       missionDaily.forEach(mission -> {
         UserMissionDaily userMissionDaily = userMissionDailies.stream()
           .filter(userMission -> userMission.mission.id.equals(mission.id)).findFirst().orElse(null);
+        if (mission.type == Enums.MissionType.TWEET_REPLIES) {
+          List<TwitterRepliesDailyText> lst = findListTwitterRepliesDailyText();
+          if (lst != null) {
+            Random rand = new Random();
+            TwitterRepliesDailyText randomElement = lst.get(rand.nextInt(lst.size()));
+            mission.url = mission.url.replace("{text}", randomElement.text);
+          }
+        }
         UserMissionResponse userMissionResponse = new UserMissionResponse(mission.id, "Mission Daily", mission.name,
           mission.image, mission.description, mission.type, mission.url, mission.point, mission.xp,
           userMissionDaily != null ? userMissionDaily.status : null, mission.isFake, null, mission.amount,
@@ -606,8 +619,222 @@ public class RedisService {
     redissonClient.getKeys().deleteByPattern(redisKey + "*");
   }
 
+  public List<TwitterRepliesDailyText> findListTwitterRepliesDailyText() {
+    String redisKey = "LIST_TWITTER_REPLIES_DAILY_TEXT";
+    try {
+      RBucket<List<TwitterRepliesDailyText>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      List<TwitterRepliesDailyText> object = TwitterRepliesDailyText.listAll();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return TwitterRepliesDailyText.listAll();
+  }
+
   public void clearCacheByPrefix(String prefix) {
     redissonClient.getKeys().deleteByPattern(prefix + "*");
+  }
+
+  public WorldMapResponse findWorldMap(long userId) {
+    long dateTime = Utils.getNewDay().getTimeInMillis() / 1000;
+    String redisKey = "WORLD_MAP_" + userId + "_" + dateTime;
+    try {
+      RBucket<WorldMapResponse> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      WorldMap worldMap = WorldMap.find("user.id = ?1 and date = ?2", userId, dateTime).firstResult();
+      if (worldMap != null) {
+        WorldMapResponse worldMapResponse = new WorldMapResponse();
+        worldMapResponse.id = worldMap.id;
+        worldMapResponse.numberMissionCompleted = worldMap.numberMissionCompleted;
+        worldMapResponse.isWinCombo = worldMap.winDailyCombo;
+        worldMapResponse.agency = new WorldMapItemResponse(findWorldMapItemById(worldMap.agency.id));
+        worldMapResponse.tool = new WorldMapItemResponse(findWorldMapItemById(worldMap.tool.id));
+        worldMapResponse.continent = new WorldMapItemResponse(findWorldMapItemById(worldMap.continent.id));
+        worldMapResponse.date = worldMap.date;
+        worldMapResponse.time = worldMap.time;
+        worldMapResponse.isCompleted = worldMap.isCompleted;
+        worldMapResponse.results.add(
+          new WorldMapResultResponse(1L, worldMap.mission1Type, worldMap.mission1IsCompleted,
+            worldMap.mission1Detail, worldMap.mission1Location, worldMap.mission1LocationName,
+            worldMap.mission1CreatedAt, worldMap.mission1EndedAt));
+        worldMapResponse.results.add(
+          new WorldMapResultResponse(2L, worldMap.mission2Type, worldMap.mission2IsCompleted,
+            worldMap.mission2Detail, worldMap.mission2Location, worldMap.mission2LocationName,
+            worldMap.mission2CreatedAt, worldMap.mission2EndedAt));
+        worldMapResponse.results.add(
+          new WorldMapResultResponse(3L, worldMap.mission3Type, worldMap.mission3IsCompleted,
+            worldMap.mission3Detail, worldMap.mission3Location, worldMap.mission3LocationName,
+            worldMap.mission3CreatedAt, worldMap.mission3EndedAt));
+        worldMapResponse.results.add(
+          new WorldMapResultResponse(4L, worldMap.mission4Type, worldMap.mission4IsCompleted,
+            worldMap.mission4Detail, worldMap.mission4Location, worldMap.mission4LocationName,
+            worldMap.mission4CreatedAt, worldMap.mission4EndedAt));
+        worldMapResponse.results.add(
+          new WorldMapResultResponse(5L, worldMap.mission5Type, worldMap.mission5IsCompleted,
+            worldMap.mission5Detail, worldMap.mission5Location, worldMap.mission5LocationName,
+            worldMap.mission5CreatedAt, worldMap.mission5EndedAt));
+        value.setAsync(worldMapResponse, 1, TimeUnit.DAYS);
+        return worldMapResponse;
+      }
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return null;
+  }
+
+  public WorldMapItem findWorldMapItemById(long id) {
+    String redisKey = "WORLD_MAP_ITEM_ID_" + id;
+    try {
+      RBucket<WorldMapItem> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      WorldMapItem object = WorldMapItem.find("id = ?1", id).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return WorldMapItem.find("id = ?1", id).firstResult();
+  }
+
+  public WorldMapItem findWorldMapByCode(String code) {
+    String redisKey = "WORLD_MAP_ITEM_CODE_" + code.toUpperCase();
+    try {
+      RBucket<WorldMapItem> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      WorldMapItem object = WorldMapItem.find("lower(code) = ?1", code.toLowerCase()).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return WorldMapItem.find("code = ?1", code).firstResult();
+  }
+
+  public List<WorldMapCity> findWorldMapCityByContinent(String continent) {
+    String redisKey = "WORLD_MAP_CITY_" + continent.toUpperCase();
+    try {
+      RBucket<List<WorldMapCity>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      List<WorldMapCity> object = WorldMapCity.find("lower(continent) = ?1", continent.toLowerCase()).list();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return WorldMapCity.find("lower(continent) = ?1", continent.toLowerCase()).list();
+  }
+
+  public List<WorldMapItemResponse> findWorldMapItemByType(Enums.WorldMapItemType type) {
+    String redisKey = "WORLD_MAP_ITEM_LIST_TYPE_" + type;
+    try {
+      RBucket<List<WorldMapItemResponse>> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      List<WorldMapItemResponse> object = WorldMapItem.find("type = ?1", type).project(WorldMapItemResponse.class)
+        .list();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return WorldMapItem.find("type = ?1", type).project(WorldMapItemResponse.class).list();
+  }
+
+  public MissionSudoku findMissionSudokuById(long id) {
+    String redisKey = "MISSION_SUDOKU_ID_" + id;
+    try {
+      RBucket<MissionSudoku> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      MissionSudoku object = MissionSudoku.find("id = ?1", id).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return MissionSudoku.find("id = ?1", id).firstResult();
+  }
+
+  @Transactional
+  public WorldMapDailyCombo findMWorldMapDailyComboToday() {
+    long dateTime = Utils.getNewDay().getTimeInMillis() / 1000;
+    String redisKey = "WORLD_MAP_DAILY_COMBO_" + dateTime;
+    try {
+      RBucket<WorldMapDailyCombo> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      WorldMapDailyCombo object = WorldMapDailyCombo.find("id = ?1", dateTime).firstResult();
+      if (object != null) {
+        value.setAsync(object, 1, TimeUnit.DAYS);
+      }
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return WorldMapDailyCombo.find("id = ?1", dateTime).firstResult();
+  }
+
+  public WorldMapItem randomWorldMapItem(Enums.WorldMapItemType type) {
+    List<WorldMapItemResponse> worldMapCities = findWorldMapItemByType(type);
+    Random rand = new Random();
+    WorldMapItemResponse randomElement = worldMapCities.get(rand.nextInt(worldMapCities.size()));
+    return new WorldMapItem(randomElement.id, randomElement.name, randomElement.code, randomElement.description,
+      randomElement.type, randomElement.image);
+  }
+
+  public Long findMaxMissionSudoku() {
+    String redisKey = "MAX_MISSION_SUDOKU";
+    try {
+      RBucket<Long> value = redissonClient.getBucket(redisKey);
+      if (value.isExists()) {
+        return value.get();
+      }
+      logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
+      Long object = MissionSudoku.count();
+      value.setAsync(object, 1, TimeUnit.DAYS);
+      return object;
+    } catch (Exception e) {
+      logger.errorv(e, "Error while finding " + redisKey);
+    }
+    return MissionSudoku.count();
+  }
+
+  public void clearWorldMap(long userId) {
+    clearCacheByPrefix("WORLD_MAP_" + userId);
   }
 
   public static class LeagueMemberRedis {
