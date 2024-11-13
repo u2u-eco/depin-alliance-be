@@ -4,6 +4,7 @@ import io.quarkus.panache.common.Sort;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -40,13 +41,15 @@ public class ScheduleMissionTwitter {
   @ConfigProperty(name = "expr.every.twitter-post-reply")
   String scheduleTwitterPostReply;
 
+  @ActivateRequestContext
   void onStart(@Observes StartupEvent event) {
     if (StringUtils.isNotBlank(scheduleTwitterFollow) && !"disabled".equals(scheduleTwitterFollow)) {
       new Thread(() -> {
         while (true) {
           try {
             scheduleFollow();
-          } catch (Exception ignored) {
+          } catch (Exception exception) {
+            exception.printStackTrace();
           } finally {
             try {
               Thread.sleep(10000);
@@ -57,7 +60,6 @@ public class ScheduleMissionTwitter {
         }
       }).start();
     }
-
     if (StringUtils.isNotBlank(scheduleTwitterLike) && !"disabled".equals(scheduleTwitterLike)) {
       new Thread(() -> {
         while (true) {
@@ -109,6 +111,7 @@ public class ScheduleMissionTwitter {
   }
 
   //  @Scheduled(every = "${expr.every.twitter}", identity = "task-twitter")
+  @ActivateRequestContext
   void scheduleFollow() {
     //verify follow
     long currentTime = Utils.getCalendar().getTimeInMillis();
@@ -139,7 +142,8 @@ public class ScheduleMissionTwitter {
     }
   }
 
-//  @Scheduled(every = "${expr.every.twitter-like}", identity = "task-twitter-like")
+  //  @Scheduled(every = "${expr.every.twitter-like}", identity = "task-twitter-like")
+  @ActivateRequestContext
   void scheduleLikeDaily() {
     //verify Like
     long currentTime = Utils.getCalendar().getTimeInMillis();
@@ -155,7 +159,8 @@ public class ScheduleMissionTwitter {
     }
   }
 
-//  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-post")
+  //  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-post")
+  @ActivateRequestContext
   void schedulePostDaily() {
     //verify Post Reply
     long currentTime = Utils.getCalendar().getTimeInMillis();
@@ -186,7 +191,8 @@ public class ScheduleMissionTwitter {
     }
   }
 
-//  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-reply")
+  //  @Scheduled(every = "${expr.every.twitter-post-reply}", identity = "task-twitter-reply")
+  @ActivateRequestContext
   void scheduleReplyDaily() {
     //verify Post Reply
     long currentTime = Utils.getCalendar().getTimeInMillis();
@@ -289,7 +295,6 @@ public class ScheduleMissionTwitter {
       if (missionDaily.xp != null && missionDaily.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(userId);
       }
-//      redisService.clearMissionDaily(userId, missionDaily.date);
     }
   }
 }
