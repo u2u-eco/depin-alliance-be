@@ -176,15 +176,20 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
         Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
-        userMission = UserMissionDaily.findById(userMission.id);
+        //        userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
           break;
         }
         boolean isVerify = false;
         if (Objects.equals(userMission.mission.id, missionPost.id)) {
-          isVerify = twitterService.isUserRetweet(userMission.twitterUid.toString(), missionPost.referId,
-            missionPost.timeStart);
-          logger.info("Verify retweet " + isVerify + " user " + userMission.twitterUid + " " + missionPost.referId);
+          if (missionPost.isFake) {
+            isVerify = true;
+            logger.info("Fake retweet " + isVerify + " user " + userMission.twitterUid + " " + missionPost.referId);
+          } else {
+            isVerify = twitterService.isUserRetweet(userMission.twitterUid.toString(), missionPost.referId,
+              missionPost.timeStart);
+            logger.info("Verify retweet " + isVerify + " user " + userMission.twitterUid + " " + missionPost.referId);
+          }
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
       }
@@ -208,15 +213,20 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
         Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
-        userMission = UserMissionDaily.findById(userMission.id);
+        //        userMission = UserMissionDaily.findById(userMission.id);
         if (userMission.status != Enums.MissionStatus.VERIFYING) {
           break;
         }
         boolean isVerify = false;
         if (Objects.equals(userMission.mission.id, missionReply.id)) {
-          isVerify = twitterService.isUserReply(userMission.twitterUid.toString(), missionReply.referId,
-            missionReply.timeStart);
-          logger.info("Verify reply " + isVerify + " user " + userMission.twitterUid + " " + missionReply.referId);
+          if (missionReply.isFake) {
+            isVerify = true;
+            logger.info("Fake reply " + isVerify + " user " + userMission.twitterUid + " " + missionReply.referId);
+          } else {
+            isVerify = twitterService.isUserReply(userMission.twitterUid.toString(), missionReply.referId,
+              missionReply.timeStart);
+            logger.info("Verify reply " + isVerify + " user " + userMission.twitterUid + " " + missionReply.referId);
+          }
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
       }
