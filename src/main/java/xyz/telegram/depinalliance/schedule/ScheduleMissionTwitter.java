@@ -128,11 +128,11 @@ public class ScheduleMissionTwitter {
         boolean isVerify = false;
         try {
           UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
-          switch (mission.type) {
-          case FOLLOW_TWITTER:
+          if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
             isVerify = twitterService.isUserFollowing(userSocial.twitterUid.toString(), mission.referId);
-            logger.info("Verify follow " + isVerify + " user " + userSocial.userId + " " + mission.referId);
-            break;
+            logger.info("Verify follow " + isVerify + " user " + userMission.user.id + " " + mission.referId);
+          } else {
+
           }
         } catch (Exception e) {
           e.printStackTrace();
@@ -154,7 +154,12 @@ public class ScheduleMissionTwitter {
       List<UserMissionDaily> userMissions = UserMissionDaily.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
         Sort.ascending("updatedAt"), mission.id, Enums.MissionStatus.VERIFYING, timeValidate).list();
       for (UserMissionDaily userMission : userMissions) {
-        updateUserMissionDaily(true, userMission.id, userMission.user.id, currentDate);
+        UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+        if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
+          updateUserMissionDaily(true, userMission.id, userMission.user.id, currentDate);
+        } else {
+          logger.info("Verify like false user " + userMission.user.id + " not link twitter");
+        }
       }
     }
   }
@@ -176,19 +181,20 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
         Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
-        //        userMission = UserMissionDaily.findById(userMission.id);
-        if (userMission.status != Enums.MissionStatus.VERIFYING) {
-          break;
-        }
         boolean isVerify = false;
         if (Objects.equals(userMission.mission.id, missionPost.id)) {
-          if (missionPost.isFake) {
-            isVerify = true;
-            logger.info("Fake retweet " + isVerify + " user " + userMission.twitterUid + " " + missionPost.referId);
+          UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+          if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
+            if (missionPost.isFake) {
+              isVerify = true;
+              logger.info("Fake retweet " + isVerify + " user " + userSocial.twitterUid + " " + missionPost.referId);
+            } else {
+              isVerify = twitterService.isUserRetweet(userSocial.twitterUid.toString(), missionPost.referId,
+                missionPost.timeStart);
+              logger.info("Verify retweet " + isVerify + " user " + userSocial.twitterUid + " " + missionPost.referId);
+            }
           } else {
-            isVerify = twitterService.isUserRetweet(userMission.twitterUid.toString(), missionPost.referId,
-              missionPost.timeStart);
-            logger.info("Verify retweet " + isVerify + " user " + userMission.twitterUid + " " + missionPost.referId);
+            logger.info("Verify retweet " + isVerify + " user " + userMission.user.id + " not link twitter");
           }
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
@@ -213,19 +219,20 @@ public class ScheduleMissionTwitter {
         "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
         Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
-        //        userMission = UserMissionDaily.findById(userMission.id);
-        if (userMission.status != Enums.MissionStatus.VERIFYING) {
-          break;
-        }
         boolean isVerify = false;
         if (Objects.equals(userMission.mission.id, missionReply.id)) {
-          if (missionReply.isFake) {
-            isVerify = true;
-            logger.info("Fake reply " + isVerify + " user " + userMission.twitterUid + " " + missionReply.referId);
+          UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+          if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
+            if (missionReply.isFake) {
+              isVerify = true;
+              logger.info("Fake reply " + isVerify + " user " + userSocial.twitterUid + " " + missionReply.referId);
+            } else {
+              isVerify = twitterService.isUserReply(userSocial.twitterUid.toString(), missionReply.referId,
+                missionReply.timeStart);
+              logger.info("Verify reply " + isVerify + " user " + userSocial.twitterUid + " " + missionReply.referId);
+            }
           } else {
-            isVerify = twitterService.isUserReply(userMission.twitterUid.toString(), missionReply.referId,
-              missionReply.timeStart);
-            logger.info("Verify reply " + isVerify + " user " + userMission.twitterUid + " " + missionReply.referId);
+            logger.info("Verify reply " + isVerify + " user " + userMission.user.id + " not link twitter");
           }
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
