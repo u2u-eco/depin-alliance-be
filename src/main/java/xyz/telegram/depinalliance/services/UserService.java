@@ -56,8 +56,9 @@ public class UserService {
           Map<String, Object> params = new HashMap<>();
           params.put("id", ref.id);
           params.put("point", pointRef);
+          params.put("pointEarned1", Utils.pointAirdrop(pointRef));
           User.updateUser(
-            "point = point + :point, pointEarned = pointEarned + :point , totalFriend = totalFriend + 1 where id = :id",
+            "point = point + :point, pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1 , totalFriend = totalFriend + 1 where id = :id",
             params);
         }
       }
@@ -145,9 +146,9 @@ public class UserService {
     paramsUser.put("status", Enums.UserStatus.DETECTED_DEVICE_INFO);
     paramsUser.put("pointUnClaimed", pointUnClaimed);
     paramsUser.put("miningPower", miningPower);
-    paramsUser.put("detectDevice", deviceInfo);
+//    paramsUser.put("detectDevice", deviceInfo);
     User.updateUser(
-      "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1, detectDevice = :detectDevice where id = :id",
+      "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1 where id = :id",
       paramsUser);
     return pointUnClaimed;
   }
@@ -157,14 +158,14 @@ public class UserService {
     if (user.status != Enums.UserStatus.STARTED) {
       return BigDecimal.ZERO;
     }
-    if (request == null) {
-      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
-    }
+//    if (request == null) {
+//      throw new BusinessException(ResponseMessageConstants.DATA_INVALID);
+//    }
 
     BigDecimal pointUnClaimed = BigDecimal.ZERO;
     String deviceInfoFinal = "";
     Map<String, Object> paramsUser = new HashMap<>();
-    try {
+    /*try {
       String deviceInfoStr = Utils.convertObjectToString(request);
       DeviceInfo deviceInfo = Utils.toObject(deviceInfoStr, DeviceInfo.class);
 
@@ -220,7 +221,10 @@ public class UserService {
     if (pointUnClaimed.compareTo(new BigDecimal(6000)) <= 0) {
       pointUnClaimed = new BigDecimal(6000).add(
         new BigDecimal(Utils.getRandomNumber(0, 200)).multiply(new BigDecimal(10)));
-    }
+    }*/
+    pointUnClaimed = new BigDecimal(20000).add(
+      new BigDecimal(Utils.getRandomNumber(0, 100)).multiply(new BigDecimal(100)));
+
     UserDevice userDevice = UserDevice.findByUserAndIndex(user.id, 1);
     String codeCpu = redisService.findConfigByKey(Enums.Config.CPU_DEFAULT);
     Item itemCpu = redisService.findItemByCode(codeCpu);
@@ -246,7 +250,8 @@ public class UserService {
     paramsUser.put("pointUnClaimed", pointUnClaimed);
     paramsUser.put("miningPower", miningPower);
     paramsUser.put("detectDevice", deviceInfoFinal);
-
+    paramsUser.put("devicePlatform", "");
+    paramsUser.put("deviceModel", "");
     User.updateUser(
       "status = :status, pointUnClaimed = :pointUnClaimed, pointBonus = :pointUnClaimed, miningPower = :miningPower, miningPowerReal = :miningPower, totalDevice = 1, detectDevice = :detectDevice, devicePlatform = :devicePlatform, deviceModel = :deviceModel where id = :id",
       paramsUser);
@@ -263,10 +268,11 @@ public class UserService {
     paramsUser.put("id", user.id);
     paramsUser.put("status", Enums.UserStatus.CLAIMED);
     paramsUser.put("point", user.pointUnClaimed);
+    paramsUser.put("pointEarned1", Utils.pointAirdrop(user.pointUnClaimed));
     paramsUser.put("maximumPower", user.level.maxMiningPower);
     paramsUser.put("firstLoginTime", Utils.getCalendar().getTimeInMillis());
     User.updateUser(
-      "status = :status, point = :point, pointEarned = :point, pointUnClaimed = 0, maximumPower = :maximumPower, firstLoginTime = :firstLoginTime where id = :id",
+      "status = :status, point = :point, pointEarned = :point, pointEarned1 = pointEarned1 + :pointEarned1, pointUnClaimed = 0, maximumPower = :maximumPower, firstLoginTime = :firstLoginTime where id = :id",
       paramsUser);
     return Utils.stripDecimalZeros(user.pointUnClaimed);
   }
@@ -319,6 +325,7 @@ public class UserService {
       paramsUser.put("id", user.id);
       paramsUser.put("point", pointUnClaimed);
       paramsUser.put("pointRef", pointRef);
+      paramsUser.put("pointEarned1",Utils.pointAirdrop(pointUnClaimed));
       if (pointBonus.compareTo(BigDecimal.ZERO) > 0) {
         ClaimRewardHistory claimRewardHistory = new ClaimRewardHistory();
         claimRewardHistory.user = user;
@@ -333,12 +340,13 @@ public class UserService {
         claimRewardHistory.persist();
       }
       User.updateUser(
-        "point = point + :point, pointClaimed = pointClaimed + pointUnClaimed, pointEarned = pointEarned + :point, pointUnClaimed = 0, pointRef = pointRef + :pointRef, claimNumber = claimNumber + 1  where id = :id",
+        "point = point + :point, pointClaimed = pointClaimed + pointUnClaimed, pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1, pointUnClaimed = 0, pointRef = pointRef + :pointRef, claimNumber = claimNumber + 1  where id = :id",
         paramsUser);
       Map<String, Object> paramsUserRef = new HashMap<>();
       paramsUserRef.put("id", userRefId);
       paramsUserRef.put("point", pointRef);
-      User.updateUser("point = point + :point, pointEarned = pointEarned + :point  where id = :id", paramsUserRef);
+      paramsUserRef.put("pointEarned1",Utils.pointAirdrop(pointRef));
+      User.updateUser("point = point + :point, pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1  where id = :id", paramsUserRef);
 
       return new ClaimResponse(pointUnClaimed, pointBonus);
     }

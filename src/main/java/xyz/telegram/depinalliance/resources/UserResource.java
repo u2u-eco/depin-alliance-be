@@ -126,6 +126,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.lastCheckin = user.lastCheckIn;
     userInfoResponse.code = user.code;
     userInfoResponse.pointEarned = user.pointEarned;
+    userInfoResponse.pointEarned1 = user.pointEarned1;
     userInfoResponse.totalDevice = user.totalDevice;
     BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
     userInfoResponse.rateBonusReward = new BigDecimal("5").add(rateBonus);
@@ -231,6 +232,17 @@ public class UserResource extends BaseResource {
     res.put("currentRank", User.findRankEarnedByUserId(getTelegramId()));
     res.put("ranking",
       User.find("id != 1 ", Sort.descending("pointEarned").and("miningPowerReal", Sort.Direction.Descending))
+        .page(0, 30).project(RankingEarnedResponse.class).list());
+    return ResponseData.ok(res);
+  }
+
+  @GET
+  @Path("ranking-airdrop")
+  public ResponseData rankingAirdrop() {
+    Map<String, Object> res = new HashMap<>();
+    res.put("currentRank", User.findRankEarned1ByUserId(getTelegramId()));
+    res.put("ranking",
+      User.find("id != 1 ", Sort.descending("pointEarned1").and("miningPowerReal", Sort.Direction.Descending))
         .page(0, 30).project(RankingEarnedResponse.class).list());
     return ResponseData.ok(res);
   }
