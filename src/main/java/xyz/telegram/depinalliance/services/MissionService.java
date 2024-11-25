@@ -131,7 +131,7 @@ public class MissionService {
       paramsUser.put("lastCheckIn", today);
       paramsUser.put("point", dailyCheckin.point);
       paramsUser.put("xp", dailyCheckin.xp);
-      paramsUser.put("pointEarned1",dailyCheckin.point);
+      paramsUser.put("pointEarned1",Utils.pointAirdrop(dailyCheckin.point));
       User.updateUser(
         sql + "lastCheckIn = :lastCheckIn, point = point + :point, pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1, xp = xp + :xp where id = :id",
         paramsUser);
