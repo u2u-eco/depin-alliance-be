@@ -214,7 +214,7 @@ public class User extends BaseEntity {
 
   public static long findRankEarned1ByUserId(long userId) {
     return find(
-      "select position from ( select id as id, row_number() over(order by pointEarned1 desc, miningPowerReal desc) as position from User where id != 1) result where id =?1",
+      "select position from ( select id as id, row_number() over(order by pointEarned1 desc, miningPowerReal desc) as position from User where id != 1 and level.id < 25) result where id =?1",
       userId).project(Long.class).firstResult();
   }
 
