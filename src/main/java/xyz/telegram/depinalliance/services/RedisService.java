@@ -616,7 +616,7 @@ public class RedisService {
 
   public void clearMissionDaily(long userId, long date) {
     String redisKey = "MISSION_DAILY_" + userId + "_" + date;
-    redissonClient.getKeys().deleteByPattern(redisKey + "*");
+    redissonClient.getKeys().delete(redisKey);
   }
 
   public List<TwitterRepliesDailyText> findListTwitterRepliesDailyText() {
