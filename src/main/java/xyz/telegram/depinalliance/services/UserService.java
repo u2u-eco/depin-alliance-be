@@ -543,7 +543,7 @@ public class UserService {
     params.put("setting", request.enable);
     params.put("currentSetting", currentSetting);
     if (User.updateUser(sql, params)) {
-      redisService.clearCacheByPrefix("SETTING_USER_" + userId);
+      redisService.clear("SETTING_USER_" + userId);
       return true;
     }
     throw new BusinessException(ResponseMessageConstants.HAS_ERROR);

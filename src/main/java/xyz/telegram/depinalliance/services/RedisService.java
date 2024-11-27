@@ -16,9 +16,6 @@ import xyz.telegram.depinalliance.common.utils.Utils;
 import xyz.telegram.depinalliance.entities.*;
 
 import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -663,25 +660,25 @@ public class RedisService {
         worldMapResponse.time = worldMap.time;
         worldMapResponse.isCompleted = worldMap.isCompleted;
         worldMapResponse.results.add(
-          new WorldMapResultResponse(1L, worldMap.mission1Type, worldMap.mission1IsCompleted,
-            worldMap.mission1Detail, worldMap.mission1Location, worldMap.mission1LocationName,
-            worldMap.mission1CreatedAt, worldMap.mission1EndedAt));
+          new WorldMapResultResponse(1L, worldMap.mission1Type, worldMap.mission1IsCompleted, worldMap.mission1Detail,
+            worldMap.mission1Location, worldMap.mission1LocationName, worldMap.mission1CreatedAt,
+            worldMap.mission1EndedAt));
         worldMapResponse.results.add(
-          new WorldMapResultResponse(2L, worldMap.mission2Type, worldMap.mission2IsCompleted,
-            worldMap.mission2Detail, worldMap.mission2Location, worldMap.mission2LocationName,
-            worldMap.mission2CreatedAt, worldMap.mission2EndedAt));
+          new WorldMapResultResponse(2L, worldMap.mission2Type, worldMap.mission2IsCompleted, worldMap.mission2Detail,
+            worldMap.mission2Location, worldMap.mission2LocationName, worldMap.mission2CreatedAt,
+            worldMap.mission2EndedAt));
         worldMapResponse.results.add(
-          new WorldMapResultResponse(3L, worldMap.mission3Type, worldMap.mission3IsCompleted,
-            worldMap.mission3Detail, worldMap.mission3Location, worldMap.mission3LocationName,
-            worldMap.mission3CreatedAt, worldMap.mission3EndedAt));
+          new WorldMapResultResponse(3L, worldMap.mission3Type, worldMap.mission3IsCompleted, worldMap.mission3Detail,
+            worldMap.mission3Location, worldMap.mission3LocationName, worldMap.mission3CreatedAt,
+            worldMap.mission3EndedAt));
         worldMapResponse.results.add(
-          new WorldMapResultResponse(4L, worldMap.mission4Type, worldMap.mission4IsCompleted,
-            worldMap.mission4Detail, worldMap.mission4Location, worldMap.mission4LocationName,
-            worldMap.mission4CreatedAt, worldMap.mission4EndedAt));
+          new WorldMapResultResponse(4L, worldMap.mission4Type, worldMap.mission4IsCompleted, worldMap.mission4Detail,
+            worldMap.mission4Location, worldMap.mission4LocationName, worldMap.mission4CreatedAt,
+            worldMap.mission4EndedAt));
         worldMapResponse.results.add(
-          new WorldMapResultResponse(5L, worldMap.mission5Type, worldMap.mission5IsCompleted,
-            worldMap.mission5Detail, worldMap.mission5Location, worldMap.mission5LocationName,
-            worldMap.mission5CreatedAt, worldMap.mission5EndedAt));
+          new WorldMapResultResponse(5L, worldMap.mission5Type, worldMap.mission5IsCompleted, worldMap.mission5Detail,
+            worldMap.mission5Location, worldMap.mission5LocationName, worldMap.mission5CreatedAt,
+            worldMap.mission5EndedAt));
         value.setAsync(worldMapResponse, 1, TimeUnit.DAYS);
         return worldMapResponse;
       }
@@ -837,6 +834,10 @@ public class RedisService {
     long dateTime = Utils.getNewDay().getTimeInMillis() / 1000;
     String redisKey = "WORLD_MAP_" + userId + "_" + dateTime;
     redissonClient.getKeys().delete(redisKey);
+  }
+
+  public void clear(String keys) {
+    redissonClient.getKeys().delete(keys);
   }
 
   public static class LeagueMemberRedis {
