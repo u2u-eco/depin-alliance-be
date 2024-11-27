@@ -616,7 +616,7 @@ public class RedisService {
 
   public void clearMissionDaily(long userId, long date) {
     String redisKey = "MISSION_DAILY_" + userId + "_" + date;
-    redissonClient.getKeys().deleteByPattern(redisKey + "*");
+    redissonClient.getKeys().deleteByPatternAsync(redisKey + "*");
   }
 
   public List<TwitterRepliesDailyText> findListTwitterRepliesDailyText() {
@@ -639,7 +639,7 @@ public class RedisService {
   }
 
   public void clearCacheByPrefix(String prefix) {
-    redissonClient.getKeys().deleteByPattern(prefix + "*");
+    redissonClient.getKeys().deleteByPatternAsync(prefix + "*");
   }
 
   public WorldMapResponse findWorldMap(long userId) {
