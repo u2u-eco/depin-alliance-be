@@ -9,6 +9,7 @@ import xyz.telegram.depinalliance.common.constans.Enums;
 import xyz.telegram.depinalliance.common.models.request.PagingParameters;
 import xyz.telegram.depinalliance.common.models.response.FriendResponse;
 import xyz.telegram.depinalliance.common.models.response.ResponsePage;
+import xyz.telegram.depinalliance.common.utils.Utils;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ public class User extends BaseEntity {
   public BigDecimal pointUsed = BigDecimal.ZERO;
   @Column(name = "point_earned", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
   public BigDecimal pointEarned = BigDecimal.ZERO;
+  @Column(name = "point_earned_1", scale = 18, precision = 29, columnDefinition = "numeric(29, 18) DEFAULT 0")
+  public BigDecimal pointEarned1 = BigDecimal.ZERO;
   @Column(name = "claim_number", columnDefinition = "bigint DEFAULT 0")
   public long claimNumber = 0;
   @Column(name = "point_bonus", scale = 18, precision = 29)
@@ -167,7 +170,8 @@ public class User extends BaseEntity {
     if (point.compareTo(BigDecimal.ZERO) < 0) {
       sql = "pointUsed = pointUsed + :point * -1, ";
     } else {
-      sql = "pointEarned = pointEarned + :point, ";
+      sql = "pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1, ";
+      params.put("pointEarned1", Utils.pointAirdrop(point));
     }
     return updateUser(sql + "point = point + :point where id = :id and point + :point >= 0", params);
   }
@@ -189,7 +193,8 @@ public class User extends BaseEntity {
     params.put("xp", xp);
     String sql = "";
     if (point.compareTo(BigDecimal.ZERO) > 0) {
-      sql = "pointEarned = pointEarned + :point, ";
+      sql = "pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1, ";
+      params.put("pointEarned1",Utils.pointAirdrop(point));
     }
     return updateUser(
       sql + "point = point + :point, xp = xp + :xp where id = :id and point + :point >=0 and xp + :xp >= 0", params);
@@ -204,6 +209,12 @@ public class User extends BaseEntity {
   public static long findRankEarnedByUserId(long userId) {
     return find(
       "select position from ( select id as id, row_number() over(order by pointEarned desc, miningPowerReal desc) as position from User where id != 1) result where id =?1",
+      userId).project(Long.class).firstResult();
+  }
+
+  public static long findRankEarned1ByUserId(long userId) {
+    return find(
+      "select position from ( select id as id, row_number() over(order by pointEarned1 desc, miningPowerReal desc) as position from User where id != 1 and level.id < 25) result where id =?1",
       userId).project(Long.class).firstResult();
   }
 

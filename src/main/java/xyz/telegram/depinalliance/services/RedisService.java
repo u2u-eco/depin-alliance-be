@@ -616,7 +616,7 @@ public class RedisService {
 
   public void clearMissionDaily(long userId, long date) {
     String redisKey = "MISSION_DAILY_" + userId + "_" + date;
-    redissonClient.getKeys().deleteByPattern(redisKey + "*");
+    redissonClient.getKeys().delete(redisKey);
   }
 
   public List<TwitterRepliesDailyText> findListTwitterRepliesDailyText() {
@@ -834,7 +834,9 @@ public class RedisService {
   }
 
   public void clearWorldMap(long userId) {
-    clearCacheByPrefix("WORLD_MAP_" + userId);
+    long dateTime = Utils.getNewDay().getTimeInMillis() / 1000;
+    String redisKey = "WORLD_MAP_" + userId + "_" + dateTime;
+    redissonClient.getKeys().delete(redisKey);
   }
 
   public static class LeagueMemberRedis {

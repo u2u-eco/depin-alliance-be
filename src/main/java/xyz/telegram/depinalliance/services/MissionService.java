@@ -102,8 +102,9 @@ public class MissionService {
       paramsUser.put("lastCheckIn", today);
       paramsUser.put("point", dailyCheckin.point);
       paramsUser.put("xp", dailyCheckin.xp);
+      paramsUser.put("pointEarned1", Utils.pointAirdrop(dailyCheckin.point));
       User.updateUser(
-        "startCheckIn = :startCheckIn, lastCheckIn = :lastCheckIn, point = point + :point, pointEarned = pointEarned + :point, xp = xp + :xp where id = :id",
+        "startCheckIn = :startCheckIn, lastCheckIn = :lastCheckIn, point = point + :point, pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1, xp = xp + :xp where id = :id",
         paramsUser);
       if (dailyCheckin.xp != null && dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);
@@ -130,8 +131,9 @@ public class MissionService {
       paramsUser.put("lastCheckIn", today);
       paramsUser.put("point", dailyCheckin.point);
       paramsUser.put("xp", dailyCheckin.xp);
+      paramsUser.put("pointEarned1",Utils.pointAirdrop(dailyCheckin.point));
       User.updateUser(
-        sql + "lastCheckIn = :lastCheckIn, point = point + :point, pointEarned = pointEarned + :point, xp = xp + :xp where id = :id",
+        sql + "lastCheckIn = :lastCheckIn, point = point + :point, pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1, xp = xp + :xp where id = :id",
         paramsUser);
       if (dailyCheckin.xp != null && dailyCheckin.xp.compareTo(BigDecimal.ZERO) > 0) {
         userService.updateLevelByExp(user.id);

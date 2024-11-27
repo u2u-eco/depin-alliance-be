@@ -77,8 +77,7 @@ public class Utils {
   }
 
   public static Calendar getCalendar() {
-    Calendar utcTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    return utcTime;
+    return Calendar.getInstance(TimeZone.getTimeZone("UTC"));
   }
 
   public static Calendar getNewDay() {
@@ -87,6 +86,27 @@ public class Utils {
     calendar.set(Calendar.MINUTE, 0);
     calendar.set(Calendar.SECOND, 0);
     return calendar;
+  }
+
+  public static BigDecimal pointAirdrop(BigDecimal point) {
+    Calendar calendar = getCalendar();
+    long currentTime = calendar.getTimeInMillis();
+    calendar.set(Calendar.HOUR_OF_DAY, 0);
+    calendar.set(Calendar.MINUTE, 0);
+    calendar.set(Calendar.SECOND, 0);
+    calendar.set(Calendar.MILLISECOND, 0);
+    calendar.set(Calendar.DAY_OF_MONTH, 26);
+    calendar.set(Calendar.MONTH, Calendar.NOVEMBER);
+    calendar.set(Calendar.YEAR, 2024);
+    long startTime = calendar.getTimeInMillis();
+    calendar.set(Calendar.DAY_OF_MONTH, 10);
+    calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+    calendar.set(Calendar.YEAR, 2024);
+    long endTime = calendar.getTimeInMillis();
+    if (startTime <= currentTime && currentTime < endTime) {
+      return point;
+    }
+    return BigDecimal.ZERO;
   }
 
   public static BigDecimal stripDecimalZeros(BigDecimal value) {

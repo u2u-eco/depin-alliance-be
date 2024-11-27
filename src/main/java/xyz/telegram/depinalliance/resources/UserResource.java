@@ -126,6 +126,7 @@ public class UserResource extends BaseResource {
     userInfoResponse.lastCheckin = user.lastCheckIn;
     userInfoResponse.code = user.code;
     userInfoResponse.pointEarned = user.pointEarned;
+    userInfoResponse.pointEarned1 = user.pointEarned1;
     userInfoResponse.totalDevice = user.totalDevice;
     BigDecimal rateBonus = user.rateReward.subtract(BigDecimal.ONE).multiply(new BigDecimal(100));
     userInfoResponse.rateBonusReward = new BigDecimal("5").add(rateBonus);
@@ -214,6 +215,12 @@ public class UserResource extends BaseResource {
   }
 
   @GET
+  @Path("current-ranking-engineer")
+  public ResponseData<?> currentRankingEngineer() {
+    return ResponseData.ok(User.findRankByUserId(getTelegramId()));
+  }
+
+  @GET
   @Path("ranking-engineer")
   public ResponseData ranking() {
     Map<String, Object> res = new HashMap<>();
@@ -232,6 +239,19 @@ public class UserResource extends BaseResource {
     res.put("ranking",
       User.find("id != 1 ", Sort.descending("pointEarned").and("miningPowerReal", Sort.Direction.Descending))
         .page(0, 30).project(RankingEarnedResponse.class).list());
+    return ResponseData.ok(res);
+  }
+
+  @GET
+  @Path("ranking-airdrop")
+  public ResponseData rankingAirdrop() {
+    Map<String, Object> res = new HashMap<>();
+    Long levelId = User.find("select level.id from User where id = ?1", getTelegramId()).project(Long.class)
+      .firstResult();
+    res.put("currentRank", levelId < 25 ? User.findRankEarned1ByUserId(getTelegramId()) : 0);
+    res.put("ranking", User.find("id != 1 and level.id < 25",
+        Sort.descending("pointEarned1").and("miningPowerReal", Sort.Direction.Descending)).page(0, 30)
+      .project(RankingAirdropResponse.class).list());
     return ResponseData.ok(res);
   }
 

@@ -33,6 +33,7 @@ public class UserInfoResponse {
   public String detectDevice;
   public String devicePlatform;
   public BigDecimal pointEarned;
+  public BigDecimal pointEarned1;
   public Boolean skipTutorialMain;
   public Boolean skipTutorialWorldMap;
 }
