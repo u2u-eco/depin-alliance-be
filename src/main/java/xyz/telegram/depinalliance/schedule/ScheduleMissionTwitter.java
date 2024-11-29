@@ -38,8 +38,12 @@ public class ScheduleMissionTwitter {
   String scheduleTwitterFollow;
   @ConfigProperty(name = "expr.every.twitter-like")
   String scheduleTwitterLike;
-  @ConfigProperty(name = "expr.every.twitter-post-reply")
-  String scheduleTwitterPostReply;
+  @ConfigProperty(name = "expr.every.twitter-post")
+  String scheduleTwitterPost;
+  @ConfigProperty(name = "expr.every.twitter-reply")
+  String scheduleTwitterReply;
+  @ConfigProperty(name = "expr.every.twitter-quote")
+  String scheduleTwitterQuote;
 
   @ActivateRequestContext
   void onStart(@Observes StartupEvent event) {
@@ -56,7 +60,6 @@ public class ScheduleMissionTwitter {
             } catch (InterruptedException ignored) {
             }
           }
-
         }
       }).start();
     }
@@ -72,12 +75,11 @@ public class ScheduleMissionTwitter {
             } catch (InterruptedException ignored) {
             }
           }
-
         }
       }).start();
     }
 
-    if (StringUtils.isNotBlank(scheduleTwitterPostReply) && !"disabled".equals(scheduleTwitterPostReply)) {
+    if (StringUtils.isNotBlank(scheduleTwitterPost) && !"disabled".equals(scheduleTwitterPost)) {
       new Thread(() -> {
         while (true) {
           try {
@@ -89,10 +91,10 @@ public class ScheduleMissionTwitter {
             } catch (InterruptedException ignored) {
             }
           }
-
         }
       }).start();
-
+    }
+    if (StringUtils.isNotBlank(scheduleTwitterReply) && !"disabled".equals(scheduleTwitterReply)) {
       new Thread(() -> {
         while (true) {
           try {
@@ -104,10 +106,11 @@ public class ScheduleMissionTwitter {
             } catch (InterruptedException ignored) {
             }
           }
-
         }
       }).start();
 
+    }
+    if (StringUtils.isNotBlank(scheduleTwitterQuote) && !"disabled".equals(scheduleTwitterQuote)) {
       new Thread(() -> {
         while (true) {
           try {
@@ -119,7 +122,6 @@ public class ScheduleMissionTwitter {
             } catch (InterruptedException ignored) {
             }
           }
-
         }
       }).start();
     }
