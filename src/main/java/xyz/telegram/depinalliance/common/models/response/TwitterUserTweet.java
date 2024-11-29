@@ -22,6 +22,7 @@ public class TwitterUserTweet {
     public String retweetId;
     @JsonProperty("in_reply_to_status_id")
     public String replyId;
-
+    @JsonProperty("quoted_status_id")
+    public String quoteId;
   }
 }

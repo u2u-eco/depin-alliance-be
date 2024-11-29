@@ -85,7 +85,7 @@ public class TwitterResource extends BaseResource {
       userSocial.twitterToken = state;
       userSocial.persist();
     }
-    redisService.clearCacheByPrefix("USER_SOCIAL_" + getTelegramId());
+    redisService.clear("USER_SOCIAL_" + getTelegramId());
     UriBuilder uriBuilder = UriBuilder.fromUri("https://x.com/i/oauth2/authorize").queryParam("response_type", "code")
       .queryParam("client_id", twitterConfig.clientId()).queryParam("redirect_uri", twitterConfig.callbackUrl())
       .queryParam("scope", "users.read follows.read tweet.read like.read offline.access").queryParam("state", state)
@@ -121,7 +121,7 @@ public class TwitterResource extends BaseResource {
       userSocial.twitterToken = state;
       userSocial.persist();
     }
-    redisService.clearCacheByPrefix("USER_SOCIAL_" + getTelegramId());
+    redisService.clear("USER_SOCIAL_" + getTelegramId());
     return ResponseData.ok();
   }
 
@@ -187,7 +187,7 @@ public class TwitterResource extends BaseResource {
             accountTwitter.create();
             accountTwitter.persist();
           }
-          redisService.clearCacheByPrefix("USER_SOCIAL_" + userSocial.userId);
+          redisService.clear("USER_SOCIAL_" + userSocial.userId);
           try {
             Mission mission = redisService.findMissionByType(Enums.MissionType.CONNECT_X);
             if (mission != null) {

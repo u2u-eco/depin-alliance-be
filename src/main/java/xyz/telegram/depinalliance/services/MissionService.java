@@ -131,7 +131,7 @@ public class MissionService {
       paramsUser.put("lastCheckIn", today);
       paramsUser.put("point", dailyCheckin.point);
       paramsUser.put("xp", dailyCheckin.xp);
-      paramsUser.put("pointEarned1",Utils.pointAirdrop(dailyCheckin.point));
+      paramsUser.put("pointEarned1", Utils.pointAirdrop(dailyCheckin.point));
       User.updateUser(
         sql + "lastCheckIn = :lastCheckIn, point = point + :point, pointEarned = pointEarned + :point, pointEarned1 = pointEarned1 + :pointEarned1, xp = xp + :xp where id = :id",
         paramsUser);
@@ -188,6 +188,7 @@ public class MissionService {
       case FOLLOW_TWITTER:
       case RETWEETS:
       case TWEET_REPLIES:
+      case TWEET_QUOTE:
         UserSocial userSocial = redisService.findUserSocial(user.id);
         if (userSocial == null || StringUtils.isBlank(userSocial.twitterUsername)) {
           throw new BusinessException(ResponseMessageConstants.USER_MUST_LINK_TWITTER);
@@ -364,8 +365,7 @@ public class MissionService {
           int c = new Random().nextInt(1000);
           if (c < (redisService.getSystemConfigInt(Enums.Config.RANDOM_PERCENT_VENTURE_MIND_AI))) {
             if (Event.updateTotalUsdt(new BigDecimal(1L), Enums.EventId.VENTURE_MIND_AI.getId())) {
-              UserItem.create(
-                new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.USDT_5.name()), null));
+              UserItem.create(new UserItem(user, redisService.findItemByCode(Enums.ItemSpecial.USDT_5.name()), null));
               return new MissionRewardResponse(1L, "5 $USDT", check.rewardImage);
             } else {
               Mission.update("rewardType = null where id = ?1", check.id);
@@ -477,6 +477,7 @@ public class MissionService {
       case FOLLOW_TWITTER:
       case RETWEETS:
       case TWEET_REPLIES:
+      case TWEET_QUOTE:
         UserSocial userSocial = redisService.findUserSocial(userId);
         if (userSocial == null || StringUtils.isBlank(userSocial.twitterUsername)) {
           throw new BusinessException(ResponseMessageConstants.USER_MUST_LINK_TWITTER);
