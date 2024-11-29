@@ -107,6 +107,21 @@ public class ScheduleMissionTwitter {
 
         }
       }).start();
+
+      new Thread(() -> {
+        while (true) {
+          try {
+            scheduleQuoteDaily();
+          } catch (Exception ignored) {
+          } finally {
+            try {
+              Thread.sleep(10000);
+            } catch (InterruptedException ignored) {
+            }
+          }
+
+        }
+      }).start();
     }
   }
 
@@ -234,6 +249,41 @@ public class ScheduleMissionTwitter {
           } else {
             logger.info("Verify reply " + isVerify + " user " + userMission.user.id + " not link twitter");
           }
+        }
+        updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
+      }
+    }
+  }
+
+  @ActivateRequestContext
+  void scheduleQuoteDaily() {
+    //verify Quote
+    long currentTime = Utils.getCalendar().getTimeInMillis();
+    long timeValidate = currentTime - twitterConfig.verifyTime();
+    long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
+    MissionDaily missionQuote = redisService.findMissionDailyByType(Enums.MissionType.TWEET_QUOTE);
+    List<Long> missionId = new ArrayList<>();
+    if (missionQuote != null) {
+      missionId.add(missionQuote.id);
+    }
+    if (!missionId.isEmpty()) {
+      List<UserMissionDaily> userMissions = UserMissionDaily.find(
+        "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
+        Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
+      for (UserMissionDaily userMission : userMissions) {
+        boolean isVerify = false;
+        UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+        if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
+          if (missionQuote.isFake) {
+            isVerify = true;
+            logger.info("Fake quote " + isVerify + " user " + userSocial.twitterUid + " " + missionQuote.referId);
+          } else {
+            isVerify = twitterService.isUserQuote(userSocial.twitterUid.toString(), missionQuote.referId,
+              missionQuote.timeStart);
+            logger.info("Verify quote " + isVerify + " user " + userSocial.twitterUid + " " + missionQuote.referId);
+          }
+        } else {
+          logger.info("Verify quote " + isVerify + " user " + userMission.user.id + " not link twitter");
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
       }

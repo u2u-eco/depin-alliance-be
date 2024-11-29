@@ -397,7 +397,7 @@ public class RedisService {
     };
     RBucket<List<UserMissionResponse>> value = redissonClient.getBucket(redisKey);
     if (value.isExists()) {
-      value.deleteAsync();
+      value.delete();
     }
   }
 
