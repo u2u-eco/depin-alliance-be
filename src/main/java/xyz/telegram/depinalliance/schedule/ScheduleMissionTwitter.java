@@ -166,10 +166,14 @@ public class ScheduleMissionTwitter {
     long currentTime = Utils.getCalendar().getTimeInMillis();
     long timeValidate = currentTime - twitterConfig.verifyTime();
     long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
-    MissionDaily mission = redisService.findMissionDailyByType(Enums.MissionType.LIKE_TWITTER);
-    if (mission != null) {
-      List<UserMissionDaily> userMissions = UserMissionDaily.find("mission.id = ?1 and status = ?2 and updatedAt <= ?3",
-        Sort.ascending("updatedAt"), mission.id, Enums.MissionStatus.VERIFYING, timeValidate).list();
+    List<MissionDaily> missions = redisService.findMissionDailyByType(Enums.MissionType.LIKE_TWITTER);
+    if (missions != null) {
+      List<Long> missionId = new ArrayList<>();
+      missions.forEach(mission -> missionId.add(mission.id));
+
+      List<UserMissionDaily> userMissions = UserMissionDaily.find(
+        "mission.id in (?1) and status = ?2 and updatedAt <= ?3", Sort.ascending("updatedAt"), missionId,
+        Enums.MissionStatus.VERIFYING, timeValidate).list();
       for (UserMissionDaily userMission : userMissions) {
         UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
         if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
@@ -188,10 +192,14 @@ public class ScheduleMissionTwitter {
     long currentTime = Utils.getCalendar().getTimeInMillis();
     long timeValidate = currentTime - twitterConfig.verifyTime();
     long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
-    MissionDaily missionPost = redisService.findMissionDailyByType(Enums.MissionType.RETWEETS);
+    List<MissionDaily> missionPosts = redisService.findMissionDailyByType(Enums.MissionType.RETWEETS);
     List<Long> missionId = new ArrayList<>();
-    if (missionPost != null) {
-      missionId.add(missionPost.id);
+    Map<Long, MissionDaily> missionDailyMap = new HashMap<>();
+    if (missionPosts != null) {
+      missionPosts.forEach(mission -> {
+        missionDailyMap.put(mission.id, mission);
+        missionId.add(mission.id);
+      });
     }
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
@@ -199,20 +207,19 @@ public class ScheduleMissionTwitter {
         Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
         boolean isVerify = false;
-        if (Objects.equals(userMission.mission.id, missionPost.id)) {
-          UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
-          if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
-            if (missionPost.isFake) {
-              isVerify = true;
-              logger.info("Fake retweet " + isVerify + " user " + userSocial.twitterUid + " " + missionPost.referId);
-            } else {
-              isVerify = twitterService.isUserRetweet(userSocial.twitterUid.toString(), missionPost.referId,
-                missionPost.timeStart);
-              logger.info("Verify retweet " + isVerify + " user " + userSocial.twitterUid + " " + missionPost.referId);
-            }
+        MissionDaily missionPost = missionDailyMap.get(userMission.mission.id);
+        UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+        if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
+          if (missionPost.isFake) {
+            isVerify = true;
+            logger.info("Fake retweet " + isVerify + " user " + userSocial.twitterUid + " " + missionPost.referId);
           } else {
-            logger.info("Verify retweet " + isVerify + " user " + userMission.user.id + " not link twitter");
+            isVerify = twitterService.isUserRetweet(userSocial.twitterUid.toString(), missionPost.referId,
+              missionPost.timeStart);
+            logger.info("Verify retweet " + isVerify + " user " + userSocial.twitterUid + " " + missionPost.referId);
           }
+        } else {
+          logger.info("Verify retweet " + isVerify + " user " + userMission.user.id + " not link twitter");
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
       }
@@ -226,10 +233,14 @@ public class ScheduleMissionTwitter {
     long currentTime = Utils.getCalendar().getTimeInMillis();
     long timeValidate = currentTime - twitterConfig.verifyTime();
     long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
-    MissionDaily missionReply = redisService.findMissionDailyByType(Enums.MissionType.TWEET_REPLIES);
+    List<MissionDaily> missionReplies = redisService.findMissionDailyByType(Enums.MissionType.TWEET_REPLIES);
     List<Long> missionId = new ArrayList<>();
-    if (missionReply != null) {
-      missionId.add(missionReply.id);
+    Map<Long, MissionDaily> missionDailyMap = new HashMap<>();
+    if (missionReplies != null) {
+      missionReplies.forEach(mission -> {
+        missionDailyMap.put(mission.id, mission);
+        missionId.add(mission.id);
+      });
     }
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
@@ -237,20 +248,19 @@ public class ScheduleMissionTwitter {
         Enums.MissionStatus.VERIFYING, timeValidate).page(0, 40).list();
       for (UserMissionDaily userMission : userMissions) {
         boolean isVerify = false;
-        if (Objects.equals(userMission.mission.id, missionReply.id)) {
-          UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
-          if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
-            if (missionReply.isFake) {
-              isVerify = true;
-              logger.info("Fake reply " + isVerify + " user " + userSocial.twitterUid + " " + missionReply.referId);
-            } else {
-              isVerify = twitterService.isUserReply(userSocial.twitterUid.toString(), missionReply.referId,
-                missionReply.timeStart);
-              logger.info("Verify reply " + isVerify + " user " + userSocial.twitterUid + " " + missionReply.referId);
-            }
+        MissionDaily missionReply = missionDailyMap.get(userMission.mission.id);
+        UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+        if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
+          if (missionReply.isFake) {
+            isVerify = true;
+            logger.info("Fake reply " + isVerify + " user " + userSocial.twitterUid + " " + missionReply.referId);
           } else {
-            logger.info("Verify reply " + isVerify + " user " + userMission.user.id + " not link twitter");
+            isVerify = twitterService.isUserReply(userSocial.twitterUid.toString(), missionReply.referId,
+              missionReply.timeStart);
+            logger.info("Verify reply " + isVerify + " user " + userSocial.twitterUid + " " + missionReply.referId);
           }
+        } else {
+          logger.info("Verify reply " + isVerify + " user " + userMission.user.id + " not link twitter");
         }
         updateUserMissionDaily(isVerify, userMission.id, userMission.user.id, currentDate);
       }
@@ -263,10 +273,14 @@ public class ScheduleMissionTwitter {
     long currentTime = Utils.getCalendar().getTimeInMillis();
     long timeValidate = currentTime - twitterConfig.verifyTime();
     long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
-    MissionDaily missionQuote = redisService.findMissionDailyByType(Enums.MissionType.TWEET_QUOTE);
+    List<MissionDaily> missionQuotes = redisService.findMissionDailyByType(Enums.MissionType.TWEET_QUOTE);
     List<Long> missionId = new ArrayList<>();
-    if (missionQuote != null) {
-      missionId.add(missionQuote.id);
+    Map<Long, MissionDaily> missionDailyMap = new HashMap<>();
+    if (missionQuotes != null) {
+      missionQuotes.forEach(mission -> {
+        missionDailyMap.put(mission.id, mission);
+        missionId.add(mission.id);
+      });
     }
     if (!missionId.isEmpty()) {
       List<UserMissionDaily> userMissions = UserMissionDaily.find(
@@ -275,6 +289,7 @@ public class ScheduleMissionTwitter {
       for (UserMissionDaily userMission : userMissions) {
         boolean isVerify = false;
         UserSocial userSocial = redisService.findUserSocial(userMission.user.id);
+        MissionDaily missionQuote = missionDailyMap.get(userMission.mission.id);
         if (userSocial != null && StringUtils.isNotBlank(userSocial.twitterUsername)) {
           if (missionQuote.isFake) {
             isVerify = true;
