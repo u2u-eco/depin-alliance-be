@@ -591,16 +591,16 @@ public class RedisService {
     return MissionDaily.findById(id);
   }
 
-  public MissionDaily findMissionDailyByType(Enums.MissionType type) {
+  public List<MissionDaily> findMissionDailyByType(Enums.MissionType type) {
     long currentDate = Utils.getNewDay().getTimeInMillis() / 1000L;
-    String redisKey = "MISSION_DAILY_TYPE_" + type.name() + "_" + currentDate;
+    String redisKey = "MISSION_DAILY_LIST_TYPE_" + type.name() + "_" + currentDate;
     try {
-      RBucket<MissionDaily> value = redissonClient.getBucket(redisKey);
+      RBucket<List<MissionDaily>> value = redissonClient.getBucket(redisKey);
       if (value.isExists()) {
         return value.get();
       }
       logger.info("Get from db and set cache " + redisKey + " ttl : 1 days");
-      MissionDaily object = MissionDaily.find("type = ?1 and date = ?2", type, currentDate).firstResult();
+      List<MissionDaily> object = MissionDaily.list("type = ?1 and date = ?2", type, currentDate);
       if (object != null) {
         value.setAsync(object, 1, TimeUnit.DAYS);
       }
